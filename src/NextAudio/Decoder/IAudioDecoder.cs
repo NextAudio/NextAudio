@@ -30,7 +30,7 @@ namespace NextAudio
         /// <param name="outputCount">The output count of the output buffer.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
         /// <returns>The number of bytes read.</returns>
-        ValueTask<int> DecodeAsync(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset, int outputCount, CancellationToken cancellationToken = default);
+        Task<int> DecodeAsync(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset, int outputCount, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Read and decode the input buffer and write to the output buffer.
