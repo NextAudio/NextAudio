@@ -5,7 +5,7 @@ namespace NextAudio
     /// <summary>
     /// Represents an audio encoder.
     /// </summary>
-    public interface IAudioEncoder
+    public interface IAudioEncoder : IDisposable
     {
         /// <summary>
         /// The channels number of the input audio.
