@@ -132,12 +132,12 @@ namespace NextAudio
 
             if (disposing)
             {
-                _decoder?.Dispose();
+                _decoder.Dispose();
 
-                Reader?.Complete();
-                Writer?.Complete();
-                InputReader?.Complete();
-                OutputWriter?.Complete();
+                Reader.Complete();
+                Writer.Complete();
+                InputReader.Complete();
+                OutputWriter.Complete();
             }
 
             _isDisposed = true;
@@ -157,7 +157,7 @@ namespace NextAudio
 
         private async ValueTask DisposeAsyncCore()
         {
-            _decoder?.Dispose();
+            _decoder.Dispose();
 
             await Reader.CompleteAsync();
             await Writer.CompleteAsync();
