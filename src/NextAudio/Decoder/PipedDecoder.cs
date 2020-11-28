@@ -60,7 +60,7 @@ namespace NextAudio.Decoder
         /// Runs the decoder pipeline reading from <see cref="Writer" /> and writing to the <see cref="Reader" />.
         /// </summary>
         /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
-        /// <returns>A <see cref="Task" /> that represents an asynchronous operation.</returns>
+        /// <returns>A <see cref="Task"/> that represents an asynchronous operation.</returns>
         public async Task DecodeAsync(CancellationToken cancellationToken = default)
         {
             try
@@ -94,7 +94,7 @@ namespace NextAudio.Decoder
 
                     var bytesReaded = _decoder.Decode(inputMemory.Span, outputBuffer.Span);
 
-                    if (bytesReaded < 0 || cancellationToken.IsCancellationRequested)
+                    if (bytesReaded <= 0 || cancellationToken.IsCancellationRequested)
                         return;
 
                     OutputWriter.Advance(bytesReaded);
