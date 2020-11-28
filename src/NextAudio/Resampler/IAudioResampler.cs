@@ -5,7 +5,7 @@ namespace NextAudio
     /// <summary>
     /// Represents an audio resampler.
     /// </summary>
-    public interface IResampler
+    public interface IAudioResampler
     {
         /// <summary>
         /// The input sample rate.
