@@ -25,13 +25,25 @@ namespace NextAudio.Utils
         /// <summary>
         /// Check if <paramref name="value"/> is <c>null</c>.
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="value">The value to be checked.</param>
         /// <typeparam name="T">The type of <paramref name="value"/>.</typeparam>
         /// <returns><c>true</c> if <paramref name="value"/> is <c>null</c></returns>
         public static bool IsNull<T>(this T? value)
             where T : class
         {
             return value == null;
+        }
+
+        /// <summary>
+        /// Check if <paramref name="value"/> is not <c>null</c>.
+        /// </summary>
+        /// <param name="value">The value to be checked.</param>
+        /// <typeparam name="T">The type of <paramref name="value" />.</typeparam>
+        /// <returns><c>true</c> if <paramref name="value"/> is not <c>null</c></returns>
+        public static bool IsNotNull<T>(this T? value)
+            where T : class
+        {
+            return value != null;
         }
     }
 }
