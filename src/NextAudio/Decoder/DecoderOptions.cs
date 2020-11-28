@@ -19,11 +19,11 @@ namespace NextAudio
         /// <summary>
         /// The channels number of the input audio.
         /// </summary>
-        public int Channels { get; }
+        public virtual int Channels { get; }
 
         /// <summary>
         /// The sample rate of the input audio.
         /// </summary>
-        public int SampleRate { get; }
+        public virtual int SampleRate { get; }
     }
 }

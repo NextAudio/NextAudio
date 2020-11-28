@@ -1,3 +1,4 @@
+using NextAudio.Utils;
 using System;
 using System.Buffers;
 
@@ -8,6 +9,19 @@ namespace NextAudio
     /// </summary>
     public abstract class BaseEncoder : IAudioEncoder
     {
+        /// <summary>
+        /// Creates a new instance of <see cref="BaseEncoder" />.
+        /// </summary>
+        /// <param name="options">The options for this encoder.</param>
+        protected BaseEncoder(EncoderOptions options)
+        {
+            options.NotNull(nameof(options));
+
+            Channels = options.Channels;
+            SampleRate = options.SampleRate;
+            BitRate = options.BitRate;
+        }
+
         /// <inheritdoc />
         public virtual int Channels { get; }
 

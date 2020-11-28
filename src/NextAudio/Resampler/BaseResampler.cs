@@ -1,3 +1,4 @@
+using NextAudio.Utils;
 using System;
 using System.Buffers;
 
@@ -8,17 +9,29 @@ namespace NextAudio
     /// </summary>
     public abstract class BaseResampler : IAudioResampler
     {
-        /// <inheritdoc />
-        public int InputSampleRate { get; }
+        /// <summary>
+        /// Creates a new instance of <see cref="BaseResampler" />.
+        /// </summary>
+        /// <param name="options">The options for this resampler.</param>
+        protected BaseResampler(ResamplerOptions options)
+        {
+            options.NotNull(nameof(options));
+
+            InputSampleRate = options.InputSampleRate;
+            OutputSampleRate = options.OutputSampleRate;
+        }
 
         /// <inheritdoc />
-        public int OutputSampleRate { get; }
+        public virtual int InputSampleRate { get; }
+
+        /// <inheritdoc />
+        public virtual int OutputSampleRate { get; }
 
         /// <inheritdoc />
         public abstract int Resample(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset, int outputCount);
 
         /// <inheritdoc />
-        public int Resample(ReadOnlySpan<byte> inputBuffer, Span<byte> outputBuffer)
+        public virtual int Resample(ReadOnlySpan<byte> inputBuffer, Span<byte> outputBuffer)
         {
             var sharedInputBuffer = ArrayPool<byte>.Shared.Rent(inputBuffer.Length);
             var sharedOutputBuffer = ArrayPool<byte>.Shared.Rent(outputBuffer.Length);
