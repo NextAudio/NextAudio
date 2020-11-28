@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace NextAudio
 {
     /// <summary>
-    /// A pipe based decoder that uses <see cref="IAudioDecoder" />.
+    /// A pipe based encoder that uses <see cref="IAudioEncoder" />.
     /// </summary>
-    public class PipedDecoder : IDisposable, IAsyncDisposable
+    public class PipedEncoder : IDisposable, IAsyncDisposable
     {
         private bool _isDisposed;
 
@@ -17,21 +17,21 @@ namespace NextAudio
         private readonly Pipe _outputPipe;
 
         /// <summary>
-        /// The decoder to be used for pipes.
+        /// The encoder to be used for pipes.
         /// </summary>
-        protected readonly IAudioDecoder _decoder;
+        protected readonly IAudioEncoder _encoder;
 
         /// <summary>
-        /// Creates a new instance of <see cref="PipedDecoder" />.
+        /// Creates a new instance of <see cref="PipedEncoder" />.
         /// </summary>
-        /// <param name="decoder">The decoder to be used for pipes.</param>
+        /// <param name="encoder">The encoder to be used for pipes.</param>
         /// <param name="options">The pipe options to be used for pipes.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="decoder" /> cannot be null.</exception>
-        public PipedDecoder(IAudioDecoder decoder, PipeOptions? options = null)
+        /// <exception cref="ArgumentNullException"><paramref name="encoder" /> cannot be null.</exception>
+        public PipedEncoder(IAudioEncoder encoder, PipeOptions? options = null)
         {
-            decoder.NotNull(nameof(decoder));
+            encoder.NotNull(nameof(encoder));
 
-            _decoder = decoder;
+            _encoder = encoder;
             _inputPipe = new Pipe(options ?? PipeOptions.Default);
             _outputPipe = new Pipe(options ?? PipeOptions.Default);
         }
@@ -39,39 +39,44 @@ namespace NextAudio
         /// <summary>
         /// The channels number of the input audio.
         /// </summary>
-        public virtual int Channels => _decoder.Channels;
+        public virtual int Channels => _encoder.Channels;
 
         /// <summary>
         /// The sample rate of the input audio.
         /// </summary>
-        public virtual int SampleRate => _decoder.SampleRate;
+        public virtual int SampleRate => _encoder.SampleRate;
 
         /// <summary>
-        /// Reader for the decoded audio data.
+        /// The requested bitrate for output data.
+        /// </summary>
+        public virtual int BitRate => _encoder.BitRate;
+
+        /// <summary>
+        /// Reader for the encoded audio data.
         /// </summary>
         public PipeReader Reader => _outputPipe.Reader;
 
         /// <summary>
-        /// Write for the encoded audio data.
+        /// Write for the decoded audio data.
         /// </summary>
         public PipeWriter Writer => _inputPipe.Writer;
 
         /// <summary>
-        /// Reader for encoded audio data.
+        /// Reader for decoded audio data.
         /// </summary>
         protected PipeReader InputReader => _inputPipe.Reader;
 
         /// <summary>
-        /// Writer for decoded audio data.
+        /// Writer for encoded audio data.
         /// </summary>
         protected PipeWriter OutputWriter => _outputPipe.Writer;
 
         /// <summary>
-        /// Runs the decoder pipeline reading from <see cref="Writer" /> and writing to the <see cref="Reader" />.
+        /// Runs the encoder pipeline reading from <see cref="Writer" /> and writing to the <see cref="Reader" />.
         /// </summary>
         /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
         /// <returns>A <see cref="Task"/> that represents an asynchronous operation.</returns>
-        public async Task DecodeAsync(CancellationToken cancellationToken = default)
+        public async Task EncodeAsync(CancellationToken cancellationToken = default)
         {
             try
             {
@@ -102,7 +107,7 @@ namespace NextAudio
 
                     var outputBuffer = OutputWriter.GetMemory();
 
-                    var bytesReaded = _decoder.Decode(inputMemory.Span, outputBuffer.Span);
+                    var bytesReaded = _encoder.Encode(inputMemory.Span, outputBuffer.Span);
 
                     if (bytesReaded <= 0 || cancellationToken.IsCancellationRequested)
                         return;
@@ -120,7 +125,7 @@ namespace NextAudio
         }
 
         /// <summary>
-        /// Resets the decoder pipeline.
+        /// Resets the encoder pipeline.
         /// </summary>
         public virtual void Reset()
         {
@@ -136,7 +141,7 @@ namespace NextAudio
         }
 
         /// <summary>
-        /// Releases the unmanaged resources used by the <see cref="PipedDecoder" /> and optionally releases the managed resources.
+        /// Releases the unmanaged resources used by the <see cref="PipedEncoder" /> and optionally releases the managed resources.
         /// </summary>
         /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
         protected void Dispose(bool disposing)
@@ -180,7 +185,7 @@ namespace NextAudio
         }
 
         /// <inheritdoc />
-        ~PipedDecoder()
+        ~PipedEncoder()
         {
             Dispose(false);
         }

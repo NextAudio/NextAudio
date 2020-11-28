@@ -51,7 +51,7 @@ namespace NextAudio
         }
 
         /// <summary>
-        /// Releases the unmanaged resources used by the <see cref="BaseDecoder" /> and optionally releases the managed resources.
+        /// Releases the unmanaged resources used by the <see cref="BaseEncoder" /> and optionally releases the managed resources.
         /// </summary>
         /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
         protected abstract void Dispose(bool disposing);
