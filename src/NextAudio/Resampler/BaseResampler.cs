@@ -57,7 +57,6 @@ namespace NextAudio
         public void Dispose()
         {
             Dispose(false);
-
             GC.SuppressFinalize(this);
         }
 
@@ -66,5 +65,11 @@ namespace NextAudio
         /// </summary>
         /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
         public abstract void Dispose(bool disposing);
+
+        /// <inheritdoc />
+        ~BaseResampler()
+        {
+            Dispose(false);
+        }
     }
 }
