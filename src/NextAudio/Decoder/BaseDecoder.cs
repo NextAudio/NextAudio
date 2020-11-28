@@ -1,3 +1,4 @@
+using NextAudio.Utils;
 using System;
 using System.Buffers;
 using System.Runtime.InteropServices;
@@ -17,6 +18,8 @@ namespace NextAudio
         /// <param name="options">The options for this decoder.</param>
         protected BaseDecoder(DecoderOptions options)
         {
+            options.NotNull(nameof(options));
+
             Channels = options.Channels;
             SampleRate = options.SampleRate;
         }

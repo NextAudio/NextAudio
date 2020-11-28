@@ -111,3 +111,6 @@ dotnet_naming_style.starts_with_i_pascal_case.capitalization = pascal_case
 
 dotnet_naming_style.starts_with_low_line_camel_case.required_prefix = _
 dotnet_naming_style.starts_with_low_line_camel_case.capitalization = camel_case
+
+# CA1816: Dispose methods should call SuppressFinalize
+dotnet_diagnostic.CA1816.severity = none
