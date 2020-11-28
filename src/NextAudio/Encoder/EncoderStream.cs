@@ -2,7 +2,7 @@ using NextAudio.Utils;
 using System.Buffers;
 using System.IO;
 
-namespace NextAudio.Encoder
+namespace NextAudio
 {
     /// <summary>
     /// A stream based encoder that uses <see cref="IAudioEncoder" />.
