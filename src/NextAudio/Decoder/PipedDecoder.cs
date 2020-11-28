@@ -4,7 +4,7 @@ using System.IO.Pipelines;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NextAudio.Decoder
+namespace NextAudio
 {
     /// <summary>
     /// A pipe based decoder that uses <see cref="IAudioDecoder" />.
