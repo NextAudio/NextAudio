@@ -71,7 +71,7 @@ namespace NextAudio
         /// </summary>
         /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
         /// <returns>A <see cref="Task"/> that represents an asynchronous operation.</returns>
-        public async Task DecodeAsync(CancellationToken cancellationToken = default)
+        public virtual async Task DecodeAsync(CancellationToken cancellationToken = default)
         {
             try
             {
