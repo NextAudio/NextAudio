@@ -12,8 +12,16 @@ namespace NextAudio
         private bool _isDisposed;
 
         private readonly bool _disposeSourceStream;
-        private readonly IAudioDecoder _decoder;
-        private readonly Stream _sourceStream;
+
+        /// <summary>
+        /// The decoder to be used on <see cref="Read"/>.
+        /// </summary>
+        protected readonly IAudioDecoder _decoder;
+
+        /// <summary>
+        /// The source <see cref="Stream" /> to be used to read input audio.
+        /// </summary>
+        protected readonly Stream _sourceStream;
 
         /// <summary>
         /// Creates a new instance of <see cref="DecoderStream" />.

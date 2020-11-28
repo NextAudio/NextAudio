@@ -9,13 +9,17 @@ namespace NextAudio
     /// <summary>
     /// A pipe based decoder that uses <see cref="IAudioDecoder" />.
     /// </summary>
-    public sealed class PipedDecoder : IDisposable, IAsyncDisposable
+    public class PipedDecoder : IDisposable, IAsyncDisposable
     {
         private bool _isDisposed;
 
         private readonly Pipe _inputPipe;
         private readonly Pipe _outputPipe;
-        private readonly IAudioDecoder _decoder;
+
+        /// <summary>
+        /// The decoder to be used for pipes.
+        /// </summary>
+        protected readonly IAudioDecoder _decoder;
 
         /// <summary>
         /// Creates a new instance of <see cref="PipedDecoder" />.
@@ -52,9 +56,15 @@ namespace NextAudio
         /// </summary>
         public PipeWriter Writer => _inputPipe.Writer;
 
-        private PipeReader InputReader => _inputPipe.Reader;
+        /// <summary>
+        /// Reader for encoded audio data.
+        /// </summary>
+        protected PipeReader InputReader => _inputPipe.Reader;
 
-        private PipeWriter OutputWriter => _outputPipe.Writer;
+        /// <summary>
+        /// Writer for decoded audio data.
+        /// </summary>
+        protected PipeWriter OutputWriter => _outputPipe.Writer;
 
         /// <summary>
         /// Runs the decoder pipeline reading from <see cref="Writer" /> and writing to the <see cref="Reader" />.
@@ -112,7 +122,7 @@ namespace NextAudio
         /// <summary>
         /// Resets the decoder pipeline.
         /// </summary>
-        public void Reset()
+        public virtual void Reset()
         {
             _inputPipe.Reset();
             _outputPipe.Reset();
