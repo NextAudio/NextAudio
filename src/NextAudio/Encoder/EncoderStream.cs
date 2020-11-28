@@ -129,5 +129,11 @@ namespace NextAudio
 
             _isDisposed = true;
         }
+
+        /// <inheritdoc />
+        ~EncoderStream()
+        {
+            Dispose(false);
+        }
     }
 }
