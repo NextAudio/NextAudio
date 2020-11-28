@@ -1,7 +1,7 @@
 namespace NextAudio
 {
     /// <summary>
-    /// Options for an <see cref="IAudioDecoder" />
+    /// Options for an <see cref="IAudioDecoder" />.
     /// </summary>
     public class DecoderOptions
     {
