@@ -124,5 +124,11 @@ namespace NextAudio
 
             _isDisposed = true;
         }
+
+        /// <inheritdoc />
+        ~DecoderStream()
+        {
+            Dispose(false);
+        }
     }
 }
