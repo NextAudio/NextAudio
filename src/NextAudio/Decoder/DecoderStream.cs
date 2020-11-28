@@ -11,6 +11,7 @@ namespace NextAudio
     {
         private bool _isDisposed;
 
+        private readonly bool _disposeSourceStream;
         private readonly IAudioDecoder _decoder;
         private readonly Stream _sourceStream;
 
@@ -34,6 +35,7 @@ namespace NextAudio
         /// <param name="decoder">The decoder to be used on <see cref="Read" />.</param>
         public DecoderStream(IAudioDecoder decoder) : this(decoder, new MemoryStream())
         {
+            _disposeSourceStream = true;
         }
 
         /// <summary>
@@ -107,9 +109,8 @@ namespace NextAudio
             if (_isDisposed)
                 return;
 
-            if (disposing)
+            if (disposing && _disposeSourceStream)
             {
-                _decoder.Dispose();
                 _sourceStream.Dispose();
             }
 
