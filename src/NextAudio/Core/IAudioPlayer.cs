@@ -18,7 +18,7 @@ namespace NextAudio
         /// <summary>
         /// The current playing track if has any.
         /// </summary>
-        AudioTrack? CurrentTrack { get; }
+        AudioTrackInfo? CurrentTrack { get; }
 
         /// <summary>
         /// The pipe reader for read data from the current playing audio track.
