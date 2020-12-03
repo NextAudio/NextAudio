@@ -19,5 +19,19 @@ namespace NextAudio
         /// <param name="query">The query to be used for search.</param>
         /// <returns>The result of the search.</returns>
         ValueTask<SearchResult> SearchAsync(string query);
+
+        /// <summary>
+        /// Get the audio track for the specified <see cref="AudioTrackInfo" />.
+        /// </summary>
+        /// <param name="trackInfo">The track info to get the audio track.</param>
+        /// <returns>An <see cref="AudioTrack" /> instance.</returns>
+        Task<AudioTrack> GetAudioTrackAsync(AudioTrackInfo trackInfo);
+
+        /// <summary>
+        /// Get the audio track for the specified <paramref name="identifier" />.
+        /// </summary>
+        /// <param name="identifier">The identifier to get the audio track.</param>
+        /// <returns>An <see cref="AudioTrack" /> instance.</returns>
+        Task<AudioTrack> GetAudioTrackAsync(string identifier);
     }
 }
