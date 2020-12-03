@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 namespace NextAudio
 {
@@ -11,5 +12,12 @@ namespace NextAudio
         /// The name of this audio provider.
         /// </summary>
         string Name { get; }
+
+        /// <summary>
+        /// Search for track for the specified <paramref name="query"/>.
+        /// </summary>
+        /// <param name="query">The query to be used for search.</param>
+        /// <returns>The result of the search.</returns>
+        ValueTask<SearchResult> SearchAsync(string query);
     }
 }
