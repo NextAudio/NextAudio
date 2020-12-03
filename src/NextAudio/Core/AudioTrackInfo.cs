@@ -12,15 +12,15 @@ namespace NextAudio
         /// </summary>
         /// <param name="title">The title of the track.</param>
         /// <param name="author">The author of the track if has any.</param>
-        /// <param name="length">The length of the track if is not a stream.</param>
+        /// <param name="duration">The duration of the track if is not a stream.</param>
         /// <param name="providerIdentifier">The identifier of the track for the provider if has any.</param>
         /// <param name="isStream">Indicates if the track is a stream.</param>
         /// <param name="uri">The uri of the track if has any.</param>
-        public AudioTrackInfo(string title, string? author = null, string? providerIdentifier = null, long? length = null, Uri? uri = null, bool isStream = false)
+        public AudioTrackInfo(string title, string? author = null, string? providerIdentifier = null, TimeSpan? duration = null, Uri? uri = null, bool isStream = false)
         {
             Title = title;
             Author = author;
-            Length = length;
+            Duration = duration;
             ProviderIdentifier = providerIdentifier;
             IsStream = isStream;
             Uri = uri;
@@ -37,10 +37,10 @@ namespace NextAudio
         public virtual string? Author { get; }
 
         /// <summary>
-        /// The length of the track if is not a stream.
+        /// The duration of the track if is not a stream.
         /// </summary>
         /// <value></value>
-        public virtual long? Length { get; }
+        public virtual TimeSpan? Duration { get; }
 
         /// <summary>
         /// The identifier of the track for the provider if has any.
