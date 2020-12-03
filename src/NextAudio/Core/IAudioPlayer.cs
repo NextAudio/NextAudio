@@ -26,6 +26,11 @@ namespace NextAudio
         PipeReader TrackReader { get; }
 
         /// <summary>
+        /// The playback output codec.
+        /// </summary>
+        AudioCodec OutputCodec { get; }
+
+        /// <summary>
         /// If has any playing track and if is not paused.
         /// </summary>
         bool IsPlaying { get; }
