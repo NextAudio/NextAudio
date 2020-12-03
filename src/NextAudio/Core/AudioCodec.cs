@@ -10,13 +10,15 @@ namespace NextAudio
         /// </summary>
         /// <param name="fullName">The full name of the codec.</param>
         /// <param name="name">The popular name of the codec (same as the file extension);</param>
+        /// <param name="container">The container name of the codec.</param>
         /// <param name="sampleRate">The sample rate of the codec.</param>
         /// <param name="channels">The number of channels of codec.</param>
         /// <param name="bitDepth">The bit depth of the codec.</param>
-        public AudioCodec(string fullName, string name, int sampleRate, int channels, int bitDepth)
+        public AudioCodec(string fullName, string name, string container, int sampleRate, int channels, int bitDepth)
         {
             FullName = fullName;
             Name = name;
+            Container = container;
             SampleRate = sampleRate;
             Channels = channels;
             BitDepth = bitDepth;
@@ -31,6 +33,11 @@ namespace NextAudio
         /// The popular name of the codec (same as the file extension);
         /// </summary>
         public virtual string Name { get; }
+
+        /// <summary>
+        /// The container name of the codec.
+        /// </summary>
+        public virtual string Container { get; }
 
         /// <summary>
         /// The sample rate of the audio stream.
