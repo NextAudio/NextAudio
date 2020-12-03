@@ -18,8 +18,8 @@ namespace NextAudio
         public abstract int Channels { get; }
 
         /// <summary>
-        /// The bits per sample of the audio stream.
+        /// The bit depth of the audio stream.
         /// </summary>
-        public abstract int BitsPerSample { get; }
+        public abstract int BitDepth { get; }
     }
 }
