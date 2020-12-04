@@ -227,6 +227,8 @@ namespace NextAudio.FFMpegCore
             if (GetVolume() == volume)
                 return default;
 
+            ValidateVolumeValue(volume, nameof(volume));
+
             Volatile.Write(ref volume, volume);
 
             if (!_writeTaskStarted || _currentTrack.IsNull() || _currentStream.IsNull())
