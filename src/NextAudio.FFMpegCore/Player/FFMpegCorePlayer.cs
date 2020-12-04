@@ -21,6 +21,7 @@ namespace NextAudio.FFMpegCore
         private int _volume = 100;
         private int _bufferSize = 200;
         private AudioTrack? _currentTrack;
+        private TaskCompletionSource<bool>? _pauseTsc;
 
         /// <summary>
         /// Creates a new instance of <see cref="FFMpegCorePlayer" />.
@@ -85,22 +86,44 @@ namespace NextAudio.FFMpegCore
         }
 
         /// <inheritdoc />
-        public ValueTask ResumeAsync(CancellationToken cancellationToken = default)
+        public ValueTask PauseAsync(CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            if (cancellationToken.IsCancellationRequested)
+                return default;
+
+            if (IsPaused)
+                return default;
+
+
+            _pauseTsc = new TaskCompletionSource<bool>();
+            IsPaused = true;
+
+            cancellationToken.Register(() =>
+            {
+                _pauseTsc.TrySetCanceled(cancellationToken);
+            });
+
+            return default;
         }
 
         /// <inheritdoc />
-        public ValueTask PauseAsync(CancellationToken cancellationToken = default)
+        public ValueTask ResumeAsync(CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            if (cancellationToken.IsCancellationRequested)
+                return default;
+
+            if (!IsPaused || _pauseTsc.IsNull())
+                return default;
+
+            _pauseTsc!.TrySetResult(true);
+            IsPaused = false;
+
+            return default;
         }
 
         /// <inheritdoc />
         public ValueTask SeekAsync(TimeSpan time, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+            => throw new NotSupportedException();
 
         /// <inheritdoc />
         public ValueTask SetVolumeAsync(int volume, CancellationToken cancellationToken = default)
