@@ -28,6 +28,7 @@ namespace NextAudio.Utils
         /// <param name="value">The value to be checked.</param>
         /// <typeparam name="T">The type of <paramref name="value"/>.</typeparam>
         /// <returns><c>true</c> if <paramref name="value"/> is <c>null</c></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNull<T>(this T? value)
             where T : class
         {
@@ -40,6 +41,7 @@ namespace NextAudio.Utils
         /// <param name="value">The value to be checked.</param>
         /// <typeparam name="T">The type of <paramref name="value" />.</typeparam>
         /// <returns><c>true</c> if <paramref name="value"/> is not <c>null</c></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNotNull<T>(this T? value)
             where T : class
         {
