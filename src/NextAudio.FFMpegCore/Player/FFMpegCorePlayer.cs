@@ -19,6 +19,7 @@ namespace NextAudio.FFMpegCore
         private bool _isPaused;
         private int _volume = 100;
         private int _bufferSize = 200;
+        private AudioTrack? _currentTrack;
 
         /// <summary>
         /// Creates a new instance of <see cref="FFMpegCorePlayer" />.
@@ -47,7 +48,7 @@ namespace NextAudio.FFMpegCore
         public TimeSpan Position { get; }
 
         /// <inheritdoc />
-        public AudioTrackInfo? CurrentTrack { get; }
+        public AudioTrackInfo? CurrentTrack => _currentTrack?.TrackInfo;
 
         /// <inheritdoc />
         public PipeReader TrackReader => _trackPipe.Reader;
@@ -68,8 +69,9 @@ namespace NextAudio.FFMpegCore
             private set => Volatile.Write(ref _isPaused, value);
         }
 
+        // TODO: Seek support.
         /// <inheritdoc />
-        public bool SeekSupported { get; }
+        public bool SeekSupported => false;
 
         /// <inheritdoc />
         public bool VolumeSupported => true;
