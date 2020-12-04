@@ -14,18 +14,26 @@ namespace NextAudio
         protected readonly Stream _sourceStream;
 
         /// <summary>
+        /// If the source stream should be disposed.
+        /// </summary>
+        private bool _disposeSourceStream;
+
+        /// <summary>
         /// Creates a new instance of <see cref="AudioTrack" />.
         /// </summary>
         /// <param name="sourceStream">The source stream for the audio track.</param>
         /// <param name="trackInfo">Information about the audio track.</param>
         /// <param name="codec">The codec for the audio track.</param>
+        /// <param name="disposeSourceStream">If the source stream should be disposed.</param>
         /// <param name="provider">The provider for the audio track.</param>
-        public AudioTrack(Stream sourceStream, AudioTrackInfo trackInfo, AudioCodec codec, IAudioProvider? provider = null)
+        public AudioTrack(Stream sourceStream, AudioTrackInfo trackInfo, AudioCodec codec, bool disposeSourceStream = false, IAudioProvider? provider = null)
         {
             _sourceStream = sourceStream;
             TrackInfo = trackInfo;
             Codec = codec;
             Provider = provider;
+
+            _disposeSourceStream = disposeSourceStream;
         }
 
         /// <summary>
@@ -61,6 +69,16 @@ namespace NextAudio
         }
 
         /// <inheritdoc />
+        public override AudioTrack Clone()
+        {
+            var copy = new AudioTrack(_sourceStream, TrackInfo, Codec, _disposeSourceStream, Provider);
+
+            _disposeSourceStream = false;
+
+            return copy;
+        }
+
+        /// <inheritdoc />
         public override void Flush()
             => _sourceStream.Flush();
 
@@ -79,5 +97,16 @@ namespace NextAudio
         /// <inheritdoc />
         public override void Write(byte[] buffer, int offset, int count)
             => throw new NotSupportedException();
+
+        /// <inheritdoc />
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (disposing && _disposeSourceStream)
+            {
+                _sourceStream.Dispose();
+            }
+        }
     }
 }

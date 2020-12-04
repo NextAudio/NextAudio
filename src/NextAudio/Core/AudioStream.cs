@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 
 namespace NextAudio
@@ -11,5 +12,8 @@ namespace NextAudio
         /// The codec of the audio stream.
         /// </summary>
         public abstract AudioCodec Codec { get; }
+
+        /// <inheritdoc />
+        public abstract AudioStream Clone();
     }
 }

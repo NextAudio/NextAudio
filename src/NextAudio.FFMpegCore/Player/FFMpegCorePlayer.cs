@@ -28,6 +28,8 @@ namespace NextAudio.FFMpegCore
         private AudioTrack? _currentTrack;
         private TaskCompletionSource<bool>? _pauseTsc;
         private MemoryStream? _currentStream;
+        private long? _oldPosition;
+        private bool _writeTaskStarted;
 
         /// <summary>
         /// Creates a new instance of <see cref="FFMpegCorePlayer" />.
@@ -110,7 +112,7 @@ namespace NextAudio.FFMpegCore
             _currentStream = new MemoryStream();
 
             await FFMpegArguments
-                    .FromPipeInput(new StreamPipeSource(audioTrack))
+                    .FromPipeInput(new StreamPipeSource(_currentTrack!))
                     .OutputToPipe(new StreamPipeSink(_currentStream!), options =>
                     {
                         var args = new List<string>();
@@ -145,10 +147,14 @@ namespace NextAudio.FFMpegCore
                     })
                     .ProcessAsynchronously();
 
-            _currentStream.Position = 0;
+            if (_oldPosition.HasValue)
+                _currentStream.Position = _oldPosition.Value;
+            else
+                _currentStream.Position = 0;
 
             await ResumeAsync(cancellationToken);
             IsPlaying = true;
+            _oldPosition = null;
         }
 
         /// <inheritdoc />
@@ -194,7 +200,21 @@ namespace NextAudio.FFMpegCore
         /// <inheritdoc />
         public ValueTask SetVolumeAsync(int volume, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            if (cancellationToken.IsCancellationRequested)
+                return default;
+
+            if (GetVolume() == volume)
+                return default;
+
+            Volatile.Write(ref volume, volume);
+
+            if (!_writeTaskStarted || _currentTrack.IsNull() || _currentStream.IsNull())
+                return default;
+
+            _oldPosition = _currentStream!.Position;
+            var currentTrackCopy = _currentTrack!.Clone();
+
+            return new ValueTask(PlayAsync(currentTrackCopy, cancellationToken));
         }
 
         /// <inheritdoc />
@@ -253,6 +273,7 @@ namespace NextAudio.FFMpegCore
                 _currentTrack?.Dispose();
             }
 
+            IsPlaying = false;
             _isDisposed = true;
         }
 
