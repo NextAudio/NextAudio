@@ -1,6 +1,7 @@
 using NextAudio.Utils;
 using System;
 using System.IO.Pipelines;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,6 +31,7 @@ namespace NextAudio.FFMpegCore
             options.NotNull(nameof(options));
             options.PipeOptions.NotNull(nameof(options.PipeOptions));
             options.OutputCodec.NotNull(nameof(options.OutputCodec));
+            ValidateVolumeValue(options.DefaultVolume, nameof(options.DefaultVolume));
 
             _trackPipe = new Pipe(options.PipeOptions);
             _cts = new CancellationTokenSource();
@@ -109,7 +111,10 @@ namespace NextAudio.FFMpegCore
         /// <inheritdoc />
         public ValueTask StopAsync(CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            if (cancellationToken.IsCancellationRequested)
+                return default;
+
+            return DisposeAsync();
         }
 
         /// <inheritdoc />
@@ -121,12 +126,20 @@ namespace NextAudio.FFMpegCore
             => Volatile.Write(ref _bufferSize, bufferSize);
 
         /// <inheritdoc />
-
         public int GetVolume()
             => Volatile.Read(ref _volume);
 
-        /// <inheritdoc />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void ValidateVolumeValue(int volume, string paramName)
+        {
+            if (volume < 0)
+                throw new ArgumentOutOfRangeException(paramName, "The minimum volume value must be greater than or equal to zero.");
 
+            if (volume > 150)
+                throw new ArgumentOutOfRangeException(paramName, "The maximum volume value must be less than or equal to 150.");
+        }
+
+        /// <inheritdoc />
         public void Dispose()
         {
             Dispose(true);
@@ -148,6 +161,7 @@ namespace NextAudio.FFMpegCore
                 _cts.Cancel(false);
                 TrackWriter.Complete();
                 TrackReader.Complete();
+                _currentTrack?.Dispose();
             }
 
             _isDisposed = true;
@@ -173,8 +187,12 @@ namespace NextAudio.FFMpegCore
                 return;
 
             _cts.Cancel(false);
+
             await TrackWriter.CompleteAsync();
             await TrackReader.CompleteAsync();
+
+            if (_currentTrack.IsNotNull())
+                await _currentTrack!.DisposeAsync();
         }
 
         /// <inheritdoc />
