@@ -18,6 +18,7 @@ namespace NextAudio.FFMpegCore
     public class FFMpegCorePlayer : IAudioPlayer
     {
         private readonly Pipe _trackPipe;
+        private readonly SemaphoreSlim _playSemaphore;
         private readonly CancellationTokenSource _cts;
 
         private bool _isDisposed;
@@ -43,6 +44,7 @@ namespace NextAudio.FFMpegCore
             ValidateVolumeValue(options.DefaultVolume, nameof(options.DefaultVolume));
 
             _trackPipe = new Pipe(options.PipeOptions);
+            _playSemaphore = new SemaphoreSlim(1, 1);
             _cts = new CancellationTokenSource();
 
             OutputCodec = options.OutputCodec;
@@ -101,62 +103,85 @@ namespace NextAudio.FFMpegCore
 
             var cts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken);
 
-            if (IsPlaying)
-                await PauseAsync(cts.Token);
+            await _playSemaphore.WaitAsync(cts.Token);
 
-            if (_currentTrack.IsNotNull())
-                await _currentTrack!.DisposeAsync();
+            try
+            {
+                if (IsPlaying)
+                    await PauseAsync(cts.Token);
 
-            if (_currentStream.IsNotNull())
-                await _currentStream!.DisposeAsync();
+                if (_currentTrack.IsNotNull())
+                    await _currentTrack!.DisposeAsync();
 
-            _currentTrack = audioTrack;
-            _currentStream = new MemoryStream();
+                if (_currentStream.IsNotNull())
+                    await _currentStream!.DisposeAsync();
 
-            await FFMpegArguments
-                    .FromPipeInput(new StreamPipeSource(_currentTrack!))
-                    .OutputToPipe(new StreamPipeSink(_currentStream!), options =>
-                    {
-                        var args = new List<string>();
+                _currentTrack = audioTrack;
+                _currentStream = new MemoryStream();
 
-                        var currentFormat = _currentTrack.Codec.Name;
-                        var outputFormat = OutputCodec.Name;
+                await FFMpegArguments
+                        .FromPipeInput(new StreamPipeSource(_currentTrack!))
+                        .OutputToPipe(new StreamPipeSink(_currentStream!), options =>
+                        {
+                            var args = new List<string>();
 
-                        if (!currentFormat.Equals(outputFormat))
-                            args.Add($"-f {outputFormat}");
+                            var currentFormat = _currentTrack.Codec.Name;
+                            var outputFormat = OutputCodec.Name;
 
-                        var currentChannels = _currentTrack.Codec.Channels;
-                        var outputChannels = OutputCodec.Channels;
+                            if (!currentFormat.Equals(outputFormat))
+                                args.Add($"-f {outputFormat}");
 
-                        if (currentChannels != outputChannels)
-                            args.Add($"-ac {outputChannels}");
+                            var currentChannels = _currentTrack.Codec.Channels;
+                            var outputChannels = OutputCodec.Channels;
 
-                        var currentSampleRate = _currentTrack.Codec.SampleRate;
-                        var outputSampleRate = OutputCodec.SampleRate;
+                            if (currentChannels != outputChannels)
+                                args.Add($"-ac {outputChannels}");
 
-                        if (currentSampleRate != outputSampleRate)
-                            args.Add($"-ar {outputSampleRate}");
+                            var currentSampleRate = _currentTrack.Codec.SampleRate;
+                            var outputSampleRate = OutputCodec.SampleRate;
 
-                        // TODO: see bit depth conversion?
+                            if (currentSampleRate != outputSampleRate)
+                                args.Add($"-ar {outputSampleRate}");
 
-                        var volume = GetVolume();
+                            // TODO: see bit depth conversion?
 
-                        if (volume != 100)
-                            args.Add($"-af {volume / 100f}");
+                            var volume = GetVolume();
 
-                        if (args.Any())
-                            options.WithCustomArgument(string.Join(' ', args));
-                    })
-                    .ProcessAsynchronously();
+                            if (volume != 100)
+                                args.Add($"-af {volume / 100f}");
 
-            if (_oldPosition.HasValue)
-                _currentStream.Position = _oldPosition.Value;
-            else
-                _currentStream.Position = 0;
+                            if (args.Any())
+                                options.WithCustomArgument(string.Join(' ', args));
+                        })
+                        .ProcessAsynchronously();
 
-            await ResumeAsync(cts.Token);
-            IsPlaying = true;
-            _oldPosition = null;
+                if (_oldPosition.HasValue)
+                    _currentStream.Position = _oldPosition.Value;
+                else
+                    _currentStream.Position = 0;
+
+                _oldPosition = null;
+
+                await ResumeAsync(cts.Token);
+
+                if (!_writeTaskStarted)
+                    _ = Task.Run(ProcessTrackAsync, cts.Token);
+            }
+            finally
+            {
+                if (!_isDisposed)
+                    _playSemaphore.Release();
+            }
+        }
+
+        private Task ProcessTrackAsync()
+        {
+            if (_writeTaskStarted)
+                return Task.CompletedTask;
+
+            _writeTaskStarted = true;
+
+            return Task.CompletedTask;
         }
 
         /// <inheritdoc />
@@ -168,19 +193,8 @@ namespace NextAudio.FFMpegCore
             if (IsPaused)
                 return default;
 
-
             _pauseTsc = new TaskCompletionSource<bool>();
             IsPaused = true;
-
-            var cts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken);
-
-            cancellationToken.Register((tsc) =>
-            {
-                if (tsc.IsNull() || tsc is not ValueTuple<TaskCompletionSource<bool>?, CancellationToken> tuple)
-                    return;
-
-                tuple.Item1?.TrySetCanceled(tuple.Item2);
-            }, (_pauseTsc, cts.Token));
 
             return default;
         }
@@ -284,6 +298,8 @@ namespace NextAudio.FFMpegCore
 
                 _currentTrack?.Dispose();
                 _currentStream?.Dispose();
+
+                _playSemaphore.Dispose();
             }
 
             IsPlaying = false;
@@ -311,6 +327,8 @@ namespace NextAudio.FFMpegCore
 
             _cts.Cancel(false);
             _cts.Dispose();
+
+            _playSemaphore.Dispose();
 
             await TrackWriter.CompleteAsync();
             await TrackReader.CompleteAsync();
