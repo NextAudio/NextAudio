@@ -1,6 +1,11 @@
+using FFMpegCore;
+using FFMpegCore.Pipes;
 using NextAudio.Utils;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.IO.Pipelines;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,6 +27,7 @@ namespace NextAudio.FFMpegCore
         private int _bufferSize = 200;
         private AudioTrack? _currentTrack;
         private TaskCompletionSource<bool>? _pauseTsc;
+        private MemoryStream? _currentStream;
 
         /// <summary>
         /// Creates a new instance of <see cref="FFMpegCorePlayer" />.
@@ -82,7 +88,67 @@ namespace NextAudio.FFMpegCore
         /// <inheritdoc />
         public async Task PlayAsync(AudioTrack audioTrack, CancellationToken cancellationToken = default)
         {
+            if (cancellationToken.IsCancellationRequested)
+                return;
 
+            audioTrack.NotNull(nameof(audioTrack));
+            audioTrack.TrackInfo.NotNull(nameof(audioTrack.TrackInfo));
+
+            // TODO: Audio analyzer.
+            audioTrack.Codec.NotNull(nameof(audioTrack.Codec));
+
+            if (IsPlaying)
+                await PauseAsync(cancellationToken);
+
+            if (_currentTrack.IsNotNull())
+                await _currentTrack!.DisposeAsync();
+
+            if (_currentStream.IsNotNull())
+                await _currentStream!.DisposeAsync();
+
+            _currentTrack = audioTrack;
+            _currentStream = new MemoryStream();
+
+            await FFMpegArguments
+                    .FromPipeInput(new StreamPipeSource(audioTrack))
+                    .OutputToPipe(new StreamPipeSink(_currentStream!), options =>
+                    {
+                        var args = new List<string>();
+
+                        var currentFormat = _currentTrack.Codec.Name;
+                        var outputFormat = OutputCodec.Name;
+
+                        if (!currentFormat.Equals(outputFormat))
+                            args.Add($"-f {outputFormat}");
+
+                        var currentChannels = _currentTrack.Codec.Channels;
+                        var outputChannels = OutputCodec.Channels;
+
+                        if (currentChannels != outputChannels)
+                            args.Add($"-ac {outputChannels}");
+
+                        var currentSampleRate = _currentTrack.Codec.SampleRate;
+                        var outputSampleRate = OutputCodec.SampleRate;
+
+                        if (currentSampleRate != outputSampleRate)
+                            args.Add($"-ar {outputSampleRate}");
+
+                        // TODO: see bit depth conversion?
+
+                        var volume = GetVolume();
+
+                        if (volume != 100)
+                            args.Add($"-af {volume / 100f}");
+
+                        if (args.Any())
+                            options.WithCustomArgument(string.Join(' ', args));
+                    })
+                    .ProcessAsynchronously();
+
+            _currentStream.Position = 0;
+
+            await ResumeAsync(cancellationToken);
+            IsPlaying = true;
         }
 
         /// <inheritdoc />
@@ -216,6 +282,9 @@ namespace NextAudio.FFMpegCore
 
             if (_currentTrack.IsNotNull())
                 await _currentTrack!.DisposeAsync();
+
+            if (_currentStream.IsNotNull())
+                await _currentStream!.DisposeAsync();
         }
 
         /// <inheritdoc />
