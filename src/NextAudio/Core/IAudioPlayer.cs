@@ -48,10 +48,10 @@ namespace NextAudio
         /// <summary>
         /// Play the requested audio track.
         /// </summary>
-        /// <param name="audioTrackInfo">The requested audio track to be played.</param>
+        /// <param name="audioTrack">The requested audio track to be played.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
         /// <returns>A <see cref="Task"/> that represents an asynchronous operation.</returns>
-        Task PlayAsync(AudioTrackInfo audioTrackInfo, CancellationToken cancellationToken = default);
+        Task PlayAsync(AudioTrack audioTrack, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Stop the playback and destroy the player.

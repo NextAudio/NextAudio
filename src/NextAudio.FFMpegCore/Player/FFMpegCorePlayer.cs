@@ -80,9 +80,9 @@ namespace NextAudio.FFMpegCore
         public bool VolumeSupported => true;
 
         /// <inheritdoc />
-        public Task PlayAsync(AudioTrackInfo audioTrackInfo, CancellationToken cancellationToken = default)
+        public async Task PlayAsync(AudioTrack audioTrack, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+
         }
 
         /// <inheritdoc />
