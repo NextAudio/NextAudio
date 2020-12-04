@@ -1,3 +1,4 @@
+using NextAudio.Utils;
 using System;
 using System.IO.Pipelines;
 using System.Threading;
@@ -5,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace NextAudio.FFMpegCore
 {
+    /// <summary>
+    /// Represents 
+    /// </summary>
     public class FFMpegCorePlayer : IAudioPlayer
     {
         private readonly Pipe _trackPipe;
@@ -14,17 +18,30 @@ namespace NextAudio.FFMpegCore
         private bool _isPlaying;
         private bool _isPaused;
         private int _volume = 100;
+        private int _bufferSize = 200;
 
-        public FFMpegCorePlayer()
+        /// <summary>
+        /// Creates a new instance of <see cref="FFMpegCorePlayer" />.
+        /// </summary>
+        /// <param name="options">The options for the player.</param>
+        public FFMpegCorePlayer(FFmpegCorePlayerOptions options)
         {
-            _trackPipe = new Pipe();
+            options.NotNull(nameof(options));
+            options.PipeOptions.NotNull(nameof(options.PipeOptions));
+            options.OutputCodec.NotNull(nameof(options.OutputCodec));
+
+            _trackPipe = new Pipe(options.PipeOptions);
             _cts = new CancellationTokenSource();
+
+            OutputCodec = options.OutputCodec;
+            _volume = options.DefaultVolume;
+            _bufferSize = options.DefaultBufferSize;
         }
 
         /// <summary>
         /// The requested codec output.
         /// </summary>
-        public AudioCodec CodecOutput { get; }
+        public AudioCodec OutputCodec { get; }
 
         /// <inheritdoc />
         public TimeSpan Position { get; }
@@ -82,12 +99,6 @@ namespace NextAudio.FFMpegCore
         }
 
         /// <inheritdoc />
-        public void SetBufferSize(int bufferSize)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc />
         public ValueTask SetVolumeAsync(int volume, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
@@ -100,11 +111,12 @@ namespace NextAudio.FFMpegCore
         }
 
         /// <inheritdoc />
-
         public int GetBufferSize()
-        {
-            throw new NotImplementedException();
-        }
+            => Volatile.Read(ref _bufferSize);
+
+        /// <inheritdoc />
+        public void SetBufferSize(int bufferSize)
+            => Volatile.Write(ref _bufferSize, bufferSize);
 
         /// <inheritdoc />
 
