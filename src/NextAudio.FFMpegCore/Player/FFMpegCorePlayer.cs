@@ -99,8 +99,10 @@ namespace NextAudio.FFMpegCore
             // TODO: Audio analyzer.
             audioTrack.Codec.NotNull(nameof(audioTrack.Codec));
 
+            var cts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken);
+
             if (IsPlaying)
-                await PauseAsync(cancellationToken);
+                await PauseAsync(cts.Token);
 
             if (_currentTrack.IsNotNull())
                 await _currentTrack!.DisposeAsync();
@@ -152,7 +154,7 @@ namespace NextAudio.FFMpegCore
             else
                 _currentStream.Position = 0;
 
-            await ResumeAsync(cancellationToken);
+            await ResumeAsync(cts.Token);
             IsPlaying = true;
             _oldPosition = null;
         }
@@ -170,10 +172,15 @@ namespace NextAudio.FFMpegCore
             _pauseTsc = new TaskCompletionSource<bool>();
             IsPaused = true;
 
-            cancellationToken.Register(() =>
+            var cts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken);
+
+            cancellationToken.Register((tsc) =>
             {
-                _pauseTsc.TrySetCanceled(cancellationToken);
-            });
+                if (tsc.IsNull() || tsc is not ValueTuple<TaskCompletionSource<bool>?, CancellationToken> tuple)
+                    return;
+
+                tuple.Item1?.TrySetCanceled(tuple.Item2);
+            }, (_pauseTsc, cts.Token));
 
             return default;
         }
@@ -214,7 +221,9 @@ namespace NextAudio.FFMpegCore
             _oldPosition = _currentStream!.Position;
             var currentTrackCopy = _currentTrack!.Clone();
 
-            return new ValueTask(PlayAsync(currentTrackCopy, cancellationToken));
+            var cts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken);
+
+            return new ValueTask(PlayAsync(currentTrackCopy, cts.Token));
         }
 
         /// <inheritdoc />
@@ -268,9 +277,13 @@ namespace NextAudio.FFMpegCore
             if (disposing)
             {
                 _cts.Cancel(false);
+                _cts.Dispose();
+
                 TrackWriter.Complete();
                 TrackReader.Complete();
+
                 _currentTrack?.Dispose();
+                _currentStream?.Dispose();
             }
 
             IsPlaying = false;
@@ -297,6 +310,7 @@ namespace NextAudio.FFMpegCore
                 return;
 
             _cts.Cancel(false);
+            _cts.Dispose();
 
             await TrackWriter.CompleteAsync();
             await TrackReader.CompleteAsync();
