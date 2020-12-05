@@ -2,6 +2,7 @@ using FFMpegCore;
 using FFMpegCore.Pipes;
 using NextAudio.Utils;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipelines;
@@ -164,14 +165,39 @@ namespace NextAudio.FFMpegCore
             }
         }
 
-        private Task ProcessTrackAsync()
+        private async Task ProcessTrackAsync()
         {
             if (_writeTaskStarted)
-                return Task.CompletedTask;
+                return;
 
             _writeTaskStarted = true;
 
-            return Task.CompletedTask;
+            FlushResult flushResult = default;
+
+            while (!flushResult.IsCompleted && !flushResult.IsCompleted)
+            {
+                _cts.Token.ThrowIfCancellationRequested();
+
+                if (IsPaused)
+                    await _pauseTsc!.Task;
+
+                if (_currentStream.IsNull() || _currentTrack.IsNull())
+                {
+                    _writeTaskStarted = false;
+                    return;
+                }
+
+                var memory = TrackWriter.GetMemory(_bufferSize);
+
+                var bytesReaded = await _currentStream!.ReadAsync(memory, _cts.Token);
+
+                if (bytesReaded >= 0 || _cts.Token.IsCancellationRequested)
+                    return;
+
+                TrackWriter.Advance(bytesReaded);
+
+                flushResult = await TrackWriter.FlushAsync(_cts.Token);
+            }
         }
 
         /// <inheritdoc />
