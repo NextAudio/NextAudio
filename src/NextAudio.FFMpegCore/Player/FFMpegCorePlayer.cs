@@ -22,8 +22,6 @@ namespace NextAudio.FFMpegCore
         private readonly CancellationTokenSource _cts;
 
         private bool _isDisposed;
-        private bool _isPlaying;
-        private bool _isPaused;
         private int _volume = 100;
         private int _bufferSize = 200;
         private AudioTrack? _currentTrack;
@@ -69,18 +67,10 @@ namespace NextAudio.FFMpegCore
         private PipeWriter TrackWriter => _trackPipe.Writer;
 
         /// <inheritdoc />
-        public bool IsPlaying
-        {
-            get => Volatile.Read(ref _isPlaying) && !Volatile.Read(ref _isPaused);
-            private set => Volatile.Write(ref _isPlaying, value);
-        }
+        public bool IsPlaying => !IsPaused && _writeTaskStarted && !_isDisposed;
 
         /// <inheritdoc />
-        public bool IsPaused
-        {
-            get => Volatile.Read(ref _isPaused);
-            private set => Volatile.Write(ref _isPaused, value);
-        }
+        public bool IsPaused => _pauseTsc.IsNotNull();
 
         // TODO: Seek support.
         /// <inheritdoc />
@@ -194,7 +184,6 @@ namespace NextAudio.FFMpegCore
                 return default;
 
             _pauseTsc = new TaskCompletionSource<bool>();
-            IsPaused = true;
 
             return default;
         }
@@ -209,7 +198,7 @@ namespace NextAudio.FFMpegCore
                 return default;
 
             _pauseTsc!.TrySetResult(true);
-            IsPaused = false;
+            _pauseTsc = null;
 
             return default;
         }
@@ -304,7 +293,6 @@ namespace NextAudio.FFMpegCore
                 _playSemaphore.Dispose();
             }
 
-            IsPlaying = false;
             _isDisposed = true;
         }
 
