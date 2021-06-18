@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBotSample.Services.Hosted;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +26,19 @@ namespace DiscordBotSample
                     services.Configure<DiscordSocketConfig>(config =>
                     {
                         config.AlwaysDownloadUsers = false;
+
+                        // ASP.NET Core logging will decide the correct.
+                        config.LogLevel = LogSeverity.Debug;
+                    });
+                    services.Configure<CommandServiceConfig>(config =>
+                    {
+                        config.DefaultRunMode = RunMode.Async;
+                        config.SeparatorChar = ' ';
+                        config.CaseSensitiveCommands = true;
+                        config.IgnoreExtraArgs = true;
+
+                        // ASP.NET Core logging will decide the correct.
+                        config.LogLevel = LogSeverity.Debug;
                     });
 
                     services.AddSingleton(sp =>
@@ -32,9 +47,16 @@ namespace DiscordBotSample
 
                         return new DiscordSocketClient(config.Value);
                     });
+                    services.AddSingleton(sp =>
+                    {
+                        var config = sp.GetRequiredService<IOptions<CommandServiceConfig>>();
+
+                        return new CommandService(config.Value);
+                    });
                     
                     services.AddHostedService<DiscordToMicrosoftLoggingService>();
                     services.AddHostedService<DiscordBotStartService>();
+                    services.AddHostedService<DiscordCommandHandlerService>();
                 });
     }
 }
