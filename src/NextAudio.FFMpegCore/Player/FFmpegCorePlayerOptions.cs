@@ -8,7 +8,7 @@ namespace NextAudio.FFMpegCore
     public class FFmpegCorePlayerOptions
     {
         // Yes this container is not correct.
-        private static readonly AudioCodec DefaultOutputCodec = new AudioCodec("PCM", "s16le", "WAV", 48000, 2, 16);
+        private static readonly AudioCodec DefaultOutputCodec = new("PCM", "s16le", "WAV", 48000, 2, 16);
 
         /// <summary>
         /// The requested output codec.

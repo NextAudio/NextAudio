@@ -1,4 +1,3 @@
-using NextAudio.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -42,8 +41,8 @@ namespace NextAudio
         public IEnumerator<TTrackInfo> GetEnumerator()
         {
             lock (_source)
-                for (var node = _source.First; node.IsNotNull(); node = node.Next)
-                    yield return node!.Value;
+                for (var node = _source.First; node != null; node = node.Next)
+                    yield return node.Value;
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -52,7 +51,8 @@ namespace NextAudio
         /// <inheritdoc />
         public void Remove(TTrackInfo trackInfo)
         {
-            trackInfo.NotNull(nameof(trackInfo));
+            if (trackInfo == null)
+                throw new ArgumentNullException(nameof(trackInfo));
 
             lock (_source)
                 _source.Remove(trackInfo);
@@ -65,11 +65,11 @@ namespace NextAudio
             {
                 var currentNode = _source.First;
 
-                for (var i = 0; i <= index && currentNode.IsNotNull(); i++)
+                for (var i = 0; i <= index && currentNode != null; i++)
                 {
                     if (i != index)
                     {
-                        currentNode = currentNode!.Next;
+                        currentNode = currentNode.Next;
                         continue;
                     }
 
@@ -77,7 +77,7 @@ namespace NextAudio
                     break;
                 }
 
-                if (currentNode.IsNull())
+                if (currentNode == null)
                     throw new ArgumentOutOfRangeException(nameof(index));
 
                 return currentNode!.Value;
@@ -105,16 +105,16 @@ namespace NextAudio
             lock (_source)
             {
                 var currentNode = _source.First;
-                while (tempIndex != startIndex && currentNode.IsNotNull())
+                while (tempIndex != startIndex && currentNode != null)
                 {
                     tempIndex++;
-                    currentNode = currentNode!.Next;
+                    currentNode = currentNode.Next;
                 }
 
                 var nextNode = currentNode?.Next;
-                for (var i = 0; i < endIndex && currentNode.IsNotNull(); i++)
+                for (var i = 0; i < endIndex && currentNode != null; i++)
                 {
-                    var tempValue = currentNode!.Value;
+                    var tempValue = currentNode.Value;
                     removed[i] = tempValue;
 
                     _source.Remove(currentNode);
@@ -137,7 +137,7 @@ namespace NextAudio
                 var shadow = new TTrackInfo[_source.Count];
                 var i = 0;
 
-                for (var node = _source.First; node.IsNotNull(); node = node.Next)
+                for (var node = _source.First; node != null; node = node.Next)
                 {
                     var random = new Random(BitConverter.ToInt32(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())));
 
@@ -146,7 +146,7 @@ namespace NextAudio
                     if (i != j)
                         shadow[i] = shadow[j];
 
-                    shadow[j] = node!.Value;
+                    shadow[j] = node.Value;
                     i++;
                 }
 
@@ -168,14 +168,14 @@ namespace NextAudio
                     return false;
                 }
 
-                if (_source.First.IsNull())
+                if (_source.First == null)
                 {
                     trackInfo = default;
                     return true;
                 }
 
                 var result = _source.First?.Value;
-                if (result.IsNull())
+                if (result == null)
                 {
                     trackInfo = default;
                     return false;
@@ -191,7 +191,8 @@ namespace NextAudio
         /// <inheritdoc />
         public bool TryEnqueue(TTrackInfo trackInfo)
         {
-            trackInfo.NotNull(nameof(trackInfo));
+            if (trackInfo == null)
+                throw new ArgumentNullException(nameof(trackInfo));
 
             lock (_source)
                 _source.AddLast(trackInfo);
@@ -204,13 +205,13 @@ namespace NextAudio
         {
             lock (_source)
             {
-                if (_source.First.IsNull())
+                if (_source.First == null)
                 {
                     trackInfo = default;
                     return false;
                 }
 
-                trackInfo = _source.First!.Value;
+                trackInfo = _source.First.Value;
                 return true;
             }
         }

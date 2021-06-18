@@ -1,6 +1,5 @@
 using FFMpegCore;
 using FFMpegCore.Pipes;
-using NextAudio.Utils;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
@@ -37,9 +36,19 @@ namespace NextAudio.FFMpegCore
         /// <param name="options">The options for the player.</param>
         public FFMpegCorePlayer(FFmpegCorePlayerOptions options)
         {
-            options.NotNull(nameof(options));
-            options.PipeOptions.NotNull(nameof(options.PipeOptions));
-            options.OutputCodec.NotNull(nameof(options.OutputCodec));
+            if (options == null)
+                throw new ArgumentNullException(nameof(options));
+
+#pragma warning disable CA2208
+
+            if (options.PipeOptions == null)
+                throw new ArgumentNullException($"{nameof(options)}.{nameof(options.PipeOptions)}");
+
+            if (options.OutputCodec == null)
+                throw new ArgumentNullException($"{nameof(options)}.{nameof(options.OutputCodec)}");
+
+#pragma warning disable CA2208
+
             ValidateVolumeValue(options.DefaultVolume, nameof(options.DefaultVolume));
 
             _trackPipe = new Pipe(options.PipeOptions);
@@ -71,7 +80,7 @@ namespace NextAudio.FFMpegCore
         public bool IsPlaying => !IsPaused && _writeTaskStarted && !_isDisposed;
 
         /// <inheritdoc />
-        public bool IsPaused => _pauseTsc.IsNotNull();
+        public bool IsPaused => _pauseTsc != null;
 
         // TODO: Seek support.
         /// <inheritdoc />
@@ -86,11 +95,17 @@ namespace NextAudio.FFMpegCore
             if (cancellationToken.IsCancellationRequested)
                 return;
 
-            audioTrack.NotNull(nameof(audioTrack));
-            audioTrack.TrackInfo.NotNull(nameof(audioTrack.TrackInfo));
+            if (audioTrack == null)
+                throw new ArgumentNullException(nameof(audioTrack));
+
+#pragma warning disable CA2208
+            if (audioTrack.TrackInfo == null)
+                throw new ArgumentNullException($"{nameof(audioTrack)}.{nameof(audioTrack.TrackInfo)}");
 
             // TODO: Audio analyzer.
-            audioTrack.Codec.NotNull(nameof(audioTrack.Codec));
+            if (audioTrack.Codec == null)
+                throw new ArgumentNullException($"{nameof(audioTrack)}.{nameof(audioTrack.Codec)}");
+#pragma warning disable CA2208
 
             var cts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken);
 
@@ -101,10 +116,10 @@ namespace NextAudio.FFMpegCore
                 if (IsPlaying)
                     await PauseAsync(cts.Token);
 
-                if (_currentTrack.IsNotNull())
+                if (_currentTrack != null)
                     await _currentTrack!.DisposeAsync();
 
-                if (_currentStream.IsNotNull())
+                if (_currentStream != null)
                     await _currentStream!.DisposeAsync();
 
                 _currentTrack = audioTrack;
@@ -181,7 +196,7 @@ namespace NextAudio.FFMpegCore
                 if (IsPaused)
                     await _pauseTsc!.Task;
 
-                if (_currentStream.IsNull() || _currentTrack.IsNull())
+                if (_currentStream == null || _currentTrack == null)
                 {
                     _writeTaskStarted = false;
                     return;
@@ -220,7 +235,7 @@ namespace NextAudio.FFMpegCore
             if (cancellationToken.IsCancellationRequested)
                 return default;
 
-            if (!IsPaused || _pauseTsc.IsNull())
+            if (!IsPaused || _pauseTsc == null)
                 return default;
 
             _pauseTsc!.TrySetResult(true);
@@ -246,7 +261,7 @@ namespace NextAudio.FFMpegCore
 
             Volatile.Write(ref volume, volume);
 
-            if (!_writeTaskStarted || _currentTrack.IsNull() || _currentStream.IsNull())
+            if (!_writeTaskStarted || _currentTrack == null || _currentStream == null)
                 return default;
 
             _oldPosition = _currentStream!.Position;
@@ -349,17 +364,11 @@ namespace NextAudio.FFMpegCore
             await TrackWriter.CompleteAsync();
             await TrackReader.CompleteAsync();
 
-            if (_currentTrack.IsNotNull())
-                await _currentTrack!.DisposeAsync();
+            if (_currentTrack != null)
+                await _currentTrack.DisposeAsync();
 
-            if (_currentStream.IsNotNull())
-                await _currentStream!.DisposeAsync();
-        }
-
-        /// <inheritdoc />
-        ~FFMpegCorePlayer()
-        {
-            Dispose(false);
+            if (_currentStream != null)
+                await _currentStream.DisposeAsync();
         }
     }
 }
