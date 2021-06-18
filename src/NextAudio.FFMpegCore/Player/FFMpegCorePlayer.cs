@@ -126,8 +126,8 @@ namespace NextAudio.FFMpegCore
                 _currentStream = new MemoryStream();
 
                 await FFMpegArguments
-                        .FromPipeInput(new StreamPipeSource(_currentTrack!))
-                        .OutputToPipe(new StreamPipeSink(_currentStream!), options =>
+                        .FromPipeInput(new StreamPipeSource(_currentTrack))
+                        .OutputToPipe(new StreamPipeSink(_currentStream), options =>
                         {
                             var args = new List<string>();
 
