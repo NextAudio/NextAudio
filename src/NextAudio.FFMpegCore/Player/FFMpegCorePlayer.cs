@@ -25,7 +25,7 @@ namespace NextAudio.FFMpegCore
         private int _volume = 100;
         private int _bufferSize = 200;
         private AudioTrack? _currentTrack;
-        private TaskCompletionSource<bool>? _pauseTsc;
+        private TaskCompletionSource? _pauseTsc;
         private MemoryStream? _currentStream;
         private long? _oldPosition;
         private bool _writeTaskStarted;
@@ -224,7 +224,7 @@ namespace NextAudio.FFMpegCore
             if (IsPaused)
                 return default;
 
-            _pauseTsc = new TaskCompletionSource<bool>();
+            _pauseTsc = new();
 
             return default;
         }
@@ -238,7 +238,7 @@ namespace NextAudio.FFMpegCore
             if (!IsPaused || _pauseTsc == null)
                 return default;
 
-            _pauseTsc.TrySetResult(true);
+            _pauseTsc.TrySetResult();
             _pauseTsc = null;
 
             return default;

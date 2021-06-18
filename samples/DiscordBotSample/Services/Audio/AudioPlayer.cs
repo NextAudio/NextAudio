@@ -10,6 +10,8 @@ namespace DiscordBotSample.Services.Audio
 {
     public class AudioPlayer : IAsyncDisposable
     {
+        public static readonly AudioCodec OPUS_CODEC = new("Opus", "libopus", "libopus", 48000, 2, 16);
+
         private readonly FFMpegCorePlayer _underlyingPlayer;
         private IAudioClient _audioClient;
 
@@ -21,7 +23,7 @@ namespace DiscordBotSample.Services.Audio
 
             var options = new FFmpegCorePlayerOptions
             {
-                OutputCodec = new AudioCodec("Opus", "libopus", "libopus", 48000, 2, 16),
+                OutputCodec = OPUS_CODEC,
             };
 
             _underlyingPlayer = new(options);
