@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using DiscordBotSample.Services.Audio;
 using DiscordBotSample.Services.Hosted;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -34,7 +35,7 @@ namespace DiscordBotSample
                     {
                         config.DefaultRunMode = RunMode.Async;
                         config.SeparatorChar = ' ';
-                        config.CaseSensitiveCommands = true;
+                        config.CaseSensitiveCommands = false;
                         config.IgnoreExtraArgs = true;
 
                         // ASP.NET Core logging will decide the correct.
@@ -53,6 +54,8 @@ namespace DiscordBotSample
 
                         return new CommandService(config.Value);
                     });
+
+                    services.AddSingleton<AudioService>();
                     
                     services.AddHostedService<DiscordToMicrosoftLoggingService>();
                     services.AddHostedService<DiscordBotStartService>();
