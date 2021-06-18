@@ -26,7 +26,7 @@ namespace NextAudio.FFMpegCore
         private int _bufferSize = 200;
         private AudioTrack? _currentTrack;
         private TaskCompletionSource? _pauseTsc;
-        private MemoryStream? _currentStream;
+        private Stream? _currentStream;
         private long? _oldPosition;
         private bool _writeTaskStarted;
 
@@ -123,43 +123,59 @@ namespace NextAudio.FFMpegCore
                     await _currentStream.DisposeAsync();
 
                 _currentTrack = audioTrack;
-                _currentStream = new MemoryStream();
 
-                await FFMpegArguments
-                        .FromPipeInput(new StreamPipeSource(_currentTrack))
-                        .OutputToPipe(new StreamPipeSink(_currentStream), options =>
-                        {
-                            var args = new List<string>();
+                var currentFormat = _currentTrack.Codec.Name;
+                var outputFormat = OutputCodec.Name;
 
-                            var currentFormat = _currentTrack.Codec.Name;
-                            var outputFormat = OutputCodec.Name;
+                var formatMatch = currentFormat.Equals(outputFormat);
 
-                            if (!currentFormat.Equals(outputFormat))
-                                args.Add($"-f {outputFormat}");
+                var currentChannels = _currentTrack.Codec.Channels;
+                var outputChannels = OutputCodec.Channels;
 
-                            var currentChannels = _currentTrack.Codec.Channels;
-                            var outputChannels = OutputCodec.Channels;
+                var channelsMatch = currentChannels == outputChannels;
 
-                            if (currentChannels != outputChannels)
-                                args.Add($"-ac {outputChannels}");
+                var currentSampleRate = _currentTrack.Codec.SampleRate;
+                var outputSampleRate = OutputCodec.SampleRate;
 
-                            var currentSampleRate = _currentTrack.Codec.SampleRate;
-                            var outputSampleRate = OutputCodec.SampleRate;
+                var sampleRateMatch = currentSampleRate == outputSampleRate; 
 
-                            if (currentSampleRate != outputSampleRate)
-                                args.Add($"-ar {outputSampleRate}");
+                if (!formatMatch || !channelsMatch || !sampleRateMatch)
+                {
+                    _currentStream = new MemoryStream();
 
-                            // TODO: see bit depth conversion?
+                    await FFMpegArguments
+                            .FromPipeInput(new StreamPipeSource(_currentTrack))
+                            .OutputToPipe(new StreamPipeSink(_currentStream), options =>
+                            {
+                                var args = new List<string>();
 
-                            var volume = GetVolume();
+                                if (!formatMatch)
+                                    args.Add($"-f {outputFormat}");
+                                
 
-                            if (volume != 100)
-                                args.Add($"-af {volume / 100f}");
+                                if (!channelsMatch)
+                                    args.Add($"-ac {outputChannels}");
 
-                            if (args.Any())
-                                options.WithCustomArgument(string.Join(' ', args));
-                        })
-                        .ProcessAsynchronously();
+
+                                if (!sampleRateMatch)
+                                    args.Add($"-ar {outputSampleRate}");
+
+                                // TODO: see bit depth conversion?
+
+                                var volume = GetVolume();
+
+                                if (volume != 100)
+                                    args.Add($"-af {volume / 100f}");
+
+                                if (args.Any())
+                                    options.WithCustomArgument(string.Join(' ', args));
+                            })
+                            .ProcessAsynchronously();
+                }
+                else
+                {
+                    _currentStream = _currentTrack;
+                }
 
                 if (_oldPosition.HasValue)
                     _currentStream.Position = _oldPosition.Value;
@@ -206,7 +222,7 @@ namespace NextAudio.FFMpegCore
 
                 var bytesReaded = await _currentStream!.ReadAsync(memory, _cts.Token);
 
-                if (bytesReaded >= 0 || _cts.Token.IsCancellationRequested)
+                if (bytesReaded <= 0 || _cts.Token.IsCancellationRequested)
                     return;
 
                 TrackWriter.Advance(bytesReaded);
