@@ -1,4 +1,5 @@
 using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -14,12 +15,14 @@ namespace DiscordBotSample.Services.Hosted
         private const string BASE_CATEGORY_NAME = "Discord.Net";
 
         private readonly DiscordSocketClient _client;
+        private readonly CommandService _commands;
         private readonly ILoggerFactory _loggerFactory;
         private readonly ConcurrentDictionary<string, ILogger> _loggers;
 
-        public DiscordToMicrosoftLoggingService(DiscordSocketClient client, ILoggerFactory loggerFactory)
+        public DiscordToMicrosoftLoggingService(DiscordSocketClient client, CommandService commands, ILoggerFactory loggerFactory)
         {
             _client = client;
+            _commands = commands;
             _loggerFactory = loggerFactory;
             
             _loggers = new();
@@ -31,6 +34,7 @@ namespace DiscordBotSample.Services.Hosted
                 return Task.CompletedTask;
             
             _client.Log += LogAsync;
+            _commands.Log += LogAsync;
 
             return Task.CompletedTask;
         }
@@ -41,6 +45,7 @@ namespace DiscordBotSample.Services.Hosted
                 return Task.CompletedTask;
 
             _client.Log -= LogAsync;
+            _commands.Log -= LogAsync;
 
             return Task.CompletedTask;
         }
