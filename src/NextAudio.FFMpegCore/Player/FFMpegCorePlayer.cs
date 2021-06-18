@@ -117,10 +117,10 @@ namespace NextAudio.FFMpegCore
                     await PauseAsync(cts.Token);
 
                 if (_currentTrack != null)
-                    await _currentTrack!.DisposeAsync();
+                    await _currentTrack.DisposeAsync();
 
                 if (_currentStream != null)
-                    await _currentStream!.DisposeAsync();
+                    await _currentStream.DisposeAsync();
 
                 _currentTrack = audioTrack;
                 _currentStream = new MemoryStream();
@@ -238,7 +238,7 @@ namespace NextAudio.FFMpegCore
             if (!IsPaused || _pauseTsc == null)
                 return default;
 
-            _pauseTsc!.TrySetResult(true);
+            _pauseTsc.TrySetResult(true);
             _pauseTsc = null;
 
             return default;
@@ -264,7 +264,7 @@ namespace NextAudio.FFMpegCore
             if (!_writeTaskStarted || _currentTrack == null || _currentStream == null)
                 return default;
 
-            _oldPosition = _currentStream!.Position;
+            _oldPosition = _currentStream.Position;
             var currentTrackCopy = _currentTrack!.Clone();
 
             var cts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken);
