@@ -220,14 +220,18 @@ namespace NextAudio.FFMpegCore
 
                 var memory = TrackWriter.GetMemory(_bufferSize);
 
-                var bytesReaded = await _currentStream!.ReadAsync(memory, _cts.Token);
-
-                if (bytesReaded <= 0 || _cts.Token.IsCancellationRequested)
-                    return;
+                var bytesReaded = await _currentStream.ReadAsync(memory, _cts.Token);
 
                 TrackWriter.Advance(bytesReaded);
 
                 flushResult = await TrackWriter.FlushAsync(_cts.Token);
+
+                if (bytesReaded <= 0 || _cts.Token.IsCancellationRequested)
+                {
+                    await TrackWriter.CompleteAsync();
+                    _writeTaskStarted = false;
+                    return;
+                }
             }
         }
 

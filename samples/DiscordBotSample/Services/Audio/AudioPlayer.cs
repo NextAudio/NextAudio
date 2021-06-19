@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using NextAudio;
 using NextAudio.FFMpegCore;
 using System;
+using System.IO.Pipelines;
 using System.Threading.Tasks;
 
 namespace DiscordBotSample.Services.Audio
@@ -21,10 +22,7 @@ namespace DiscordBotSample.Services.Audio
 
             Options = new();
 
-            var options = new FFmpegCorePlayerOptions
-            {
-                OutputCodec = OPUS_CODEC,
-            };
+            var options = new FFmpegCorePlayerOptions();
 
             _underlyingPlayer = new(options);
         }
@@ -51,8 +49,12 @@ namespace DiscordBotSample.Services.Audio
             _audioClient = await voiceChannel.ConnectAsync(true, false, false);
         }
 
-        public Task PlayAsync(AudioTrack audioTrack)
-            => _underlyingPlayer.PlayAsync(audioTrack);
+        public async Task PlayAsync(AudioTrack audioTrack)
+        {
+            await _underlyingPlayer.PlayAsync(audioTrack);
+
+            _ = Task.Run(TransmitTask);
+        }
 
         public async Task StopAsync()
         {
@@ -69,6 +71,40 @@ namespace DiscordBotSample.Services.Audio
 
         public ValueTask SetVolumeAsync(int volume)
             => _underlyingPlayer.SetVolumeAsync(volume);
+
+        private async Task TransmitTask()
+        {
+            using var outStream = _audioClient.CreatePCMStream(AudioApplication.Music);
+
+            ReadResult result = default;
+
+            while (!result.IsCompleted && !result.IsCanceled)
+            {
+                result = await _underlyingPlayer.TrackReader.ReadAsync();
+
+                var position = result.Buffer.Start;
+                var consumed = position;
+
+                try
+                {
+                    while (result.Buffer.TryGet(ref position, out var memory))
+                    {
+                        await outStream.WriteAsync(memory);
+
+                        consumed = position;
+                    }
+
+                    consumed = result.Buffer.End;
+                }
+                finally
+                {
+                    _underlyingPlayer.TrackReader.AdvanceTo(consumed);
+                }
+            }
+
+            await _underlyingPlayer.TrackReader.CompleteAsync();
+        }
+
 
         public Task DisconnectAsync()
             => DisposeAsync().AsTask();
