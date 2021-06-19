@@ -13,5 +13,7 @@ namespace DiscordBotSample.Modules.Audio
         {
             _audioService = audioService;
         }
+
+        private AudioPlayer Player => _audioService.GetPlayer(Context.Guild) ?? _audioService.CreatePlayer(Context.Guild);
     }
 }

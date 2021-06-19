@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DiscordBotSample.Modules.Audio
 {
-    public partial class AudioModule : ModuleBase<ScopedSocketCommandContext>
+    public partial class AudioModule
     {
         [Command("play")]
         public async Task PlayAsync([Remainder] string query)
@@ -19,11 +19,9 @@ namespace DiscordBotSample.Modules.Audio
 
             var audioTrack = new AudioTrack(fileStrem, trackInfo, AudioPlayer.OPUS_CODEC, true, null);
 
-            var player = _audioService.GetPlayer(Context.Guild) ?? _audioService.CreatePlayer(Context.Guild);
+            await Player.ConnectAsync(((SocketGuildUser)Context.User).VoiceChannel.Id);
 
-            await player.ConnectAsync(((SocketGuildUser)Context.User).VoiceChannel.Id);
-
-            await player.PlayAsync(audioTrack);
+            await Player.PlayAsync(audioTrack);
         }
     }
 }
