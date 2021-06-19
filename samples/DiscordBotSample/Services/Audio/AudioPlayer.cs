@@ -15,6 +15,7 @@ namespace DiscordBotSample.Services.Audio
 
         private readonly FFMpegCorePlayer _underlyingPlayer;
         private IAudioClient _audioClient;
+        private bool _transmitTaskStarted;
 
         public AudioPlayer(SocketGuild guild)
         {
@@ -45,7 +46,7 @@ namespace DiscordBotSample.Services.Audio
                 return;
 
             var voiceChannel = Guild.GetVoiceChannel(voiceChannelId);
-            
+
             _audioClient = await voiceChannel.ConnectAsync(true, false, false);
         }
 
@@ -53,7 +54,8 @@ namespace DiscordBotSample.Services.Audio
         {
             await _underlyingPlayer.PlayAsync(audioTrack);
 
-            _ = Task.Run(TransmitTask);
+            if (!_transmitTaskStarted)
+                _ = Task.Run(TransmitTask);
         }
 
         public async Task StopAsync()
@@ -74,6 +76,13 @@ namespace DiscordBotSample.Services.Audio
 
         private async Task TransmitTask()
         {
+            if (_transmitTaskStarted)
+                return;
+
+            _transmitTaskStarted = true;
+
+            await Task.Delay(10);
+
             using var outStream = _audioClient.CreatePCMStream(AudioApplication.Music);
 
             ReadResult result = default;
@@ -103,8 +112,9 @@ namespace DiscordBotSample.Services.Audio
             }
 
             await _underlyingPlayer.TrackReader.CompleteAsync();
-        }
 
+            _transmitTaskStarted = false;
+        }
 
         public Task DisconnectAsync()
             => DisposeAsync().AsTask();

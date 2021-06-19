@@ -1,7 +1,6 @@
 using FFMpegCore;
 using FFMpegCore.Pipes;
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipelines;
@@ -137,7 +136,7 @@ namespace NextAudio.FFMpegCore
                 var currentSampleRate = _currentTrack.Codec.SampleRate;
                 var outputSampleRate = OutputCodec.SampleRate;
 
-                var sampleRateMatch = currentSampleRate == outputSampleRate; 
+                var sampleRateMatch = currentSampleRate == outputSampleRate;
 
                 if (!formatMatch || !channelsMatch || !sampleRateMatch)
                 {
@@ -151,7 +150,7 @@ namespace NextAudio.FFMpegCore
 
                                 if (!formatMatch)
                                     args.Add($"-f {outputFormat}");
-                                
+
 
                                 if (!channelsMatch)
                                     args.Add($"-ac {outputChannels}");
@@ -202,6 +201,14 @@ namespace NextAudio.FFMpegCore
                 return;
 
             _writeTaskStarted = true;
+
+            try
+            {
+                _trackPipe.Reset();
+            }
+            catch
+            {
+            }
 
             FlushResult flushResult = default;
 
