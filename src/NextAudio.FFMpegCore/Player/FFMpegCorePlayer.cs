@@ -2,6 +2,7 @@ using FFMpegCore;
 using FFMpegCore.Pipes;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.IO.Pipelines;
 using System.Linq;
@@ -142,7 +143,7 @@ namespace NextAudio.FFMpegCore
                 {
                     _currentStream = new MemoryStream();
 
-                    await FFMpegArguments
+                    var builder = FFMpegArguments
                             .FromPipeInput(new StreamPipeSource(_currentTrack))
                             .OutputToPipe(new StreamPipeSink(_currentStream), options =>
                             {
@@ -151,10 +152,8 @@ namespace NextAudio.FFMpegCore
                                 if (!formatMatch)
                                     args.Add($"-f {outputFormat}");
 
-
                                 if (!channelsMatch)
                                     args.Add($"-ac {outputChannels}");
-
 
                                 if (!sampleRateMatch)
                                     args.Add($"-ar {outputSampleRate}");
@@ -163,13 +162,19 @@ namespace NextAudio.FFMpegCore
 
                                 var volume = GetVolume();
 
-                                if (volume != 100)
-                                    args.Add($"-af {volume / 100f}");
+                                if (volume != 100 || _oldPosition != null)
+                                {
+                                    var formattedVolume = (volume / 100f).ToString(NumberFormatInfo.InvariantInfo);
+                                    args.Add($"-af \"volume={formattedVolume}\"");
+                                }
 
                                 if (args.Any())
                                     options.WithCustomArgument(string.Join(' ', args));
-                            })
-                            .ProcessAsynchronously();
+                            });
+
+                    //Debug.WriteLine(builder.Arguments);
+
+                    await builder.ProcessAsynchronously();
                 }
                 else
                 {
@@ -286,13 +291,16 @@ namespace NextAudio.FFMpegCore
 
             ValidateVolumeValue(volume, nameof(volume));
 
-            Volatile.Write(ref volume, volume);
+            Volatile.Write(ref _volume, volume);
 
             if (!_writeTaskStarted || _currentTrack == null || _currentStream == null)
                 return default;
 
             _oldPosition = _currentStream.Position;
             var currentTrackCopy = _currentTrack!.Clone();
+
+            if (currentTrackCopy.CanSeek)
+                currentTrackCopy.Position = 0;
 
             var cts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken);
 

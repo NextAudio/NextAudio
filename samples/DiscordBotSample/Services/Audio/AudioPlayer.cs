@@ -42,7 +42,7 @@ namespace DiscordBotSample.Services.Audio
 
         public async Task ConnectAsync(ulong voiceChannelId)
         {
-            if (VoiceChannel != null)
+            if (_audioClient != null && _audioClient.ConnectionState == ConnectionState.Connected)
                 return;
 
             var voiceChannel = Guild.GetVoiceChannel(voiceChannelId);
