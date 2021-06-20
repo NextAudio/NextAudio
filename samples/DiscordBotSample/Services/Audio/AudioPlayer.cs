@@ -74,6 +74,9 @@ namespace DiscordBotSample.Services.Audio
         public ValueTask SetVolumeAsync(int volume)
             => _underlyingPlayer.SetVolumeAsync(volume);
 
+        public ValueTask SeekAsync(TimeSpan time)
+            => _underlyingPlayer.SeekAsync(time);
+
         private async Task TransmitTask()
         {
             if (_transmitTaskStarted)

@@ -66,7 +66,19 @@ namespace NextAudio.FFMpegCore
         public AudioCodec OutputCodec { get; }
 
         /// <inheritdoc />
-        public TimeSpan Position { get; }
+        public TimeSpan Position
+        {
+            get
+            {
+                if (!SeekSupported)
+                    return default;
+
+                if (!_writeTaskStarted || _currentTrack == null || _currentStream == null)
+                    return default;
+
+                return TimeSpan.FromSeconds((double)_currentTrack.Position / GetAverageBytesPerSecond(OutputCodec));
+            }
+        }
 
         /// <inheritdoc />
         public AudioTrackInfo? CurrentTrack => _currentTrack?.TrackInfo;
@@ -82,9 +94,8 @@ namespace NextAudio.FFMpegCore
         /// <inheritdoc />
         public bool IsPaused => _pauseTsc != null;
 
-        // TODO: Seek support.
         /// <inheritdoc />
-        public bool SeekSupported => false;
+        public bool SeekSupported => OutputCodec.FullName.Equals("PCM");
 
         /// <inheritdoc />
         public bool VolumeSupported => true;
@@ -278,7 +289,20 @@ namespace NextAudio.FFMpegCore
 
         /// <inheritdoc />
         public ValueTask SeekAsync(TimeSpan time, CancellationToken cancellationToken = default)
-            => throw new NotSupportedException();
+        {
+            if (!SeekSupported)
+                throw new NotSupportedException();
+
+            if (!_writeTaskStarted || _currentTrack == null || _currentStream == null)
+                return default;
+
+            if (!_currentStream.CanSeek)
+                throw new NotSupportedException();
+
+            _currentStream.Position = (long)(time.TotalSeconds * GetAverageBytesPerSecond(OutputCodec));
+
+            return default;
+        }
 
         /// <inheritdoc />
         public ValueTask SetVolumeAsync(int volume, CancellationToken cancellationToken = default)
@@ -404,6 +428,13 @@ namespace NextAudio.FFMpegCore
 
             if (_currentStream != null)
                 await _currentStream.DisposeAsync();
+        }
+
+        private static int GetAverageBytesPerSecond(AudioCodec codec)
+        {
+            var blockAlign = (short)(codec.Channels * (codec.BitDepth / 8));
+
+            return codec.SampleRate * blockAlign;
         }
     }
 }
