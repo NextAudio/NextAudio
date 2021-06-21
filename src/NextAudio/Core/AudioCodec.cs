@@ -30,7 +30,7 @@ namespace NextAudio
         public virtual string FullName { get; }
 
         /// <summary>
-        /// The popular name of the codec (same as the file extension);
+        /// The popular name of the codec (can be the same as the file extension);
         /// </summary>
         public virtual string Name { get; }
 
