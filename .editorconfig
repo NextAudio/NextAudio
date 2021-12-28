@@ -213,8 +213,6 @@ file_header_template = Licensed to the .NET Foundation under one or more agreeme
 
 # IDE0161: Convert to file-scoped namespace
 dotnet_diagnostic.IDE0161.severity = warning
-
-[**/{test,samples,perf}/**.{cs,vb}]
 # CA1018: Mark attributes with AttributeUsageAttribute
 dotnet_diagnostic.CA1018.severity = suggestion
 # CA1507: Use nameof to express symbol names
@@ -256,9 +254,3 @@ dotnet_diagnostic.IDE0044.severity = suggestion
 
 # CA2016: Forward the 'CancellationToken' parameter to methods that take one
 dotnet_diagnostic.CA2016.severity = suggestion
-
-# Defaults for content in the shared src/ and shared runtime dir
-
-[{**/Shared/runtime/**.{cs,vb},src/Shared/test/Shared.Tests/runtime/**.{cs,vb},**/microsoft.extensions.hostfactoryresolver.sources/**.{cs,vb}}]
-# IDE0161: Convert to file-scoped namespace
-dotnet_diagnostic.IDE0161.severity = silent

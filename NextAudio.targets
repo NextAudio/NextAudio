@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <Optimize>True</Optimize>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DebugType>Portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <Authors>Renanrcp, NextAudio contributors</Authors>
+    <Company>NextAudio</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/NextAudio/NextAudio</PackageProjectUrl>
+    <!-- <PackageIconUrl></PackageIconUrl>
+    <PackageIcon></PackageIcon> -->
+    <RepositoryUrl>https://github.com/NextAudio/NextAudio</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(VersionSuffix)' != '' And '$(BuildNumber)' != ''">
+    <Version>$(VersionPrefix)-$(VersionSuffix)-$(BuildNumber)</Version>
+    <AssemblyVersion>$(VersionPrefix).$(BuildNumber)</AssemblyVersion>
+    <FileVersion>$(VersionPrefix).$(BuildNumber)</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(VersionSuffix)' != '' And '$(BuildNumber)' == ''">
+    <Version>$(VersionPrefix)-$(VersionSuffix)</Version>
+    <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+    <FileVersion>$(VersionPrefix).0</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(VersionSuffix)' == ''">
+    <Version>$(VersionPrefix)</Version>
+    <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+    <FileVersion>$(VersionPrefix).0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- <None Include="NextAudio.png" Pack="true" PackagePath="/" /> -->
+  </ItemGroup>
+
+</Project>
