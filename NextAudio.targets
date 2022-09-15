@@ -4,6 +4,7 @@
     <VersionPrefix>1.0.0</VersionPrefix>
     <Optimize>True</Optimize>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugType>Portable</DebugType>
   </PropertyGroup>
 
