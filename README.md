@@ -1,5 +1,5 @@
-# NextAudio
 <p align="center">
+  <img src="banner.png" />
 	</br>
 	<a href="https://github.com/NextAudio/NextAudio/actions">
 		<img src="https://img.shields.io/github/workflow/status/NextAudio/NextAudio/.NET?label=BUILD%20STATUS&logo=github&style=for-the-badge&logoWidth=20&labelColor=0d0d0d" />
