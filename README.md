@@ -2,7 +2,7 @@
   <img src="banner.png" />
 	</br>
 	<a href="https://github.com/NextAudio/NextAudio/actions">
-		<img src="https://img.shields.io/github/workflow/status/NextAudio/NextAudio/.NET?label=BUILD%20STATUS&logo=github&style=for-the-badge&logoWidth=20&labelColor=0d0d0d" />
+	<img src="https://img.shields.io/endpoint?label=BUILD%20STATUS&logo=github&logoWidth=20&labelColor=0d0d0d&style=for-the-badge&url=https://github-workflow-status-badge.vercel.app/api/NextAudio/NextAudio/build-test-lint.yml" />
 	</a>
 	<a href="https://dotnet.microsoft.com/download">
 		<img src="https://img.shields.io/badge/dotnet-6+-blueviolet?label=.NET&logo=.net&style=for-the-badge&logoWidth=20&labelColor=0d0d0d" />
