@@ -7,8 +7,8 @@ assignees: ''
 
 ---
 
-## Proposal/Pain
-Which this user story will solve?
+## Description
+Which problem this user story will solve?
 
 ## Features
 Which features/tasks this user story will have?
