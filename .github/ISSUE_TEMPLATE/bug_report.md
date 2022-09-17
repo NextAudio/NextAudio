@@ -2,7 +2,7 @@
 name: Bug report
 about: Create a report about something that is not working
 title: ''
-labels: ''
+labels: 'bug'
 assignees: ''
 
 ---
@@ -18,7 +18,7 @@ Steps to reproduce the behavior:
 4. See error
 
 **Exceptions**
-If any, add exception stack trace. 
+If any, add exception stack trace.
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
