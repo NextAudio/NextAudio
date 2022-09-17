@@ -17,8 +17,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- <InternalsVisibleTo Include="NextAudio.UnitTests" />
-    <InternalsVisibleTo Include="NextAudio.FunctionalTests" /> -->
+    <InternalsVisibleTo Include="NextAudio.Matroska.UnitTests" />
+    <InternalsVisibleTo Include="NextAudio.Matroska.FunctionalTests" />
   </ItemGroup>
 
   <ItemGroup>
