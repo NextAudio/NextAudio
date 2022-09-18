@@ -45,12 +45,7 @@ public abstract class AudioDemuxer : ReadOnlyAudioStream
     /// <param name="buffer">The input buffer to write the demuxed audio.</param>
     /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
     /// <returns>The number of bytes written to the <paramref name="buffer" />.</returns>
-    public virtual ValueTask<int> DemuxAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
-    {
-        return cancellationToken.IsCancellationRequested
-            ? ValueTask.FromCanceled<int>(cancellationToken)
-            : ValueTask.FromResult(Demux(buffer.Span));
-    }
+    public abstract ValueTask<int> DemuxAsync(Memory<byte> buffer, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Asynchronously demux the audio writing to the <paramref name="buffer" />.
