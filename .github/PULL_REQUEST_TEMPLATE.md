@@ -29,7 +29,7 @@ Please check if your PR fulfills the following requirements:
 - [ ] Yes
 - [ ] No
 
-<!-- If this introduces a breaking change, please describe the impact and migration path for existing applications below. -->
+<!-- If this introduces a breaking change, please describe the impact and migration path for existing applications below, or if is linked to a relevant issue, just ignore (PLEASE DON'T REMOVE THE SECTION) -->
 
 
 ## Other information
