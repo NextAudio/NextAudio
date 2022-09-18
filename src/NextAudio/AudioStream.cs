@@ -1,111 +1,171 @@
 // Licensed to the NextAudio under one or more agreements.
 // NextAudio licenses this file to you under the MIT license.
 
-using System.ComponentModel;
+using NextAudio.Internal;
 
 namespace NextAudio;
 
 /// <summary>
 /// Represents an audio stream.
 /// </summary>
-public abstract class AudioStream : Stream
+public abstract class AudioStream : IAsyncDisposable, IDisposable
 {
+    ///
+    ~AudioStream()
+    {
+        Dispose(false);
+    }
+
+    /// <summary>
+    /// Indicates if this stream was disposed.
+    /// </summary>
+    protected bool IsDisposed { get; private set; }
+
+    /// <inheritdoc cref="Stream.CanRead" />
+    public abstract bool CanRead { get; }
+
+    /// <inheritdoc cref="Stream.CanSeek" />
+    public abstract bool CanSeek { get; }
+
+    /// <inheritdoc cref="Stream.CanWrite" />
+    public abstract bool CanWrite { get; }
+
+    /// <inheritdoc cref="Stream.Length" />
+    public abstract long Length { get; }
+
+    /// <inheritdoc cref="Stream.Position" />
+    public abstract long Position { get; set; }
+
     /// <summary>
     /// Creates a clone of this stream.
     /// </summary>
     /// <returns>A new cloned stream.</returns>
     public abstract AudioStream Clone();
 
-    #region Disable Browse of unused stream methods
+    /// <inheritdoc cref="Stream.Seek(long, SeekOrigin)" />
+    public abstract long Seek(long offset, SeekOrigin origin);
 
-    /// <inheritdoc/>
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
-    public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback? callback, object? state)
+    /// <inheritdoc cref="Stream.Read(Span{byte})" />
+    public abstract int Read(Span<byte> buffer);
+
+    /// <inheritdoc cref="Stream.Write(ReadOnlySpan{byte})" />
+    public abstract void Write(ReadOnlySpan<byte> buffer);
+
+    /// <inheritdoc cref="Stream.Read(byte[], int, int)" />
+    public virtual int Read(byte[] buffer, int offset, int count)
     {
-        return base.BeginRead(buffer, offset, count, callback, state);
+        return Read(new(buffer, offset, count));
+    }
+
+    /// <inheritdoc cref="Stream.Write(byte[], int, int)" />
+    public virtual void Write(byte[] buffer, int offset, int count)
+    {
+        Write(new(buffer, offset, count));
+    }
+
+    /// <inheritdoc cref="Stream.ReadAsync(Memory{byte}, CancellationToken)" />
+    public virtual ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+    {
+        return cancellationToken.IsCancellationRequested
+            ? ValueTask.FromCanceled<int>(cancellationToken)
+            : ValueTask.FromResult(Read(buffer.Span));
+    }
+
+    /// <summary>
+    /// Asynchronously reads a sequence of bytes from the current stream, advances the
+    /// position within the stream by the number of bytes read, and monitors cancellation
+    /// requests.
+    /// </summary>
+    /// <param name="buffer">The buffer to write the data into.</param>
+    /// <param name="offset">The byte offset in buffer at which to begin writing data from the stream.</param>
+    /// <param name="count">The maximum number of bytes to read.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None" />.</param>
+    /// <returns>
+    /// A <see cref="Task" /> that represents the asynchronous read operation. The value of the TResult
+    /// parameter contains the total number of bytes read into the buffer. The result
+    /// value can be less than the number of bytes requested if the number of bytes currently
+    /// available is less than the requested number, or it can be 0 (zero) if the end
+    /// of the stream has been reached.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">buffer is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">offset or count is negative.</exception>
+    /// <exception cref="ArgumentException">The sum of offset and count is larger than the buffer length.</exception>
+    /// <exception cref="NotSupportedException">The stream does not support reading.</exception>
+    /// <exception cref="ObjectDisposedException">The stream has been disposed.</exception>
+    /// <exception cref="InvalidOperationException">The stream is currently in use by a previous read operation.</exception>
+    public virtual ValueTask<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
+    {
+        return ReadAsync(new(buffer, offset, count), cancellationToken);
+    }
+
+    /// <inheritdoc cref="Stream.WriteAsync(ReadOnlyMemory{byte}, CancellationToken)" />
+    public virtual ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+    {
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return ValueTask.FromCanceled(cancellationToken);
+        }
+
+        Write(buffer.Span);
+
+        return ValueTask.CompletedTask;
+    }
+
+    /// <summary>
+    /// Asynchronously writes a sequence of bytes to the current stream, advances the
+    /// current position within this stream by the number of bytes written, and monitors
+    /// cancellation requests.
+    /// </summary>
+    /// <param name="buffer">The buffer to write data from.</param>
+    /// <param name="offset">The zero-based byte offset in buffer from which to begin copying bytes to the stream.</param>
+    /// <param name="count">The maximum number of bytes to write.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None" />.</param>
+    /// <returns>A <see cref="ValueTask" /> that represents the asynchronous write operation.</returns>
+    /// <exception cref="ArgumentNullException">buffer is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">offset or count is negative.</exception>
+    /// <exception cref="ArgumentException">The sum of offset and count is larger than the buffer length.</exception>
+    /// <exception cref="NotSupportedException">The stream does not support reading.</exception>
+    /// <exception cref="ObjectDisposedException">The stream has been disposed.</exception>
+    /// <exception cref="InvalidOperationException">The stream is currently in use by a previous read operation.</exception>
+    public virtual ValueTask WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
+    {
+        return WriteAsync(new(buffer, offset, count), cancellationToken);
+    }
+
+    /// <inheritdoc cref="Stream.Dispose(bool)" />
+    protected abstract void Dispose(bool disposing);
+
+    /// <summary>
+    /// Asynchronously releases the unmanaged resources.
+    /// </summary>
+    /// <returns>A <see cref="ValueTask" /> that represents the asynchronous dispose operation.</returns>
+    protected abstract ValueTask DisposeAsyncCore();
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsyncCore().ConfigureAwait(false);
+
+        Dispose(false);
+
+        GC.SuppressFinalize(this);
     }
 
     /// <inheritdoc/>
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
-    public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback? callback, object? state)
+
+    public void Dispose()
     {
-        return base.BeginWrite(buffer, offset, count, callback, state);
+        Dispose(true);
+
+        GC.SuppressFinalize(this);
     }
 
-    /// <inheritdoc/>
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
-    public override void Close()
+    /// <summary>
+    /// Implicit cast a <see cref="Stream" /> in an <see cref="AudioStream "/>
+    /// </summary>
+    /// <param name="audioStream">The <see cref="AudioStream" /> to be cast.</param>
+    public static implicit operator Stream(AudioStream audioStream)
     {
-        base.Close();
+        return new AudioStreamToStream(audioStream);
     }
-
-    /// <inheritdoc/>
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
-    public override int EndRead(IAsyncResult asyncResult)
-    {
-        return base.EndRead(asyncResult);
-    }
-
-    /// <inheritdoc/>
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
-    public override void EndWrite(IAsyncResult asyncResult)
-    {
-        base.EndWrite(asyncResult);
-    }
-
-    /// <inheritdoc/>
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
-    public override void Flush()
-    {
-        // Deprecated member.
-    }
-
-    /// <inheritdoc/>
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
-    public override Task FlushAsync(CancellationToken cancellationToken)
-    {
-        // Deprecated member.
-
-        return cancellationToken.IsCancellationRequested ? Task.FromCanceled(cancellationToken) : Task.CompletedTask;
-    }
-
-    /// <inheritdoc/>
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
-    public override void SetLength(long value)
-    {
-        throw new NotSupportedException();
-    }
-
-    /// <inheritdoc/>
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
-    public override bool CanTimeout => base.CanTimeout; // Deprecated member.
-
-    /// <inheritdoc/>
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
-    public override int WriteTimeout // Deprecated member.
-    {
-        get => base.WriteTimeout;
-        set => base.WriteTimeout = value;
-    }
-
-    /// <inheritdoc/>
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
-    public override int ReadTimeout // Deprecated member.
-    {
-        get => base.ReadTimeout;
-        set => base.ReadTimeout = value;
-    }
-
-    #endregion Disable Browse of unused stream methods
 }
