@@ -39,5 +39,5 @@ Please check if your PR fulfills the following requirements:
 <details>
   <summary>Closes Section</summary>
 <!-- Plase list all linked issues this PR will close, if none remove the section (<details> attribute) -->
-Closes #IssueNumber
+Closes #IssueNumber <br>
 </details>
