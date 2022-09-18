@@ -86,12 +86,7 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     }
 
     /// <inheritdoc cref="Stream.ReadAsync(Memory{byte}, CancellationToken)" />
-    public virtual ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
-    {
-        return cancellationToken.IsCancellationRequested
-            ? ValueTask.FromCanceled<int>(cancellationToken)
-            : ValueTask.FromResult(Read(buffer.Span));
-    }
+    public abstract ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Asynchronously reads a sequence of bytes from the current stream, advances the
@@ -121,17 +116,7 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     }
 
     /// <inheritdoc cref="Stream.WriteAsync(ReadOnlyMemory{byte}, CancellationToken)" />
-    public virtual ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
-    {
-        if (cancellationToken.IsCancellationRequested)
-        {
-            return ValueTask.FromCanceled(cancellationToken);
-        }
-
-        Write(buffer.Span);
-
-        return ValueTask.CompletedTask;
-    }
+    public abstract ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Asynchronously writes a sequence of bytes to the current stream, advances the
