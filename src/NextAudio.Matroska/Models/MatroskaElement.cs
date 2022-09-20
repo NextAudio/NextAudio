@@ -23,10 +23,10 @@ public readonly ref struct MatroskaElement
         HeaderSize = headerSize;
         DataSize = dataSize;
 
-        var type = (MatroskaElementType)id;
+        var type = MatroskaUtils.GetMatroskaElementType(id);
 
         Type = type;
-        ValueType = type.GetEbmlValueType();
+        ValueType = MatroskaUtils.GetEbmlValueType(type);
     }
 
     /// <summary>

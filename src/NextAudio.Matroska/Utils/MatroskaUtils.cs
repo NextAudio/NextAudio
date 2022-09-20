@@ -10,6 +10,7 @@ namespace NextAudio.Matroska.Utils;
 /// </summary>
 public static class MatroskaUtils
 {
+    private static readonly Type ClrMatroskaElementType = typeof(MatroskaElementType);
 
     /// <summary>
     /// Cast <see cref="MatroskaElementType" /> in an <see cref="EbmlValueType" />.
@@ -59,5 +60,17 @@ public static class MatroskaUtils
             MatroskaElementType.Unknown => throw new NotImplementedException(),
             _ => EbmlValueType.None,
         };
+    }
+
+    /// <summary>
+    /// Cast <see cref="ulong" /> in an <see cref="MatroskaElementType" />.
+    /// </summary>
+    /// <param name="id">The <see cref="ulong" /> to be cast.</param>
+    /// <returns>The casted <see cref="MatroskaElementType" />.</returns>
+    public static MatroskaElementType GetMatroskaElementType(ulong id)
+    {
+        return Enum.IsDefined(ClrMatroskaElementType, id)
+            ? (MatroskaElementType)id
+            : MatroskaElementType.Unknown;
     }
 }
