@@ -1,8 +1,10 @@
 // Licensed to the NextAudio under one or more agreements.
 // NextAudio licenses this file to you under the MIT license.
 
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
+using NextAudio.Matroska.Models;
 
 namespace NextAudio.Matroska;
 
@@ -13,14 +15,29 @@ public static class EbmlReader
 {
     internal static readonly DateTime MilleniumStart = new(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
+#pragma warning disable CS0675
     /// <summary>
-    /// Read an Ebml variable size integer from the <paramref name="buffer" />.
+    /// Read an Ebml Variable Size Integer from the <paramref name="buffer" />.
     /// </summary>
-    /// <param name="buffer">The input buffer to read the Ebml variable size integer.</param>
-    /// <returns>The parsed Ebml variable size integer.</returns>
-    public static ulong ReadVariableSizeInteger(ReadOnlySpan<byte> buffer)
+    /// <param name="buffer">The input buffer to read the Ebml Variable Size Integer.</param>
+    /// <returns>The parsed Ebml Variable Size Integer.</returns>
+    public static VInt ReadVariableSizeInteger(ReadOnlySpan<byte> buffer)
     {
-        return default;
+        var firstByte = buffer[0] & 0xff;
+        var size = BitOperations.LeadingZeroCount((uint)firstByte) - 23;
+
+        if (size > 8)
+        {
+            throw new InvalidOperationException("An Ebml Variable Size Integer cannot have more than 8 bytes of length.");
+        }
+
+        ulong encodedValue = buffer[0];
+        for (var i = 0; i < size - 1; i++)
+        {
+            encodedValue = (encodedValue << 8) | buffer[i + 1];
+        }
+
+        return new VInt(encodedValue, size);
     }
 
 #pragma warning disable CS0675
@@ -81,11 +98,11 @@ public static class EbmlReader
     }
 
     // WOOWWWW how this works??
-    // This is an union structure the same as the "C lang union structure":
+    // This is an union structure, the same as the "C lang union structure":
     // https://www.tutorialspoint.com/cprogramming/c_unions.htm
     // Basically all fields have the same position in the memory,
     // That implicts cast these value types (float/double), because
-    // after all, the value is the same just your value type representation
+    // after all, the value is the same just their value type representation
     // is different here.
     [StructLayout(LayoutKind.Explicit)]
     private struct FloatUnion

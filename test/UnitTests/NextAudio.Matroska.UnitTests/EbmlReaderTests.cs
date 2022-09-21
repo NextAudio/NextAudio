@@ -1,6 +1,7 @@
 // Licensed to the NextAudio under one or more agreements.
 // NextAudio licenses this file to you under the MIT license.
 
+using NextAudio.Matroska.Models;
 using Xunit;
 
 namespace NextAudio.Matroska.UnitTests;
@@ -135,5 +136,34 @@ public class EbmlReaderTests
 
         // Assert
         Assert.Equal(expectedValue, result.ToString());
+    }
+
+    public static IEnumerable<object[]> ReadVariableSizeIntegerReadsEbmlVariableSizeIntegerData()
+    {
+        yield return new object[] { new byte[] { 26, 69, 223, 163 }, new VInt(0x1A45DFA3, 4) };
+        yield return new object[] { new byte[] { 159, 66, 134, 129, 1, 66, 247, 29 }, new VInt(159, 1) };
+    }
+
+    [Theory]
+    [MemberData(nameof(ReadVariableSizeIntegerReadsEbmlVariableSizeIntegerData))]
+    public void ReadVariableSizeIntegerReadsEbmlVariableSizeInteger(byte[] buffer, VInt expectedValue)
+    {
+        // Arrange
+        var result = EbmlReader.ReadVariableSizeInteger(buffer);
+
+        // Assert
+        Assert.Equal(expectedValue, result);
+    }
+
+    [Theory]
+    [InlineData(new byte[] { 0, 69, 223, 163 })] // 0 is the unique byte which gives size higher than 8
+    [InlineData(new byte[] { 0, 66, 134, 129, 1, 66, 247, 29 })]
+    public void ReadVariableSizeIntegerThrowsInvalidOperationExceptionIfSizeIsHigherThan8(byte[] buffer)
+    {
+        // Arrange + Assert
+        _ = Assert.Throws<InvalidOperationException>(() =>
+        {
+            _ = EbmlReader.ReadVariableSizeInteger(buffer);
+        });
     }
 }
