@@ -5,8 +5,6 @@ using System.Text;
 
 namespace NextAudio.Matroska;
 
-#pragma warning disable CS0675
-
 /// <summary>
 /// A reader for the Ebml notation.
 /// </summary>
@@ -14,6 +12,7 @@ public static class EbmlReader
 {
     internal static readonly DateTime MilleniumStart = new(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
+#pragma warning disable CS0675
     /// <summary>
     /// Read an Ebml signed integer from the <paramref name="buffer" />.
     /// </summary>
@@ -30,6 +29,7 @@ public static class EbmlReader
 
         return result;
     }
+#pragma warning restore CS0675
 
     /// <summary>
     /// Read an Ebml unsigned integer from the <paramref name="buffer" />.
@@ -59,13 +59,11 @@ public static class EbmlReader
             throw new ArgumentOutOfRangeException(nameof(buffer), $"{nameof(buffer)}.Length is different than 4 or 8.");
         }
 
-        Span<byte> reversedBuffer = stackalloc byte[buffer.Length];
+        var signedInteger = ReadSignedInteger(buffer);
 
-        buffer.CopyTo(reversedBuffer);
-
-        reversedBuffer.Reverse();
-
-        return reversedBuffer.Length == 4 ? BitConverter.ToSingle(buffer) : BitConverter.ToDouble(buffer);
+        return buffer.Length == 4
+            ? BitConverter.Int32BitsToSingle((int)signedInteger)
+            : BitConverter.Int64BitsToDouble(signedInteger);
     }
 
     /// <summary>
@@ -131,5 +129,3 @@ public static class EbmlReader
         return outputBuffer[..bytesWritten];
     }
 }
-
-#pragma warning restore CS0675

@@ -53,8 +53,10 @@ public class EbmlReaderTests
     }
 
     [Theory]
-    [InlineData(new byte[] { 71, 59, 128, 0 }, 48000.0)]
-    [InlineData(new byte[] { 127, 223, 255, 255, 255, 255, 255, 255 }, 8.988465674311579E+307)]
+    [InlineData(new byte[] { 71, 59, 128, 0 }, 48000.0f)] // float
+    [InlineData(new byte[] { 199, 59, 128, 0 }, -48000.0f)] // float
+    [InlineData(new byte[] { 127, 223, 255, 255, 255, 255, 255, 255 }, 8.988465674311579E+307)] // double
+    [InlineData(new byte[] { 255, 223, 255, 255, 255, 255, 255, 255 }, -8.988465674311579E+307)] // double
     public void ReadFloatReadsEbmlFloat(byte[] buffer, double expectedValue)
     {
         // Arrange
