@@ -1,6 +1,7 @@
 // Licensed to the NextAudio under one or more agreements.
 // NextAudio licenses this file to you under the MIT license.
 
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace NextAudio.Matroska;
@@ -59,11 +60,34 @@ public static class EbmlReader
             throw new ArgumentOutOfRangeException(nameof(buffer), $"{nameof(buffer)}.Length is different than 4 or 8.");
         }
 
-        var signedInteger = ReadSignedInteger(buffer);
+        var union = new FloatUnion
+        {
+            UnsignedIntegerValue = ReadUnsignedInteger(buffer),
+        };
 
         return buffer.Length == 4
-            ? BitConverter.Int32BitsToSingle((int)signedInteger)
-            : BitConverter.Int64BitsToDouble(signedInteger);
+            ? union.FloatValue
+            : union.DoubleValue;
+    }
+
+    // WOOWWWW how this works??
+    // This is an union structure the as the "C lang union structure":
+    // https://www.tutorialspoint.com/cprogramming/c_unions.htm
+    // Basically all fields have the same position in the memory,
+    // That implicts cast these value types (float/double), because
+    // after all, the value is the same just your value type representation
+    // is different here.
+    [StructLayout(LayoutKind.Explicit)]
+    private ref struct FloatUnion
+    {
+        [FieldOffset(0)]
+        public ulong UnsignedIntegerValue;
+
+        [FieldOffset(0)]
+        public readonly float FloatValue;
+
+        [FieldOffset(0)]
+        public readonly double DoubleValue;
     }
 
     /// <summary>
