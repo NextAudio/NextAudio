@@ -13,6 +13,16 @@ public static class EbmlReader
 {
     internal static readonly DateTime MilleniumStart = new(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
+    /// <summary>
+    /// Read an Ebml variable size integer from the <paramref name="buffer" />.
+    /// </summary>
+    /// <param name="buffer">The input buffer to read the Ebml variable size integer.</param>
+    /// <returns>The parsed Ebml variable size integer.</returns>
+    public static ulong ReadVariableSizeInteger(ReadOnlySpan<byte> buffer)
+    {
+        return default;
+    }
+
 #pragma warning disable CS0675
     /// <summary>
     /// Read an Ebml signed integer from the <paramref name="buffer" />.
@@ -78,7 +88,7 @@ public static class EbmlReader
     // after all, the value is the same just your value type representation
     // is different here.
     [StructLayout(LayoutKind.Explicit)]
-    private ref struct FloatUnion
+    private struct FloatUnion
     {
         [FieldOffset(0)]
         public ulong UnsignedIntegerValue;
