@@ -71,7 +71,7 @@ public static class EbmlReader
     }
 
     // WOOWWWW how this works??
-    // This is an union structure the as the "C lang union structure":
+    // This is an union structure the same as the "C lang union structure":
     // https://www.tutorialspoint.com/cprogramming/c_unions.htm
     // Basically all fields have the same position in the memory,
     // That implicts cast these value types (float/double), because
