@@ -57,7 +57,7 @@ public static class MatroskaUtils
             MatroskaElementType.CueTrackPositions => EbmlValueType.MasterElement,
             MatroskaElementType.CueTrack => EbmlValueType.UnsignedInteger,
             MatroskaElementType.CueClusterPosition => EbmlValueType.UnsignedInteger,
-            MatroskaElementType.Unknown => throw new NotImplementedException(),
+            MatroskaElementType.Unknown => EbmlValueType.None,
             _ => EbmlValueType.None,
         };
     }
