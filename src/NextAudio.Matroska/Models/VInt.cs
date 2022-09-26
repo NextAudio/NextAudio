@@ -29,7 +29,8 @@ public readonly struct VInt
     public VInt(ulong encodedValue, int length)
     {
         EncodedValue = encodedValue;
-        Value = encodedValue & BitsMasks[length];
+        Length = length;
+        Value = encodedValue & BitsMasks[Length];
     }
 
     /// <summary>
@@ -41,4 +42,9 @@ public readonly struct VInt
     /// The encoded value.
     /// </summary>
     public ulong EncodedValue { get; }
+
+    /// <summary>
+    /// The length.
+    /// </summary>
+    public int Length { get; }
 }
