@@ -5,7 +5,7 @@ namespace NextAudio.Matroska.Models;
 
 /// <summary>
 /// Represents an Ebml Variable Signed Integer.
-/// /// </summary>
+/// </summary>
 public readonly struct VInt
 {
     private static readonly ulong[] BitsMasks =
