@@ -19,7 +19,7 @@ public enum EbmlValueType
     SignedInteger,
 
     /// <summary>
-    /// This element value is a unsigned integer.
+    /// This element value is an unsigned integer.
     /// </summary>
     UnsignedInteger,
 

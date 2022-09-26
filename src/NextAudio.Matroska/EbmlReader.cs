@@ -21,26 +21,52 @@ public static class EbmlReader
     /// </summary>
     /// <param name="buffer">The input buffer to read the Ebml Variable Size Integer.</param>
     /// <returns>The parsed Ebml Variable Size Integer.</returns>
+    /// <exception cref="InvalidOperationException">An Ebml Variable Size Integer cannot have more than 8 bytes of length.</exception>
     public static VInt ReadVariableSizeInteger(ReadOnlySpan<byte> buffer)
     {
-        var firstByte = buffer[0] & 0xff;
-        var size = BitOperations.LeadingZeroCount((uint)firstByte) - 23;
+        var length = ReadVariableSizeIntegerLength(buffer[0]);
 
-        if (size > 8)
+        return ReadVariableSizeInteger(buffer[0..], length);
+    }
+
+#pragma warning disable CS0675
+
+    /// <summary>
+    /// Read an Ebml Variable Size Integer from the <paramref name="buffer" /> of length <paramref name="length" />.
+    /// </summary>
+    /// <param name="buffer">The input buffer to read the Ebml Variable Size Integer.</param>
+    /// <param name="length">The length of the Ebml Variable Size Integer.</param>
+    /// <returns>The parsed Ebml Variable Size Integer.</returns>
+    /// <exception cref="InvalidOperationException">An Ebml Variable Size Integer cannot have more than 8 bytes of length.</exception>
+    public static VInt ReadVariableSizeInteger(ReadOnlySpan<byte> buffer, int length)
+    {
+        if (length > 8)
         {
             throw new InvalidOperationException("An Ebml Variable Size Integer cannot have more than 8 bytes of length.");
         }
 
         ulong encodedValue = buffer[0];
-        for (var i = 0; i < size - 1; i++)
+        for (var i = 0; i < length - 1; i++)
         {
             encodedValue = (encodedValue << 8) | buffer[i + 1];
         }
 
-        return new VInt(encodedValue, size);
+        return new VInt(encodedValue, length);
     }
 
-#pragma warning disable CS0675
+    /// <summary>
+    /// Read the length of an Ebml Variable Size Integer from the <paramref name="inputByte" />.
+    /// </summary>
+    /// <param name="inputByte">The input byte to read the length.</param>
+    /// <returns>The length of an Ebml Variable Size Integer.</returns>
+    public static int ReadVariableSizeIntegerLength(byte inputByte)
+    {
+        var firstByte = inputByte & 0xff;
+        var length = BitOperations.LeadingZeroCount((uint)firstByte) - 23;
+
+        return length;
+    }
+
     /// <summary>
     /// Read an Ebml signed integer from the <paramref name="buffer" />.
     /// </summary>

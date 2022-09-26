@@ -138,15 +138,56 @@ public class EbmlReaderTests
         Assert.Equal(expectedValue, result.ToString());
     }
 
-    public static IEnumerable<object[]> ReadVariableSizeIntegerReadsEbmlVariableSizeIntegerData()
+    [Theory]
+    [InlineData(26, 4)]
+    [InlineData(159, 1)]
+    public void ReadVariableSizeIntegerLengthReadsEbmlVariableSizeIntegerLength(byte inputByte, int expectedValue)
+    {
+        // Arrange
+        var result = EbmlReader.ReadVariableSizeIntegerLength(inputByte);
+
+        // Asser
+        Assert.Equal(expectedValue, result);
+    }
+
+    public static IEnumerable<object[]> ReadVariableSizeIntegerWithLengthReadsEbmlVariableSizeIntegerData()
+    {
+        yield return new object[] { new byte[] { 26, 69, 223, 163 }, 4, new VInt(0x1A45DFA3, 4) };
+        yield return new object[] { new byte[] { 159, 66, 134, 129, 1, 66, 247, 29 }, 1, new VInt(159, 1) };
+    }
+
+    [Theory]
+    [MemberData(nameof(ReadVariableSizeIntegerWithLengthReadsEbmlVariableSizeIntegerData))]
+    public void ReadVariableSizeIntegerWithLengthReadsEbmlVariableSizeInteger(byte[] buffer, int length, VInt expectedValue)
+    {
+        // Arrange
+        var result = EbmlReader.ReadVariableSizeInteger(buffer, length);
+
+        // Assert
+        Assert.Equal(expectedValue, result);
+    }
+
+    [Theory]
+    [InlineData(new byte[] { 69, 223, 163 }, 9)]
+    [InlineData(new byte[] { 66, 134, 129, 1, 66, 247, 29 }, 10)]
+    public void ReadVariableSizeIntegerWithLengthThrowsInvalidOperationExceptionIfSizeIsHigherThan8(byte[] buffer, int length)
+    {
+        // Arrange + Assert
+        _ = Assert.Throws<InvalidOperationException>(() =>
+        {
+            _ = EbmlReader.ReadVariableSizeInteger(buffer, length);
+        });
+    }
+
+    public static IEnumerable<object[]> ReadVariableSizeIntegerWithoutLengthReadsEbmlVariableSizeIntegerData()
     {
         yield return new object[] { new byte[] { 26, 69, 223, 163 }, new VInt(0x1A45DFA3, 4) };
         yield return new object[] { new byte[] { 159, 66, 134, 129, 1, 66, 247, 29 }, new VInt(159, 1) };
     }
 
     [Theory]
-    [MemberData(nameof(ReadVariableSizeIntegerReadsEbmlVariableSizeIntegerData))]
-    public void ReadVariableSizeIntegerReadsEbmlVariableSizeInteger(byte[] buffer, VInt expectedValue)
+    [MemberData(nameof(ReadVariableSizeIntegerWithoutLengthReadsEbmlVariableSizeIntegerData))]
+    public void ReadVariableSizeIntegerWithoutLengthReadsEbmlVariableSizeInteger(byte[] buffer, VInt expectedValue)
     {
         // Arrange
         var result = EbmlReader.ReadVariableSizeInteger(buffer);
@@ -158,7 +199,7 @@ public class EbmlReaderTests
     [Theory]
     [InlineData(new byte[] { 0, 69, 223, 163 })] // 0 is the unique byte which gives size higher than 8
     [InlineData(new byte[] { 0, 66, 134, 129, 1, 66, 247, 29 })]
-    public void ReadVariableSizeIntegerThrowsInvalidOperationExceptionIfSizeIsHigherThan8(byte[] buffer)
+    public void ReadVariableSizeIntegerWithoutLengthThrowsInvalidOperationExceptionIfSizeIsHigherThan8(byte[] buffer)
     {
         // Arrange + Assert
         _ = Assert.Throws<InvalidOperationException>(() =>
