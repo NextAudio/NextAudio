@@ -15,7 +15,6 @@ public static class EbmlReader
 {
     internal static readonly DateTime MilleniumStart = new(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-#pragma warning disable CS0675
     /// <summary>
     /// Read an Ebml Variable Size Integer from the <paramref name="buffer" />.
     /// </summary>
@@ -26,10 +25,8 @@ public static class EbmlReader
     {
         var length = ReadVariableSizeIntegerLength(buffer[0]);
 
-        return ReadVariableSizeInteger(buffer[0..], length);
+        return ReadVariableSizeInteger(buffer, length);
     }
-
-#pragma warning disable CS0675
 
     /// <summary>
     /// Read an Ebml Variable Size Integer from the <paramref name="buffer" /> of length <paramref name="length" />.
@@ -67,6 +64,7 @@ public static class EbmlReader
         return length;
     }
 
+#pragma warning disable CS0675
     /// <summary>
     /// Read an Ebml signed integer from the <paramref name="buffer" />.
     /// </summary>
