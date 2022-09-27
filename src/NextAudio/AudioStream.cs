@@ -19,19 +19,18 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     /// <summary>
     /// Creates an instance of <see cref="AudioStream" />
     /// </summary>
-    protected AudioStream()
-    {
-    }
-
-    /// <summary>
-    /// Creates an instance of <see cref="AudioStream" />
-    /// </summary>
     /// <param name="loggerFactory">A logger factory to log audio streaming info.</param>
     protected AudioStream(ILoggerFactory loggerFactory)
     {
         _loggerFactory = loggerFactory;
     }
 
+    /// <summary>
+    /// Creates an instance of <see cref="AudioStream" />.
+    /// </summary>
+    protected AudioStream()
+    {
+    }
     ///
     ~AudioStream()
     {

@@ -24,6 +24,7 @@ public readonly struct MatroskaElement
         Position = position;
         HeaderSize = headerSize;
         DataSize = dataSize;
+        DataPosition = Position + HeaderSize;
         EndPosition = Position + HeaderSize + DataSize;
 
         Type = MatroskaUtils.GetMatroskaElementType(Id);
@@ -64,6 +65,11 @@ public readonly struct MatroskaElement
     /// The size of the data containing in this element.
     /// </summary>
     public int DataSize { get; }
+
+    /// <summary>
+    /// The position of this element data in the <see cref="AudioStream" />.
+    /// </summary>
+    public long DataPosition { get; }
 
     /// <summary>
     /// The end position of this element in the <see cref="AudioStream" />.

@@ -18,6 +18,11 @@ public delegate ulong TrackSelector(IEnumerable<MatroskaTrack> tracks);
 public class MatroskaDemuxerOptions
 {
     /// <summary>
+    /// The default instance of <see cref="MatroskaDemuxerOptions" />.
+    /// </summary>
+    public static readonly MatroskaDemuxerOptions Default = new();
+
+    /// <summary>
     /// The track selector to be used to choose wich track will be demuxed.
     /// </summary>
     public TrackSelector TrackSelector { get; set; } = DefaultTrackSelector;
