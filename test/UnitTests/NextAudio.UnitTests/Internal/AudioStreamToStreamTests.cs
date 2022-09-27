@@ -462,6 +462,11 @@ public class AudioStreamToStreamTests
             return default;
         }
 
+        public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
         public override long Seek(long offset, SeekOrigin origin)
         {
             throw new NotImplementedException();
@@ -472,14 +477,19 @@ public class AudioStreamToStreamTests
             _readWriteCallback!(buffer.ToArray());
         }
 
+        public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override void Dispose(bool disposing)
         {
-            _disposeCallback!();
+            _disposeCallback?.Invoke();
         }
 
         protected override ValueTask DisposeAsyncCore()
         {
-            _disposeCallback!();
+            _disposeCallback?.Invoke();
 
             return ValueTask.CompletedTask;
         }
