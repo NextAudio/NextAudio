@@ -14,14 +14,7 @@ public abstract class ReadOnlyAudioStream : AudioStream
     /// Creates an instance of <see cref="ReadOnlyAudioStream" />.
     /// </summary>
     /// <param name="loggerFactory">A logger factory to log audio streaming info.</param>
-    protected ReadOnlyAudioStream(ILoggerFactory loggerFactory) : base(loggerFactory)
-    {
-    }
-
-    /// <summary>
-    /// Creates an instance of <see cref="ReadOnlyAudioStream" />.
-    /// </summary>
-    protected ReadOnlyAudioStream()
+    protected ReadOnlyAudioStream(ILoggerFactory? loggerFactory = null) : base(loggerFactory)
     {
     }
 

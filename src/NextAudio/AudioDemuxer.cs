@@ -14,14 +14,7 @@ public abstract class AudioDemuxer : ReadOnlyAudioStream
     /// Creates an instance of <see cref="AudioDemuxer" />.
     /// </summary>
     /// <param name="loggerFactory">A logger factory to log audio streaming info.</param>
-    protected AudioDemuxer(ILoggerFactory loggerFactory) : base(loggerFactory)
-    {
-    }
-
-    /// <summary>
-    /// Creates an instance of <see cref="AudioDemuxer" />.
-    /// </summary>
-    protected AudioDemuxer()
+    protected AudioDemuxer(ILoggerFactory? loggerFactory = null) : base(loggerFactory)
     {
     }
 

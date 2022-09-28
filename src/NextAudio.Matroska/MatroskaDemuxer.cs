@@ -3,7 +3,6 @@
 
 using System.Buffers;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using NextAudio.Matroska.Models;
 
 namespace NextAudio.Matroska;
@@ -17,11 +16,7 @@ public sealed class MatroskaDemuxer : AudioDemuxer
     private readonly ILogger<MatroskaDemuxer> _logger;
     private readonly MatroskaDemuxerOptions _options;
 
-    private bool _disposeSourceStream;
-
     private long _position;
-
-    private ulong _selectedTrackNumber;
 
     private MatroskaElement _segmentElement;
     private MatroskaElement _currentClusterElement;
@@ -33,34 +28,20 @@ public sealed class MatroskaDemuxer : AudioDemuxer
     /// Creates a new instance of <see cref="MatroskaDemuxer" />.
     /// </summary>
     /// <param name="sourceStream">The source stream with Matroska data to be demuxed.</param>
-    /// <param name="loggerFactory">A logger factory to log audio streaming info.</param>
     /// <param name="options">The options for this demuxer.</param>
-    /// <param name="disposeSourceStream">If the source stream should be disposed when this demuxer disposes.</param>
-    public MatroskaDemuxer(
-        AudioStream sourceStream,
-        ILoggerFactory loggerFactory,
-        MatroskaDemuxerOptions? options = null,
-        bool disposeSourceStream = false) : base(loggerFactory)
+    /// <param name="loggerFactory">A logger factory to log audio streaming info.</param>
+    public MatroskaDemuxer(AudioStream sourceStream, MatroskaDemuxerOptions? options = null, ILoggerFactory? loggerFactory = null)
+        : base(loggerFactory)
     {
-        _sourceStream = sourceStream;
+        _sourceStream = sourceStream ?? throw new ArgumentNullException(nameof(sourceStream));
         _options = options ?? MatroskaDemuxerOptions.Default;
-        _disposeSourceStream = disposeSourceStream;
-        _logger = loggerFactory.CreateLogger<MatroskaDemuxer>();
+        _logger = _loggerFactory.CreateLogger<MatroskaDemuxer>();
     }
 
     /// <summary>
-    /// Creates a new instance of <see cref="MatroskaDemuxer" />.
+    /// The Matroska track selected using the <see cref="MatroskaDemuxerOptions.TrackSelector" />.
     /// </summary>
-    /// <param name="sourceStream">The source stream with Matroska data to be demuxed.</param>
-    /// <param name="options">The options for this demuxer.</param>
-    /// <param name="disposeSourceStream">If the source stream should be disposed when this demuxer disposes.</param>
-    public MatroskaDemuxer(AudioStream sourceStream, MatroskaDemuxerOptions? options = null, bool disposeSourceStream = false)
-    {
-        _sourceStream = sourceStream;
-        _options = options ?? MatroskaDemuxerOptions.Default;
-        _disposeSourceStream = disposeSourceStream;
-        _logger = NullLogger<MatroskaDemuxer>.Instance;
-    }
+    public MatroskaTrack? SelectedTrack { get; private set; }
 
     /// <inheritdoc/>
     public override bool CanSeek => _sourceStream.CanSeek;
@@ -80,7 +61,7 @@ public sealed class MatroskaDemuxer : AudioDemuxer
     {
         _logger.LogReadBufferSize(buffer);
 
-        if (_selectedTrackNumber == 0)
+        if (SelectedTrack == null)
         {
             StartMatroskaReading(buffer);
         }
@@ -165,9 +146,11 @@ public sealed class MatroskaDemuxer : AudioDemuxer
             SkipElement(childElement.Value);
         }
 
-        _selectedTrackNumber = _options.TrackSelector(tracks);
+        var selectedTrackNumber = _options.TrackSelector(tracks);
 
-        _logger.LogTrackSelected(_selectedTrackNumber);
+        _logger.LogTrackSelected(selectedTrackNumber);
+
+        SelectedTrack = tracks.First(track => track.TrackNumber == selectedTrackNumber);
     }
 
     private MatroskaTrack ParseTrackElement(Span<byte> buffer, MatroskaElement trackElement)
@@ -462,7 +445,7 @@ public sealed class MatroskaDemuxer : AudioDemuxer
         }
 
 
-        if (disposing && _disposeSourceStream)
+        if (disposing && _options.DisposeSourceStream)
         {
             if (_segmentElementLogScope != null)
             {
@@ -482,7 +465,7 @@ public sealed class MatroskaDemuxer : AudioDemuxer
             return;
         }
 
-        if (_disposeSourceStream)
+        if (_options.DisposeSourceStream)
         {
             if (_segmentElementLogScope != null)
             {
@@ -494,15 +477,31 @@ public sealed class MatroskaDemuxer : AudioDemuxer
         }
     }
 
+    /// <summary>
+    /// Creates a clone of this demuxer.
+    /// </summary>
+    /// <param name="cloneSourceStream">If the source stream also needs to be cloned.</param>
+    /// <returns>A new cloned demuxer.</returns>
+    public MatroskaDemuxer Clone(bool cloneSourceStream)
+    {
+        var optionsClone = _options.Clone();
+        var sourceStreamClone = cloneSourceStream
+            ? _sourceStream.Clone()
+            : _sourceStream;
+
+        var copy = new MatroskaDemuxer(sourceStreamClone, optionsClone, _loggerFactory);
+
+        if (!cloneSourceStream)
+        {
+            _options.DisposeSourceStream = false;
+        }
+
+        return copy;
+    }
+
     /// <inheritdoc/>
     public override MatroskaDemuxer Clone()
     {
-        MatroskaDemuxer copy = _loggerFactory != null
-            ? new(_sourceStream, _loggerFactory, _options, _disposeSourceStream)
-            : new(_sourceStream, _options, _disposeSourceStream);
-
-        _disposeSourceStream = false;
-
-        return copy;
+        return Clone(false);
     }
 }

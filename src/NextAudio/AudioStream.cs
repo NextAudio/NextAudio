@@ -2,6 +2,7 @@
 // NextAudio licenses this file to you under the MIT license.
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NextAudio.Internal;
 
 namespace NextAudio;
@@ -14,23 +15,17 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     /// <summary>
     /// A logger factory to log audio streaming info.
     /// </summary>
-    protected readonly ILoggerFactory? _loggerFactory;
+    protected readonly ILoggerFactory _loggerFactory;
 
     /// <summary>
     /// Creates an instance of <see cref="AudioStream" />
     /// </summary>
     /// <param name="loggerFactory">A logger factory to log audio streaming info.</param>
-    protected AudioStream(ILoggerFactory loggerFactory)
+    protected AudioStream(ILoggerFactory? loggerFactory = null)
     {
-        _loggerFactory = loggerFactory;
+        _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
     }
 
-    /// <summary>
-    /// Creates an instance of <see cref="AudioStream" />.
-    /// </summary>
-    protected AudioStream()
-    {
-    }
     ///
     ~AudioStream()
     {

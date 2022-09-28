@@ -23,9 +23,27 @@ public class MatroskaDemuxerOptions
     public static readonly MatroskaDemuxerOptions Default = new();
 
     /// <summary>
+    /// If the source stream should be disposed when the demuxer disposes.
+    /// </summary>
+    public bool DisposeSourceStream { get; set; }
+
+    /// <summary>
     /// The track selector to be used to choose wich track will be demuxed.
     /// </summary>
     public TrackSelector TrackSelector { get; set; } = DefaultTrackSelector;
+
+    /// <summary>
+    /// Creates a clone of the current <see cref="MatroskaDemuxerOptions" />.
+    /// </summary>
+    /// <returns>A clone of the current <see cref="MatroskaDemuxerOptions" />.</returns>
+    public MatroskaDemuxerOptions Clone()
+    {
+        return new()
+        {
+            TrackSelector = TrackSelector,
+            DisposeSourceStream = DisposeSourceStream,
+        };
+    }
 
     private static ulong DefaultTrackSelector(IEnumerable<MatroskaTrack> tracks)
     {
