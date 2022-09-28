@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Abstractions;
 using NextAudio.Internal;
 using NSubstitute;
 using Xunit;
@@ -17,7 +18,7 @@ public class AudioStreamToStreamTests
     public void CanReadCallsSourceAudioStreamCanRead()
     {
         // Act
-        var audioStream = Substitute.For<AudioStream>();
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         var castStream = new AudioStreamToStream(audioStream);
 
@@ -32,7 +33,7 @@ public class AudioStreamToStreamTests
     public void CanSeekCallsSourceAudioStreamCanSeek()
     {
         // Act
-        var audioStream = Substitute.For<AudioStream>();
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         var castStream = new AudioStreamToStream(audioStream);
 
@@ -47,7 +48,7 @@ public class AudioStreamToStreamTests
     public void CanWriteCallsSourceAudioStreamCanWrite()
     {
         // Act
-        var audioStream = Substitute.For<AudioStream>();
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         var castStream = new AudioStreamToStream(audioStream);
 
@@ -62,7 +63,7 @@ public class AudioStreamToStreamTests
     public void LengthCallsSourceAudioStreamLength()
     {
         // Act
-        var audioStream = Substitute.For<AudioStream>();
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         var castStream = new AudioStreamToStream(audioStream);
 
@@ -77,7 +78,7 @@ public class AudioStreamToStreamTests
     public void PositionCallsSourceAudioStreamPosition()
     {
         // Act + Arrange
-        var audioStream = Substitute.For<AudioStream>();
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         var castStream = new AudioStreamToStream(audioStream)
         {
@@ -95,7 +96,7 @@ public class AudioStreamToStreamTests
     public void SetLengthThrowsNotSupportedException()
     {
         // Act
-        var audioStream = Substitute.For<AudioStream>();
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
         var castStream = new AudioStreamToStream(audioStream);
 
         // Arrange + Assert
@@ -109,7 +110,7 @@ public class AudioStreamToStreamTests
     public void SeekCallsSourceAudioStreamSeek()
     {
         // Act
-        var audioStream = Substitute.For<AudioStream>();
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         var castStream = new AudioStreamToStream(audioStream);
 
@@ -175,7 +176,7 @@ public class AudioStreamToStreamTests
     public void ReadCallsAudioStreamRead()
     {
         // Act
-        var audioStream = Substitute.For<AudioStream>();
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         var castStream = new AudioStreamToStream(audioStream);
 
@@ -199,7 +200,7 @@ public class AudioStreamToStreamTests
     public async Task ReadAsyncValueTaskCallsAudioStreamReadAsyncValueTask()
     {
         // Act
-        var audioStream = Substitute.For<AudioStream>();
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         Stream castStream = new AudioStreamToStream(audioStream);
 
@@ -222,7 +223,7 @@ public class AudioStreamToStreamTests
     public async Task ReadAsyncTaskCallsAudioStreamReadAsyncValueTask()
     {
         // Act
-        var audioStream = Substitute.For<AudioStream>();
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         Stream castStream = new AudioStreamToStream(audioStream);
 
@@ -249,7 +250,7 @@ public class AudioStreamToStreamTests
     public void WriteCallsAudioStreamWrite()
     {
         // Act
-        var audioStream = Substitute.For<AudioStream>();
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         var castStream = new AudioStreamToStream(audioStream);
 
@@ -273,7 +274,7 @@ public class AudioStreamToStreamTests
     public async Task WrtieAsyncValueTaskCallsAudioStreamWriteAsyncValueTask()
     {
         // Act
-        var audioStream = Substitute.For<AudioStream>();
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         Stream castStream = new AudioStreamToStream(audioStream);
 
@@ -296,7 +297,7 @@ public class AudioStreamToStreamTests
     public async Task WriteAsyncTaskCallsAudioStreamWriteAsyncValueTask()
     {
         // Act
-        var audioStream = Substitute.For<AudioStream>();
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         Stream castStream = new AudioStreamToStream(audioStream);
 
