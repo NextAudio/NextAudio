@@ -19,7 +19,10 @@ public sealed class MatroskaDemuxer : AudioDemuxer
     private long _position;
 
     private MatroskaElement _segmentElement;
-    private MatroskaElement _currentClusterElement;
+    private MatroskaElement? _currentClusterElement;
+    private MatroskaElement? _currentBlockGroupElement;
+    private MatroskaBlock? _currentBlock;
+    private int _currentBlockIndex;
 
     private IDisposable? _segmentElementLogScope;
 
@@ -56,6 +59,8 @@ public sealed class MatroskaDemuxer : AudioDemuxer
         set => Seek(value, SeekOrigin.Begin);
     }
 
+    private bool CurrentBlockHasFrames => _currentBlock.HasValue && (_currentBlockIndex + 1) < _currentBlock.Value.FrameCount;
+
     /// <inheritdoc/>
     public override int Demux(Span<byte> buffer)
     {
@@ -66,11 +71,267 @@ public sealed class MatroskaDemuxer : AudioDemuxer
             StartMatroskaReading(buffer);
         }
 
-        if (_currentClusterElement.DataPosition == _position)
+        int result;
+
+        if (_currentBlock.HasValue && CurrentBlockHasFrames)
         {
+            result = ReadFrameFromBlock(buffer, _currentBlock.Value);
+
+            if (result > 0)
+            {
+                return result;
+            }
+
+            _currentBlock = null;
         }
 
-        return _sourceStream.Read(buffer);
+        _currentBlockIndex = 0;
+
+        if (_currentBlockGroupElement.HasValue)
+        {
+            result = ReadNextFrameFromGroup(buffer, _currentBlockGroupElement.Value);
+
+            if (result > 0)
+            {
+                return result;
+            }
+
+            _currentBlockGroupElement = null;
+        }
+
+        if (_currentClusterElement.HasValue)
+        {
+            result = ReadNextFrameFromCluster(buffer, _currentClusterElement.Value);
+
+            if (result > 0)
+            {
+                return result;
+            }
+        }
+
+        return ReadNextFrameFromSegment(buffer);
+    }
+
+    private int ReadNextFrameFromSegment(Span<byte> buffer)
+    {
+        MatroskaElement? childElement;
+
+        while ((childElement = ReadNextElement(buffer, _segmentElement)) != null)
+        {
+            if (childElement.Value.Type == MatroskaElementType.Cluster)
+            {
+                var result = ReadNextFrameFromCluster(buffer, childElement.Value);
+
+                if (result > 0)
+                {
+                    _currentClusterElement = childElement;
+                    return result;
+                }
+            }
+
+            SkipElement(childElement.Value);
+        }
+
+        return 0;
+    }
+
+    private int ReadNextFrameFromCluster(Span<byte> buffer, MatroskaElement clusterElement)
+    {
+        MatroskaElement? childElement;
+
+        while ((childElement = ReadNextElement(buffer, clusterElement)) != null)
+        {
+            if (childElement.Value.Type == MatroskaElementType.BlockGroup)
+            {
+                var result = ReadNextFrameFromGroup(buffer, childElement.Value);
+
+                if (result > 0)
+                {
+                    _currentBlockGroupElement = childElement;
+                    return result;
+                }
+            }
+
+            if (childElement.Value.Type == MatroskaElementType.SimpleBlock)
+            {
+                var result = ReadFrameFromBlockElement(buffer, childElement.Value);
+
+                if (result > 0)
+                {
+                    return result;
+                }
+            }
+
+            SkipElement(childElement.Value);
+        }
+
+        return 0;
+    }
+
+    private int ReadNextFrameFromGroup(Span<byte> buffer, MatroskaElement blockGroupElement)
+    {
+        MatroskaElement? childElement;
+
+        while ((childElement = ReadNextElement(buffer, blockGroupElement)) != null)
+        {
+            if (childElement.Value.Type == MatroskaElementType.Block)
+            {
+                var result = ReadFrameFromBlockElement(buffer, childElement.Value);
+
+                if (result > 0)
+                {
+                    return result;
+                }
+            }
+
+            SkipElement(childElement.Value);
+        }
+
+        return 0;
+    }
+
+    private int ReadFrameFromBlockElement(Span<byte> buffer, MatroskaElement blockElement)
+    {
+        var block = ParseBlock(buffer, blockElement);
+
+        return !block.HasValue ? 0 : ReadFrameFromBlock(buffer, block.Value);
+    }
+
+    private int ReadFrameFromBlock(Span<byte> buffer, MatroskaBlock block)
+    {
+        while (CurrentBlockHasFrames)
+        {
+            var frameSize = block.GetFrameSizeByIndex(_currentBlockIndex);
+            var result = ReadSourceStream(buffer[..frameSize]);
+
+            _currentBlockIndex++;
+
+            if (result > 0)
+            {
+                return result;
+            }
+        }
+
+        return 0;
+    }
+
+    private MatroskaBlock? ParseBlock(Span<byte> buffer, MatroskaElement blockElement)
+    {
+        _ = ReadSourceStream(buffer[..2]);
+
+        var trackNumber = EbmlReader.ReadUnsignedInteger(buffer[..2]);
+
+        if (trackNumber != SelectedTrack?.TrackNumber)
+        {
+            return null;
+        }
+
+        _ = ReadSourceStream(buffer[2..3]);
+
+        var flags = buffer[2];
+        var lacingType = (MatroskaBlockLacingType)(flags & 0b0000110);
+
+        int frameCount;
+        int[] frameSizes;
+
+        if (lacingType != MatroskaBlockLacingType.No)
+        {
+            _ = ReadSourceStream(buffer[3..4]);
+            frameCount = (buffer[3] & 0xff) + 1;
+        }
+        else
+        {
+            frameCount = 1;
+        }
+
+        frameSizes = new int[frameCount];
+
+        switch (lacingType)
+        {
+            default:
+            case MatroskaBlockLacingType.No:
+                frameSizes[0] = (int)blockElement.GetRemaining(_position);
+                break;
+
+            case MatroskaBlockLacingType.Xiph:
+                ParseXiphLacing(buffer[4..], blockElement, frameSizes);
+                break;
+            case MatroskaBlockLacingType.FixedSize:
+                ParseFixedSizeLacing(blockElement, frameSizes);
+                break;
+            case MatroskaBlockLacingType.Ebml:
+                ParseEbmlLacing(buffer[4..], blockElement, frameSizes);
+                break;
+        }
+
+        return new MatroskaBlock(trackNumber, lacingType, frameCount, frameSizes);
+    }
+
+    private void ParseXiphLacing(Span<byte> buffer, MatroskaElement blockElement, Span<int> frameSizes)
+    {
+        var totalSize = 0;
+        var bufferIndex = 0;
+
+        for (var i = 0; i < frameSizes.Length; i++)
+        {
+            var value = 0;
+
+            do
+            {
+                _ = ReadSourceStream(buffer[bufferIndex..(bufferIndex + 1)]);
+                value += buffer[bufferIndex] & 0xff;
+            } while (value == 255);
+
+            frameSizes[i] = value;
+            totalSize += value;
+        }
+
+        var remaining = blockElement.GetRemaining(_position);
+        frameSizes[^1] = (int)remaining - totalSize;
+    }
+
+    private void ParseFixedSizeLacing(MatroskaElement blockElement, Span<int> frameSizes)
+    {
+        var size = (int)(blockElement.GetRemaining(_position) / frameSizes.Length);
+
+        for (var i = 0; i < frameSizes.Length; i++)
+        {
+            frameSizes[i] = size;
+        }
+    }
+
+    private void ParseEbmlLacing(Span<byte> buffer, MatroskaElement blockElement, Span<int> frameSizes)
+    {
+        var vInt = ReadVInt(buffer);
+
+        frameSizes[0] = (int)vInt.Value;
+
+        var totalVIntLength = vInt.Length;
+        var totalSize = frameSizes[0];
+
+        for (var i = 0; i < frameSizes.Length; i++)
+        {
+            vInt = ReadVInt(buffer[totalVIntLength..]);
+
+            frameSizes[i] = frameSizes[i - 1] + (int)ParseEbmlLaceSignedInteger(vInt);
+
+            totalVIntLength += vInt.Length;
+            totalSize += frameSizes[i];
+        }
+
+        frameSizes[^1] = (int)blockElement.GetRemaining(_position) - totalSize;
+    }
+
+    private static ulong ParseEbmlLaceSignedInteger(VInt vInt)
+    {
+        return vInt.Length switch
+        {
+            1 => vInt.Value - 63,
+            2 => vInt.Value - 8191,
+            3 => vInt.Value - 1048575,
+            4 => vInt.Value - 134217727,
+            _ => throw new InvalidOperationException("An Ebml Lace Signed Integer cannot have length higher than 4 bytes."),
+        };
     }
 
     private void StartMatroskaReading(Span<byte> buffer)
@@ -280,7 +541,7 @@ public sealed class MatroskaDemuxer : AudioDemuxer
 
     private ReadOnlySpan<byte> ReadBytes(MatroskaElement element, Span<byte> buffer)
     {
-        ReadSourceStream(buffer[..element.DataSize]);
+        _ = ReadSourceStream(buffer[..element.DataSize]);
 
         var value = buffer[..element.DataSize];
 
@@ -291,7 +552,7 @@ public sealed class MatroskaDemuxer : AudioDemuxer
 
     private double ReadFloat(MatroskaElement element, Span<byte> buffer)
     {
-        ReadSourceStream(buffer[..element.DataSize]);
+        _ = ReadSourceStream(buffer[..element.DataSize]);
 
         var value = EbmlReader.ReadFloat(buffer[..element.DataSize]);
 
@@ -302,7 +563,7 @@ public sealed class MatroskaDemuxer : AudioDemuxer
 
     private string ReadAsciiString(MatroskaElement element, Span<byte> buffer)
     {
-        ReadSourceStream(buffer[..element.DataSize]);
+        _ = ReadSourceStream(buffer[..element.DataSize]);
 
         var value = EbmlReader.ReadAsciiString(buffer[..element.DataSize]).ToString();
 
@@ -313,7 +574,7 @@ public sealed class MatroskaDemuxer : AudioDemuxer
 
     private string ReadUtf8String(MatroskaElement element, Span<byte> buffer)
     {
-        ReadSourceStream(buffer[..element.DataSize]);
+        _ = ReadSourceStream(buffer[..element.DataSize]);
 
         var value = EbmlReader.ReadUtf8String(buffer[..element.DataSize]).ToString();
 
@@ -324,7 +585,7 @@ public sealed class MatroskaDemuxer : AudioDemuxer
 
     private ulong ReadUlong(MatroskaElement element, Span<byte> buffer)
     {
-        ReadSourceStream(buffer[..element.DataSize]);
+        _ = ReadSourceStream(buffer[..element.DataSize]);
 
         var value = EbmlReader.ReadUnsignedInteger(buffer[..element.DataSize]);
 
@@ -335,11 +596,11 @@ public sealed class MatroskaDemuxer : AudioDemuxer
 
     private VInt ReadVInt(Span<byte> buffer)
     {
-        ReadSourceStream(buffer[..1]);
+        _ = ReadSourceStream(buffer[..1]);
 
         var length = EbmlReader.ReadVariableSizeIntegerLength(buffer[0]);
 
-        ReadSourceStream(buffer[1..length]);
+        _ = ReadSourceStream(buffer[1..length]);
 
         var vInt = EbmlReader.ReadVariableSizeInteger(buffer[..length], length);
 
@@ -348,16 +609,13 @@ public sealed class MatroskaDemuxer : AudioDemuxer
         return vInt;
     }
 
-    private void ReadSourceStream(Span<byte> buffer, bool throwIfEnd = true)
+    private int ReadSourceStream(Span<byte> buffer, bool throwIfEnd = true)
     {
         var bytesReaded = _sourceStream.Read(buffer);
 
         _position += bytesReaded;
 
-        if (bytesReaded <= 0 && throwIfEnd)
-        {
-            throw new EndOfStreamException();
-        }
+        return bytesReaded <= 0 && throwIfEnd ? throw new EndOfStreamException() : bytesReaded;
     }
 
     /// <inheritdoc/>
