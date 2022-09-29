@@ -59,8 +59,6 @@ public sealed class MatroskaDemuxer : AudioDemuxer
         set => Seek(value, SeekOrigin.Begin);
     }
 
-    private bool CurrentBlockHasFrames => _currentBlock.HasValue && (_currentBlockIndex + 1) < _currentBlock.Value.FrameCount;
-
     /// <inheritdoc/>
     public override int Demux(Span<byte> buffer)
     {
@@ -73,7 +71,7 @@ public sealed class MatroskaDemuxer : AudioDemuxer
 
         int result;
 
-        if (_currentBlock.HasValue && CurrentBlockHasFrames)
+        if (_currentBlock.HasValue && BlockHasFrames(_currentBlock.Value))
         {
             result = ReadFrameFromBlock(buffer, _currentBlock.Value);
 
@@ -199,7 +197,7 @@ public sealed class MatroskaDemuxer : AudioDemuxer
 
     private int ReadFrameFromBlock(Span<byte> buffer, MatroskaBlock block)
     {
-        while (CurrentBlockHasFrames)
+        while (BlockHasFrames(block))
         {
             var frameSize = block.GetFrameSizeByIndex(_currentBlockIndex);
             var result = ReadSourceStream(buffer[..frameSize]);
@@ -208,6 +206,7 @@ public sealed class MatroskaDemuxer : AudioDemuxer
 
             if (result > 0)
             {
+                _currentBlock = block;
                 return result;
             }
         }
@@ -215,20 +214,27 @@ public sealed class MatroskaDemuxer : AudioDemuxer
         return 0;
     }
 
+    private bool BlockHasFrames(MatroskaBlock block)
+    {
+        return _currentBlockIndex < block.FrameCount;
+    }
+
     private MatroskaBlock? ParseBlock(Span<byte> buffer, MatroskaElement blockElement)
     {
-        _ = ReadSourceStream(buffer[..2]);
+        var vInt = ReadVInt(buffer);
 
-        var trackNumber = EbmlReader.ReadUnsignedInteger(buffer[..2]);
+        var trackNumber = vInt.Value;
 
         if (trackNumber != SelectedTrack?.TrackNumber)
         {
             return null;
         }
 
-        _ = ReadSourceStream(buffer[2..3]);
+        _ = Seek(2, SeekOrigin.Current);
 
-        var flags = buffer[2];
+        _ = ReadSourceStream(buffer[vInt.Length..(vInt.Length + 1)]);
+
+        var flags = buffer[vInt.Length];
         var lacingType = (MatroskaBlockLacingType)(flags & 0b0000110);
 
         int frameCount;
@@ -236,8 +242,8 @@ public sealed class MatroskaDemuxer : AudioDemuxer
 
         if (lacingType != MatroskaBlockLacingType.No)
         {
-            _ = ReadSourceStream(buffer[3..4]);
-            frameCount = (buffer[3] & 0xff) + 1;
+            _ = ReadSourceStream(buffer[(vInt.Length + 1)..(vInt.Length + 2)]);
+            frameCount = (buffer[vInt.Length + 1] & 0xff) + 1;
         }
         else
         {
@@ -254,13 +260,13 @@ public sealed class MatroskaDemuxer : AudioDemuxer
                 break;
 
             case MatroskaBlockLacingType.Xiph:
-                ParseXiphLacing(buffer[4..], blockElement, frameSizes);
+                ParseXiphLacing(buffer[(vInt.Length + 2)..], blockElement, frameSizes);
                 break;
             case MatroskaBlockLacingType.FixedSize:
                 ParseFixedSizeLacing(blockElement, frameSizes);
                 break;
             case MatroskaBlockLacingType.Ebml:
-                ParseEbmlLacing(buffer[4..], blockElement, frameSizes);
+                ParseEbmlLacing(buffer[(vInt.Length + 2)..], blockElement, frameSizes);
                 break;
         }
 
@@ -600,7 +606,10 @@ public sealed class MatroskaDemuxer : AudioDemuxer
 
         var length = EbmlReader.ReadVariableSizeIntegerLength(buffer[0]);
 
-        _ = ReadSourceStream(buffer[1..length]);
+        if (length > 1)
+        {
+            _ = ReadSourceStream(buffer[1..length]);
+        }
 
         var vInt = EbmlReader.ReadVariableSizeInteger(buffer[..length], length);
 
@@ -626,7 +635,7 @@ public sealed class MatroskaDemuxer : AudioDemuxer
 
     private void SkipElement(MatroskaElement element)
     {
-        _ = Seek(element.EndPosition, SeekOrigin.Current);
+        _ = Seek(element.GetRemaining(_position), SeekOrigin.Current);
     }
 
     /// <inheritdoc/>
