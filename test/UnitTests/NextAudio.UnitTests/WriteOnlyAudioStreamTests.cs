@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -49,6 +50,19 @@ public class WriteOnlyAudioStreamTests
         });
     }
 
+    [Fact]
+    public async Task ReadAsyncThrowsNotSupportedException()
+    {
+        // Act
+        var stream = new WriteOnlyAudioStreamMock();
+
+        // Arrange + Assert
+        _ = await Assert.ThrowsAsync<NotSupportedException>(async () =>
+        {
+            _ = await stream.ReadAsync(Memory<byte>.Empty);
+        });
+    }
+
     private sealed class WriteOnlyAudioStreamMock : WriteOnlyAudioStream
     {
         public override bool CanSeek => throw new NotImplementedException();
@@ -68,6 +82,11 @@ public class WriteOnlyAudioStreamTests
         }
 
         public override void Write(ReadOnlySpan<byte> buffer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

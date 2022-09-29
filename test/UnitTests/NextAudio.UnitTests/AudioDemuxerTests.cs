@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -98,36 +99,7 @@ public class AudioDemuxerTests
     }
 
     [Fact]
-    public async Task DemuxSpanAsyncCallsSpanDemux()
-    {
-        // Act
-        var expectedBuffer = new byte[]
-        {
-            1,
-            2,
-            3
-        };
-
-        var receivedBufferCalls = 0;
-        byte[]? receivedBuffer = null;
-
-        AudioDemuxer demuxer = new AudioDemuxerMock((buffer) =>
-        {
-            receivedBuffer = buffer;
-            receivedBufferCalls++;
-        });
-
-        // Arrange
-        _ = await demuxer.DemuxAsync(expectedBuffer);
-
-        // Assert
-        Assert.NotNull(receivedBuffer);
-        Assert.Equal(1, receivedBufferCalls);
-        Assert.Equal(expectedBuffer, receivedBuffer);
-    }
-
-    [Fact]
-    public async Task DemuxByteArrayAsyncCallsSpanDemux()
+    public async Task DemuxByteArrayAsyncCallsAsyncMemoryDemux()
     {
         // Act
         var expectedBuffer = new byte[]
@@ -176,6 +148,12 @@ public class AudioDemuxerTests
         }
 
         public override int Demux(Span<byte> buffer)
+        {
+            _callback(buffer.ToArray());
+            return default;
+        }
+
+        public override ValueTask<int> DemuxAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
         {
             _callback(buffer.ToArray());
             return default;

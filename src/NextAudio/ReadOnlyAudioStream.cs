@@ -19,4 +19,10 @@ public abstract class ReadOnlyAudioStream : AudioStream
     {
         throw new NotSupportedException();
     }
+
+    /// <inheritdoc/>
+    public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+    {
+        throw new NotSupportedException();
+    }
 }
