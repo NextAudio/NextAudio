@@ -477,31 +477,15 @@ public sealed class MatroskaDemuxer : AudioDemuxer
         }
     }
 
-    /// <summary>
-    /// Creates a clone of this demuxer.
-    /// </summary>
-    /// <param name="cloneSourceStream">If the source stream also needs to be cloned.</param>
-    /// <returns>A new cloned demuxer.</returns>
-    public MatroskaDemuxer Clone(bool cloneSourceStream)
-    {
-        var optionsClone = _options.Clone();
-        var sourceStreamClone = cloneSourceStream
-            ? _sourceStream.Clone()
-            : _sourceStream;
-
-        var copy = new MatroskaDemuxer(sourceStreamClone, optionsClone, _loggerFactory);
-
-        if (!cloneSourceStream)
-        {
-            _options.DisposeSourceStream = false;
-        }
-
-        return copy;
-    }
-
     /// <inheritdoc/>
     public override MatroskaDemuxer Clone()
     {
-        return Clone(false);
+        var optionsClone = _options.Clone();
+
+        var copy = new MatroskaDemuxer(_sourceStream, optionsClone, _loggerFactory);
+
+        _options.DisposeSourceStream = false;
+
+        return copy;
     }
 }
