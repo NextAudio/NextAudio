@@ -204,11 +204,8 @@ public sealed class MatroskaDemuxer : AudioDemuxer
 
             _currentBlockIndex++;
 
-            if (result > 0)
-            {
-                _currentBlock = block;
-                return result;
-            }
+            _currentBlock = block;
+            return result;
         }
 
         return 0;
@@ -618,13 +615,18 @@ public sealed class MatroskaDemuxer : AudioDemuxer
         return vInt;
     }
 
-    private int ReadSourceStream(Span<byte> buffer, bool throwIfEnd = true)
+    private int ReadSourceStream(Span<byte> buffer)
     {
-        var bytesReaded = _sourceStream.Read(buffer);
+        var bytesReaded = 0;
+
+        do
+        {
+            bytesReaded += _sourceStream.Read(buffer[bytesReaded..]);
+        } while (bytesReaded < buffer.Length);
 
         _position += bytesReaded;
 
-        return bytesReaded <= 0 && throwIfEnd ? throw new EndOfStreamException() : bytesReaded;
+        return bytesReaded;
     }
 
     /// <inheritdoc/>
@@ -693,9 +695,7 @@ public sealed class MatroskaDemuxer : AudioDemuxer
 
         try
         {
-            var bytesRead = _sourceStream.Read(skipBuffer, 0, numberOfBytesToSkip);
-
-            _position += bytesRead;
+            _ = ReadSourceStream(skipBuffer.AsSpan(0, numberOfBytesToSkip));
         }
         finally
         {
