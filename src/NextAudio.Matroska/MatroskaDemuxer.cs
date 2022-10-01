@@ -275,7 +275,7 @@ public sealed class MatroskaDemuxer : AudioDemuxer
         var totalSize = 0;
         var bufferIndex = 0;
 
-        for (var i = 0; i < frameSizes.Length; i++)
+        for (var i = 0; i < frameSizes.Length - 1; i++)
         {
             var value = 0;
 
@@ -312,7 +312,7 @@ public sealed class MatroskaDemuxer : AudioDemuxer
         var totalVIntLength = vInt.Length;
         var totalSize = frameSizes[0];
 
-        for (var i = 0; i < frameSizes.Length; i++)
+        for (var i = 1; i < frameSizes.Length - 1; i++)
         {
             vInt = ReadVInt(buffer[totalVIntLength..]);
 
