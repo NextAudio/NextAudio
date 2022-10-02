@@ -25,6 +25,12 @@ public abstract class ReadOnlyAudioStream : AudioStream
     public override bool CanWrite => false;
 
     /// <inheritdoc/>
+    public override void SetLength(long value)
+    {
+        throw new NotSupportedException();
+    }
+
+    /// <inheritdoc/>
     public override void Write(ReadOnlySpan<byte> buffer)
     {
         throw new NotSupportedException();

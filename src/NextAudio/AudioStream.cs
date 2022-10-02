@@ -61,6 +61,9 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     /// <inheritdoc cref="Stream.Seek(long, SeekOrigin)" />
     public abstract long Seek(long offset, SeekOrigin origin);
 
+    /// <inheritdoc cref="Stream.SetLength(long)" />
+    public abstract void SetLength(long value);
+
     /// <inheritdoc cref="Stream.Read(Span{byte})" />
     public abstract int Read(Span<byte> buffer);
 
@@ -162,11 +165,20 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     }
 
     /// <summary>
-    /// Implicit cast a <see cref="Stream" /> in an <see cref="AudioStream "/>
+    /// Implicit cast a <see cref="AudioStream" /> in an <see cref="Stream "/>
     /// </summary>
     /// <param name="audioStream">The <see cref="AudioStream" /> to be cast.</param>
     public static implicit operator Stream(AudioStream audioStream)
     {
         return new AudioStreamToStream(audioStream);
+    }
+
+    /// <summary>
+    /// Implicit cast a <see cref="Stream" /> in an <see cref="AudioStream "/>
+    /// </summary>
+    /// <param name="stream">The <see cref="Stream" /> to be cast.</param>
+    public static implicit operator AudioStream(Stream stream)
+    {
+        return new StreamToAudioStream(stream);
     }
 }

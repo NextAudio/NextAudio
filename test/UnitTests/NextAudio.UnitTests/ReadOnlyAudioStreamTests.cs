@@ -63,6 +63,17 @@ public class ReadOnlyAudioStreamTests
         });
     }
 
+    [Fact]
+    public void SetLengthThrowsNotSupportedException()
+    {
+        var stream = new ReadOnlyAudioStreamMock();
+
+        _ = Assert.Throws<NotSupportedException>(() =>
+        {
+            stream.SetLength(0);
+        });
+    }
+
     private sealed class ReadOnlyAudioStreamMock : ReadOnlyAudioStream
     {
         public override bool CanSeek => throw new NotImplementedException();

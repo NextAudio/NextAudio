@@ -81,6 +81,11 @@ public class WriteOnlyAudioStreamTests
             throw new NotImplementedException();
         }
 
+        public override void SetLength(long value)
+        {
+            throw new NotImplementedException();
+        }
+
         public override void Write(ReadOnlySpan<byte> buffer)
         {
             throw new NotImplementedException();

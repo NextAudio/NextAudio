@@ -93,17 +93,15 @@ public class AudioStreamToStreamTests
     }
 
     [Fact]
-    public void SetLengthThrowsNotSupportedException()
+    public void SetLengthCallsSourceAudioStreamSetLength()
     {
         // Act
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
         var castStream = new AudioStreamToStream(audioStream);
 
-        // Arrange + Assert
-        _ = Assert.Throws<NotSupportedException>(() =>
-        {
-            castStream.SetLength(0);
-        });
+        castStream.SetLength(0);
+
+        audioStream.Received(1).SetLength(0);
     }
 
     [Fact]
@@ -173,30 +171,6 @@ public class AudioStreamToStreamTests
     }
 
     [Fact]
-    public void ReadCallsAudioStreamRead()
-    {
-        // Act
-        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
-
-        var castStream = new AudioStreamToStream(audioStream);
-
-        var expectedByteArray = new byte[]
-        {
-            1,
-            2,
-            3
-        };
-        var expectedOffset = 0;
-        var expectedCount = 3;
-
-        // Arrange
-        _ = castStream.Read(expectedByteArray, expectedOffset, expectedCount);
-
-        // Assert
-        _ = audioStream.Received(1).Read(expectedByteArray, expectedOffset, expectedCount);
-    }
-
-    [Fact]
     public async Task ReadAsyncValueTaskCallsAudioStreamReadAsyncValueTask()
     {
         // Act
@@ -220,58 +194,7 @@ public class AudioStreamToStreamTests
     }
 
     [Fact]
-    public async Task ReadAsyncTaskCallsAudioStreamReadAsyncValueTask()
-    {
-        // Act
-        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
-
-        Stream castStream = new AudioStreamToStream(audioStream);
-
-        var expectedByteArray = new byte[]
-        {
-            1,
-            2,
-            3
-        };
-        var expectedOffset = 0;
-        var expectedCount = 3;
-        var expectedCancellationToken = CancellationToken.None;
-
-        // Arrange
-#pragma warning disable CA1835
-        _ = await castStream.ReadAsync(expectedByteArray, expectedOffset, expectedCount, expectedCancellationToken);
-
-        // Assert
-        _ = await audioStream.Received(1).ReadAsync(expectedByteArray, expectedOffset, expectedCount, expectedCancellationToken);
-#pragma warning restore CA1835
-    }
-
-    [Fact]
-    public void WriteCallsAudioStreamWrite()
-    {
-        // Act
-        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
-
-        var castStream = new AudioStreamToStream(audioStream);
-
-        var expectedByteArray = new byte[]
-        {
-            1,
-            2,
-            3
-        };
-        var expectedOffset = 0;
-        var expectedCount = 3;
-
-        // Arrange
-        castStream.Write(expectedByteArray, expectedOffset, expectedCount);
-
-        // Assert
-        audioStream.Received(1).Write(expectedByteArray, expectedOffset, expectedCount);
-    }
-
-    [Fact]
-    public async Task WrtieAsyncValueTaskCallsAudioStreamWriteAsyncValueTask()
+    public async Task WriteAsyncValueTaskCallsAudioStreamWriteAsyncValueTask()
     {
         // Act
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
@@ -291,33 +214,6 @@ public class AudioStreamToStreamTests
 
         // Assert
         await audioStream.Received(1).WriteAsync(expectedMemory, expectedCancellationToken);
-    }
-
-    [Fact]
-    public async Task WriteAsyncTaskCallsAudioStreamWriteAsyncValueTask()
-    {
-        // Act
-        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
-
-        Stream castStream = new AudioStreamToStream(audioStream);
-
-        var expectedByteArray = new byte[]
-        {
-            1,
-            2,
-            3
-        };
-        var expectedOffset = 0;
-        var expectedCount = 3;
-        var expectedCancellationToken = CancellationToken.None;
-
-        // Arrange
-#pragma warning disable CA1835
-        await castStream.WriteAsync(expectedByteArray, expectedOffset, expectedCount, expectedCancellationToken);
-
-        // Assert
-        await audioStream.Received(1).WriteAsync(expectedByteArray, expectedOffset, expectedCount, expectedCancellationToken);
-#pragma warning restore CA1835
     }
 
     [Fact]
@@ -422,8 +318,8 @@ public class AudioStreamToStreamTests
         // Assert
         Assert.True(disposeAsyncCalled);
 
-        // the count will be equals 2 because DisposeAsync also calls Dispose
-        Assert.Equal(2, disposeAsyncCallsCount);
+        // the count will be equals 3 because DisposeAsync also calls Dispose and the base DisposeAsync
+        Assert.Equal(3, disposeAsyncCallsCount);
     }
 
     private sealed class AudioStreamMock : AudioStream
@@ -469,6 +365,11 @@ public class AudioStreamToStreamTests
         }
 
         public override long Seek(long offset, SeekOrigin origin)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void SetLength(long value)
         {
             throw new NotImplementedException();
         }
