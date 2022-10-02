@@ -11,9 +11,9 @@ using Xunit;
 
 namespace NextAudio.UnitTests.Utils;
 
-public class StreamUtilsTests
+public class AudioStreamUtilsTests
 {
-    public static IEnumerable<object[]> ReadFullyStreamReadsCurrentStreamData()
+    public static IEnumerable<object[]> ReadFullyAudioStreamReadsCurrentAudioStreamData()
     {
         yield return new object[]
         {
@@ -39,39 +39,39 @@ public class StreamUtilsTests
     }
 
     [Theory]
-    [MemberData(nameof(ReadFullyStreamReadsCurrentStreamData))]
-    public void ReadFullyStreamReadsCurrentStream(AudioStream stream, byte[] buffer)
+    [MemberData(nameof(ReadFullyAudioStreamReadsCurrentAudioStreamData))]
+    public void ReadFullyAudioStreamReadsCurrentAudioStream(AudioStream stream, byte[] buffer)
     {
-        var result = StreamUtils.ReadFullyStream(stream, buffer);
+        var result = AudioStreamUtils.ReadFullyAudioStream(stream, buffer);
 
         Assert.Equal(buffer.Length, result);
     }
 
     [Theory]
-    [MemberData(nameof(ReadFullyStreamReadsCurrentStreamData))]
-    public async Task ReadFullyStreamAsyncReadsCurrentStream(AudioStream stream, byte[] buffer)
+    [MemberData(nameof(ReadFullyAudioStreamReadsCurrentAudioStreamData))]
+    public async Task ReadFullyAudioStreamAsyncReadsCurrentAudioStream(AudioStream stream, byte[] buffer)
     {
-        var result = await StreamUtils.ReadFullyStreamAsync(stream, buffer);
+        var result = await AudioStreamUtils.ReadFullyAudioStreamAsync(stream, buffer);
 
         Assert.Equal(buffer.Length, result);
     }
 
     [Fact]
-    public void ReadFullyStreamNotReadsIfStreamEnded()
+    public void ReadFullyAudioStreamNotReadsIfAudioStreamEnded()
     {
         AudioStream stream = new MemoryStream(Array.Empty<byte>());
 
-        var result = StreamUtils.ReadFullyStream(stream, new byte[10]);
+        var result = AudioStreamUtils.ReadFullyAudioStream(stream, new byte[10]);
 
         Assert.Equal(0, result);
     }
 
     [Fact]
-    public async Task ReadFullyStreamAsyncNotReadsIfStreamEnded()
+    public async Task ReadFullyAudioStreamAsyncNotReadsIfAudioStreamEnded()
     {
         AudioStream stream = new MemoryStream(Array.Empty<byte>());
 
-        var result = await StreamUtils.ReadFullyStreamAsync(stream, new byte[10]);
+        var result = await AudioStreamUtils.ReadFullyAudioStreamAsync(stream, new byte[10]);
 
         Assert.Equal(0, result);
     }
@@ -81,7 +81,7 @@ public class StreamUtilsTests
     [InlineData(new object[] { 82, 8, 90 })]
     public void ComputePositionSumsPositionAndBytesReaded(long position, int bytesReaded, long expectedPosition)
     {
-        var result = StreamUtils.ComputePosition(position, bytesReaded);
+        var result = AudioStreamUtils.ComputePosition(position, bytesReaded);
 
         Assert.Equal(expectedPosition, result);
     }
