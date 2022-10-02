@@ -56,6 +56,26 @@ public class StreamUtilsTests
         Assert.Equal(buffer.Length, result);
     }
 
+    [Fact]
+    public void ReadStreamNotReadsIfStreamEnded()
+    {
+        AudioStream stream = new MemoryStream(Array.Empty<byte>());
+
+        var result = StreamUtils.ReadStream(stream, new byte[10]);
+
+        Assert.Equal(0, result);
+    }
+
+    [Fact]
+    public async Task ReadStreamAsyncNotReadsIfStreamEnded()
+    {
+        AudioStream stream = new MemoryStream(Array.Empty<byte>());
+
+        var result = await StreamUtils.ReadStreamAsync(stream, new byte[10]);
+
+        Assert.Equal(0, result);
+    }
+
     [Theory]
     [InlineData(new object[] { 10, 10, 20 })]
     [InlineData(new object[] { 82, 8, 90 })]

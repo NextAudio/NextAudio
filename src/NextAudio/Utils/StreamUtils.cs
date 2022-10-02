@@ -7,26 +7,30 @@ internal static class StreamUtils
 {
     public static int ReadStream(AudioStream stream, Span<byte> buffer)
     {
+        var totalBytesReaded = 0;
         var bytesReaded = 0;
 
         do
         {
-            bytesReaded += stream.Read(buffer[bytesReaded..]);
-        } while (bytesReaded < buffer.Length);
+            bytesReaded = stream.Read(buffer[bytesReaded..]);
+            totalBytesReaded += bytesReaded;
+        } while (bytesReaded > 0 && totalBytesReaded < buffer.Length);
 
-        return bytesReaded;
+        return totalBytesReaded;
     }
 
     public static async ValueTask<int> ReadStreamAsync(AudioStream stream, Memory<byte> buffer)
     {
+        var totalBytesReaded = 0;
         var bytesReaded = 0;
 
         do
         {
-            bytesReaded += await stream.ReadAsync(buffer[bytesReaded..]).ConfigureAwait(false);
-        } while (bytesReaded < buffer.Length);
+            bytesReaded = await stream.ReadAsync(buffer[bytesReaded..]).ConfigureAwait(false);
+            totalBytesReaded += bytesReaded;
+        } while (bytesReaded > 0 && totalBytesReaded < buffer.Length);
 
-        return bytesReaded;
+        return totalBytesReaded;
     }
 
     public static long ComputePosition(long position, int bytesReaded)
