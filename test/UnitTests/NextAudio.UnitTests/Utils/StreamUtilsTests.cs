@@ -13,7 +13,7 @@ namespace NextAudio.UnitTests.Utils;
 
 public class StreamUtilsTests
 {
-    public static IEnumerable<object[]> ReadStreamReadsCurrentStreamData()
+    public static IEnumerable<object[]> ReadFullyStreamReadsCurrentStreamData()
     {
         yield return new object[]
         {
@@ -39,39 +39,39 @@ public class StreamUtilsTests
     }
 
     [Theory]
-    [MemberData(nameof(ReadStreamReadsCurrentStreamData))]
-    public void ReadStreamReadsCurrentStream(AudioStream stream, byte[] buffer)
+    [MemberData(nameof(ReadFullyStreamReadsCurrentStreamData))]
+    public void ReadFullyStreamReadsCurrentStream(AudioStream stream, byte[] buffer)
     {
-        var result = StreamUtils.ReadStream(stream, buffer);
+        var result = StreamUtils.ReadFullyStream(stream, buffer);
 
         Assert.Equal(buffer.Length, result);
     }
 
     [Theory]
-    [MemberData(nameof(ReadStreamReadsCurrentStreamData))]
-    public async Task ReadStreamAsyncReadsCurrentStream(AudioStream stream, byte[] buffer)
+    [MemberData(nameof(ReadFullyStreamReadsCurrentStreamData))]
+    public async Task ReadFullyStreamAsyncReadsCurrentStream(AudioStream stream, byte[] buffer)
     {
-        var result = await StreamUtils.ReadStreamAsync(stream, buffer);
+        var result = await StreamUtils.ReadFullyStreamAsync(stream, buffer);
 
         Assert.Equal(buffer.Length, result);
     }
 
     [Fact]
-    public void ReadStreamNotReadsIfStreamEnded()
+    public void ReadFullyStreamNotReadsIfStreamEnded()
     {
         AudioStream stream = new MemoryStream(Array.Empty<byte>());
 
-        var result = StreamUtils.ReadStream(stream, new byte[10]);
+        var result = StreamUtils.ReadFullyStream(stream, new byte[10]);
 
         Assert.Equal(0, result);
     }
 
     [Fact]
-    public async Task ReadStreamAsyncNotReadsIfStreamEnded()
+    public async Task ReadFullyStreamAsyncNotReadsIfStreamEnded()
     {
         AudioStream stream = new MemoryStream(Array.Empty<byte>());
 
-        var result = await StreamUtils.ReadStreamAsync(stream, new byte[10]);
+        var result = await StreamUtils.ReadFullyStreamAsync(stream, new byte[10]);
 
         Assert.Equal(0, result);
     }

@@ -5,7 +5,7 @@ namespace NextAudio.Utils;
 
 internal static class StreamUtils
 {
-    public static int ReadStream(AudioStream stream, Span<byte> buffer)
+    public static int ReadFullyStream(AudioStream stream, Span<byte> buffer)
     {
         var totalBytesReaded = 0;
         var bytesReaded = 0;
@@ -19,7 +19,7 @@ internal static class StreamUtils
         return totalBytesReaded;
     }
 
-    public static async ValueTask<int> ReadStreamAsync(AudioStream stream, Memory<byte> buffer)
+    public static async ValueTask<int> ReadFullyStreamAsync(AudioStream stream, Memory<byte> buffer)
     {
         var totalBytesReaded = 0;
         var bytesReaded = 0;
