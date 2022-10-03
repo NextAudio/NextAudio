@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Abstractions;
 using NextAudio.Utils;
+using NSubstitute;
 using Xunit;
 
 namespace NextAudio.UnitTests.Utils;
@@ -76,8 +78,166 @@ public class AudioStreamUtilsTests
         Assert.Equal(0, result);
     }
 
+    [Fact]
+    public void SeekCallsSourceStreamSeekIfCanSeek()
+    {
+        var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
+
+        _ = stream.CanSeek.Returns(true);
+
+        _ = AudioStreamUtils.Seek(stream, 1000, SeekOrigin.Current, 0);
+
+        _ = stream.Received(1).Seek(1000, SeekOrigin.Current);
+    }
+
+    [Fact]
+    public async Task SeekAsyncCallsSourceStreamSeekIfCanSeek()
+    {
+        var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
+
+        _ = stream.CanSeek.Returns(true);
+
+        _ = await AudioStreamUtils.SeekAsync(stream, 1000, SeekOrigin.Current, 0);
+
+        _ = stream.Received(1).Seek(1000, SeekOrigin.Current);
+    }
+
+    [Fact]
+    public void SeekThrowsNotSupportedExceptionIfSourceCantSeekAndSeekOriginIsEndAndLengthThrows()
+    {
+        var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
+
+        _ = stream.CanSeek.Returns(false);
+        _ = stream.Length.Returns((x) => throw new NotSupportedException());
+
+        _ = Assert.Throws<NotSupportedException>(() =>
+        {
+            _ = AudioStreamUtils.Seek(stream, 1000, SeekOrigin.End, 0);
+        });
+    }
+
+    [Fact]
+    public async Task SeekAsyncThrowsNotSupportedExceptionIfSourceCantSeekAndSeekOriginIsEndAndLengthThrows()
+    {
+        var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
+
+        _ = stream.CanSeek.Returns(false);
+        _ = stream.Length.Returns((x) => throw new NotSupportedException());
+
+        _ = await Assert.ThrowsAsync<NotSupportedException>(async () =>
+        {
+            _ = await AudioStreamUtils.SeekAsync(stream, 1000, SeekOrigin.End, 0);
+        });
+    }
+
+    [Fact]
+    public void SeekThrowsIfSeekOriginIsUnknownAndSourceCantSeek()
+    {
+        var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
+
+        _ = stream.CanSeek.Returns(false);
+
+        _ = Assert.Throws<InvalidOperationException>(() =>
+        {
+            _ = AudioStreamUtils.Seek(stream, 1000, (SeekOrigin)10, 0);
+        });
+    }
+
+    [Fact]
+    public async Task SeekAsyncThrowsIfSeekOriginIsUnknownAndSourceCantSeek()
+    {
+        var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
+
+        _ = stream.CanSeek.Returns(false);
+
+        _ = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            _ = await AudioStreamUtils.SeekAsync(stream, 1000, (SeekOrigin)10, 0);
+        });
+    }
+
+    [Fact]
+    public void SeekThrowsIfSourceCantSeekAndNewPositionIsLowerThanCurrentPosition()
+    {
+        var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
+
+        _ = stream.CanSeek.Returns(false);
+
+        _ = Assert.Throws<NotSupportedException>(() =>
+        {
+            _ = AudioStreamUtils.Seek(stream, 500, SeekOrigin.Begin, 1000);
+        });
+    }
+
+    [Fact]
+    public async Task SeekAsyncThrowsIfSourceCantSeekAndNewPositionIsLowerThanCurrentPosition()
+    {
+        var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
+
+        _ = stream.CanSeek.Returns(false);
+
+        _ = await Assert.ThrowsAsync<NotSupportedException>(async () =>
+        {
+            _ = await AudioStreamUtils.SeekAsync(stream, 500, SeekOrigin.Begin, 1000);
+        });
+    }
+
+    [Fact]
+    public void SeekThrowsIfSourceCantSeekAndNewPositionIsHigherThanIntMaxValue()
+    {
+        var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
+
+        _ = stream.CanSeek.Returns(false);
+
+        _ = Assert.Throws<InvalidOperationException>(() =>
+        {
+            _ = AudioStreamUtils.Seek(stream, ((long)int.MaxValue) + 1, SeekOrigin.Current, 0);
+        });
+    }
+
+    [Fact]
+    public async Task SeekAsyncThrowsIfSourceCantSeekAndNewPositionIsHigherThanIntMaxValue()
+    {
+        var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
+
+        _ = stream.CanSeek.Returns(false);
+
+        _ = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            _ = await AudioStreamUtils.SeekAsync(stream, ((long)int.MaxValue) + 1, SeekOrigin.Current, 0);
+        });
+    }
+
+    [Theory]
+    [InlineData(100, SeekOrigin.Begin, 10, 0, 100)]
+    [InlineData(100, SeekOrigin.Current, 10, 0, 110)]
+    [InlineData(-100, SeekOrigin.End, 500, 1000, 900)]
+    public void SeekForcellySeekIfSourceCantSeek(long offset, SeekOrigin origin, long currentPosition, long length, long expectedPosition)
+    {
+        var stream = new PartialReadAudioStreamMock(false, length);
+
+        var result = AudioStreamUtils.Seek(stream, offset, origin, currentPosition);
+
+        Assert.Equal(expectedPosition, result);
+    }
+
+    [Theory]
+    [InlineData(100, SeekOrigin.Begin, 10, 0, 100)]
+    [InlineData(100, SeekOrigin.Current, 10, 0, 110)]
+    [InlineData(-100, SeekOrigin.End, 500, 1000, 900)]
+    public async Task SeekAsyncForcellySeekIfSourceCantSeek(long offset, SeekOrigin origin, long currentPosition, long length, long expectedPosition)
+    {
+        var stream = new PartialReadAudioStreamMock(false, length);
+
+        var result = await AudioStreamUtils.SeekAsync(stream, offset, origin, currentPosition);
+
+        Assert.Equal(expectedPosition, result);
+    }
+
     private class PartialReadAudioStreamMock : AudioStream
     {
+        private readonly bool _canSeek;
+        private readonly long _length;
         private readonly byte[] _buffer;
         private readonly int _maxRead;
 
@@ -87,13 +247,21 @@ public class AudioStreamUtilsTests
             _maxRead = maxRead;
         }
 
+        public PartialReadAudioStreamMock(bool canSeek, long length)
+        {
+            _buffer = new byte[8 * 1024];
+            _maxRead = 8 * 1024;
+            _canSeek = canSeek;
+            _length = length;
+        }
+
         public override bool CanRead => throw new NotImplementedException();
 
-        public override bool CanSeek => throw new NotImplementedException();
+        public override bool CanSeek => _canSeek;
 
         public override bool CanWrite => throw new NotImplementedException();
 
-        public override long Length => throw new NotImplementedException();
+        public override long Length => _length;
 
         public override long Position { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
