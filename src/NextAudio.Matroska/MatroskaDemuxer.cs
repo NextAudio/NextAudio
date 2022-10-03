@@ -524,7 +524,7 @@ public sealed class MatroskaDemuxer : AudioDemuxer
 
     private MatroskaElement? ReadNextElement(Span<byte> buffer, MatroskaElement? parent = null)
     {
-        if (parent.HasValue && parent.Value.GetRemaining(_position) == 0)
+        if (parent.HasValue && parent.Value.GetRemaining(_position) <= 0)
         {
             return null;
         }
@@ -622,7 +622,7 @@ public sealed class MatroskaDemuxer : AudioDemuxer
         do
         {
             bytesReaded += _sourceStream.Read(buffer[bytesReaded..]);
-        } while (bytesReaded < buffer.Length);
+        } while (bytesReaded > 0 && bytesReaded < buffer.Length);
 
         _position += bytesReaded;
 
