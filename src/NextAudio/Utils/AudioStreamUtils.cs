@@ -48,15 +48,4 @@ public static class AudioStreamUtils
 
         return totalBytesReaded;
     }
-
-    /// <summary>
-    /// Sums the <paramref name="position" /> and the <paramref name="bytesReaded" />.
-    /// </summary>
-    /// <param name="position">The position to be summed.</param>
-    /// <param name="bytesReaded">The total of bytes readed to be summed.</param>
-    /// <returns>The sum of <paramref name="position" /> and <paramref name="bytesReaded" />.</returns>
-    public static long ComputePosition(long position, int bytesReaded)
-    {
-        return position + bytesReaded;
-    }
 }

@@ -76,16 +76,6 @@ public class AudioStreamUtilsTests
         Assert.Equal(0, result);
     }
 
-    [Theory]
-    [InlineData(new object[] { 10, 10, 20 })]
-    [InlineData(new object[] { 82, 8, 90 })]
-    public void ComputePositionSumsPositionAndBytesReaded(long position, int bytesReaded, long expectedPosition)
-    {
-        var result = AudioStreamUtils.ComputePosition(position, bytesReaded);
-
-        Assert.Equal(expectedPosition, result);
-    }
-
     private class PartialReadAudioStreamMock : AudioStream
     {
         private readonly byte[] _buffer;

@@ -3,7 +3,6 @@
 
 using Microsoft.Extensions.Logging;
 using NextAudio.Matroska.Models;
-using NextAudio.Utils;
 
 namespace NextAudio.Matroska.Internal;
 
@@ -19,10 +18,10 @@ internal static class ElementReader
         var initialPosition = position;
 
         var elementId = VIntReader.ReadVInt(stream, buffer, position, logger);
-        position = AudioStreamUtils.ComputePosition(position, elementId.Length);
+        position += elementId.Length;
 
         var elementSize = VIntReader.ReadVInt(stream, buffer[elementId.Length..], position, logger);
-        position = AudioStreamUtils.ComputePosition(position, elementSize.Length);
+        position += elementSize.Length;
 
         var headerSize = position - initialPosition;
         var depth = parent.HasValue ? parent.Value.Depth + 1 : 0;
@@ -44,10 +43,10 @@ internal static class ElementReader
         var initialPosition = position;
 
         var elementId = await VIntReader.ReadVIntAsync(stream, buffer, position, logger);
-        position = AudioStreamUtils.ComputePosition(position, elementId.Length);
+        position += elementId.Length;
 
         var elementSize = await VIntReader.ReadVIntAsync(stream, buffer[elementId.Length..], position, logger);
-        position = AudioStreamUtils.ComputePosition(position, elementSize.Length);
+        position += elementSize.Length;
 
         var headerSize = position - initialPosition;
         var depth = parent.HasValue ? parent.Value.Depth + 1 : 0;
