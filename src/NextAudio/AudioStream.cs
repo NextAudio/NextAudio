@@ -69,6 +69,18 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     /// <inheritdoc cref="Stream.Seek(long, SeekOrigin)" />
     public abstract long Seek(long offset, SeekOrigin origin);
 
+    /// <summary>
+    /// When overridden in a derived class, asynchronously sets the position within the current stream.
+    /// </summary>
+    /// <param name="offset">A byte offset relative to the origin parameter.</param>
+    /// <param name="origin">A value of type <see cref="SeekOrigin" /> indicating the reference point
+    /// used to obtaint he new position.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests.
+    /// The default value is <see cref="CancellationToken.None" />.</param>
+    /// <returns>A <see cref="ValueTask" /> that represents an that represents an asynchronous operation
+    /// where the result is the new position within the current stream.</returns>
+    public abstract ValueTask<long> SeekAsync(long offset, SeekOrigin origin, CancellationToken cancellationToken = default);
+
     /// <inheritdoc cref="Stream.SetLength(long)" />
     public abstract void SetLength(long value);
 
@@ -103,7 +115,7 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     /// <param name="count">The maximum number of bytes to read.</param>
     /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None" />.</param>
     /// <returns>
-    /// A <see cref="Task" /> that represents the asynchronous read operation. The value of the TResult
+    /// A <see cref="ValueTask" /> that represents the asynchronous read operation. The value of the TResult
     /// parameter contains the total number of bytes read into the buffer. The result
     /// value can be less than the number of bytes requested if the number of bytes currently
     /// available is less than the requested number, or it can be 0 (zero) if the end

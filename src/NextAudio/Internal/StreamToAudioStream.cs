@@ -48,6 +48,13 @@ internal sealed class StreamToAudioStream : AudioStream
         return _sourceStream.Seek(offset, origin);
     }
 
+    public override ValueTask<long> SeekAsync(long offset, SeekOrigin origin, CancellationToken cancellationToken = default)
+    {
+        return cancellationToken.IsCancellationRequested
+            ? ValueTask.FromCanceled<long>(cancellationToken)
+            : ValueTask.FromResult(Seek(offset, origin));
+    }
+
     public override void SetLength(long value)
     {
         _sourceStream.SetLength(value);

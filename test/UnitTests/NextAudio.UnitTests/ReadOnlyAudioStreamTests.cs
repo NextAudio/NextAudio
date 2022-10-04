@@ -104,6 +104,11 @@ public class ReadOnlyAudioStreamTests
             throw new NotImplementedException();
         }
 
+        public override ValueTask<long> SeekAsync(long offset, SeekOrigin origin, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override void Dispose(bool disposing)
         {
         }

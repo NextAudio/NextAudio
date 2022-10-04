@@ -18,13 +18,21 @@ public abstract class AudioDemuxer : ReadOnlyAudioStream
     {
     }
 
-    // The majority of the demuxer will have broken state if
+    // The majority of the demuxers will have broken state if
     // Seek without a specific unit.
     /// <inheritdoc />
     public override bool CanSeek => false;
 
     /// <inheritdoc />
     public override long Seek(long offset, SeekOrigin origin)
+    {
+        throw new NotSupportedException();
+    }
+
+    // The majority of the demuxers will have broken state if
+    // Seek without a specific unit.
+    /// <inheritdoc />
+    public override ValueTask<long> SeekAsync(long offset, SeekOrigin origin, CancellationToken cancellationToken = default)
     {
         throw new NotSupportedException();
     }

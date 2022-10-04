@@ -83,6 +83,11 @@ public class WriteOnlyAudioStreamTests
             throw new NotImplementedException();
         }
 
+        public override ValueTask<long> SeekAsync(long offset, SeekOrigin origin, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
         public override void SetLength(long value)
         {
             throw new NotImplementedException();

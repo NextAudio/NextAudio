@@ -108,6 +108,21 @@ public class StreamToAudioStreamTests
     }
 
     [Fact]
+    public async Task SeekAsyncCallsSourceStreamSeek()
+    {
+        // Arrange
+        var stream = Substitute.For<Stream>();
+
+        var castStream = new StreamToAudioStream(stream);
+
+        // Act
+        _ = await castStream.SeekAsync(0, SeekOrigin.Begin);
+
+        // Assert
+        _ = stream.Received(1).Seek(0, SeekOrigin.Begin);
+    }
+
+    [Fact]
     public void SetLengthCallsSourceStreamSetLength()
     {
         // Arrange
