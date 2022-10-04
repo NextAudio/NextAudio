@@ -19,7 +19,7 @@ public class StreamToAudioStreamOptions
     /// <summary>
     /// If the source stream should be disposed when the demuxer disposes.
     /// </summary>
-    public bool DisposeSourceStream { get; set; }
+    public bool DisposeSourceStream { get; set; } = true;
 
     /// <summary>
     /// The recomended synchronicity operation to use when read/write the source <see cref="Stream" />.

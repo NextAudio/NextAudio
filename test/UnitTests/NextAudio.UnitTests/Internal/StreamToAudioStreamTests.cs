@@ -14,12 +14,30 @@ namespace NextAudio.UnitTests.Internal;
 public class StreamToAudioStreamTests
 {
     [Fact]
+    public void RecommendedSynchronicityCallsOptionsRecommendedSynchronicity()
+    {
+        // Arrange
+        var options = new StreamToAudioStreamOptions()
+        {
+            RecommendedSynchronicity = RecommendedSynchronicity.Async,
+        };
+        var stream = Substitute.For<Stream>();
+        var castStream = new StreamToAudioStream(stream, options);
+
+        // Act
+        var result = castStream.RecommendedSynchronicity;
+
+        // Assert
+        Assert.Equal(RecommendedSynchronicity.Async, result);
+    }
+
+    [Fact]
     public void CanReadCallsSourceStreamCanRead()
     {
         // Arrange
         var stream = Substitute.For<Stream>();
 
-        var castStream = new StreamToAudioStream(stream);
+        var castStream = new StreamToAudioStream(stream, StreamToAudioStreamOptions.Default);
 
         // Act
         _ = castStream.CanRead;
@@ -34,7 +52,7 @@ public class StreamToAudioStreamTests
         // Arrange
         var stream = Substitute.For<Stream>();
 
-        var castStream = new StreamToAudioStream(stream);
+        var castStream = new StreamToAudioStream(stream, StreamToAudioStreamOptions.Default);
 
         // Act
         _ = castStream.CanSeek;
@@ -49,7 +67,7 @@ public class StreamToAudioStreamTests
         // Arrange
         var stream = Substitute.For<Stream>();
 
-        var castStream = new StreamToAudioStream(stream);
+        var castStream = new StreamToAudioStream(stream, StreamToAudioStreamOptions.Default);
 
         // Act
         _ = castStream.CanWrite;
@@ -64,7 +82,7 @@ public class StreamToAudioStreamTests
         // Arrange
         var stream = Substitute.For<Stream>();
 
-        var castStream = new StreamToAudioStream(stream);
+        var castStream = new StreamToAudioStream(stream, StreamToAudioStreamOptions.Default);
 
         // Act
         _ = castStream.Length;
@@ -79,7 +97,7 @@ public class StreamToAudioStreamTests
         // Arrange
         var stream = Substitute.For<Stream>();
 
-        var castStream = new StreamToAudioStream(stream)
+        var castStream = new StreamToAudioStream(stream, StreamToAudioStreamOptions.Default)
         {
             Position = 1
         };
@@ -98,7 +116,7 @@ public class StreamToAudioStreamTests
         // Arrange
         var stream = Substitute.For<Stream>();
 
-        var castStream = new StreamToAudioStream(stream);
+        var castStream = new StreamToAudioStream(stream, StreamToAudioStreamOptions.Default);
 
         // Act
         _ = castStream.Seek(0, SeekOrigin.Begin);
@@ -113,7 +131,7 @@ public class StreamToAudioStreamTests
         // Arrange
         var stream = Substitute.For<Stream>();
 
-        var castStream = new StreamToAudioStream(stream);
+        var castStream = new StreamToAudioStream(stream, StreamToAudioStreamOptions.Default);
 
         // Act
         _ = await castStream.SeekAsync(0, SeekOrigin.Begin);
@@ -128,7 +146,7 @@ public class StreamToAudioStreamTests
         // Arrange
         var stream = Substitute.For<Stream>();
 
-        var castStream = new StreamToAudioStream(stream);
+        var castStream = new StreamToAudioStream(stream, StreamToAudioStreamOptions.Default);
 
         // Act
         castStream.SetLength(0);
@@ -154,7 +172,7 @@ public class StreamToAudioStreamTests
             byteArray = buffer;
         });
 
-        var castStream = new StreamToAudioStream(stream);
+        var castStream = new StreamToAudioStream(stream, StreamToAudioStreamOptions.Default);
 
         // Act
         _ = castStream.Read(expectedByteArray.AsSpan());
@@ -181,7 +199,7 @@ public class StreamToAudioStreamTests
             byteArray = buffer;
         });
 
-        var castStream = new StreamToAudioStream(stream);
+        var castStream = new StreamToAudioStream(stream, StreamToAudioStreamOptions.Default);
 
         // Act
         castStream.Write(expectedByteArray.AsSpan());
@@ -208,7 +226,7 @@ public class StreamToAudioStreamTests
             byteArray = buffer;
         });
 
-        var castStream = new StreamToAudioStream(stream);
+        var castStream = new StreamToAudioStream(stream, StreamToAudioStreamOptions.Default);
 
         // Act
         _ = await castStream.ReadAsync(expectedByteArray.AsMemory());
@@ -235,7 +253,7 @@ public class StreamToAudioStreamTests
             byteArray = buffer;
         });
 
-        var castStream = new StreamToAudioStream(stream);
+        var castStream = new StreamToAudioStream(stream, StreamToAudioStreamOptions.Default);
 
         // Act
         await castStream.WriteAsync(expectedByteArray.AsMemory());
@@ -243,6 +261,39 @@ public class StreamToAudioStreamTests
         // Assert
         Assert.NotNull(byteArray);
         Assert.Equal(expectedByteArray, byteArray);
+    }
+
+    [Fact]
+    public void CloneReturnsANewAudioStreamAndChangeTheCurrentOptionsToNotDisposeSourceStream()
+    {
+        // Arrange
+        var stream = new MemoryStream(new byte[] { 1, 2 });
+        var options = new StreamToAudioStreamOptions()
+        {
+            DisposeSourceStream = true,
+        };
+        var castStream = new StreamToAudioStream(stream, options);
+
+        // Act
+
+        var castResult = castStream.Clone();
+
+        // Don't dispose the source stream.
+        castStream.Dispose();
+
+        // If source stream disposed will throw exception.
+        var byteResult = stream.ReadByte();
+
+        castResult.Dispose();
+
+        // Assert
+
+        Assert.NotNull(castResult);
+        Assert.Equal(1, byteResult);
+        _ = Assert.Throws<ObjectDisposedException>(() =>
+        {
+            _ = stream.ReadByte();
+        });
     }
 
     [Fact]
@@ -258,7 +309,7 @@ public class StreamToAudioStreamTests
             disposeCallsCount++;
         });
 
-        var castStream = new StreamToAudioStream(stream);
+        var castStream = new StreamToAudioStream(stream, StreamToAudioStreamOptions.Default);
 
         // Act
         castStream.Dispose();
@@ -281,7 +332,7 @@ public class StreamToAudioStreamTests
             disposeAsyncCallsCount++;
         });
 
-        var castStream = new StreamToAudioStream(stream);
+        var castStream = new StreamToAudioStream(stream, StreamToAudioStreamOptions.Default);
 
         // Act
         await castStream.DisposeAsync();

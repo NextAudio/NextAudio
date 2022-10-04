@@ -6,10 +6,12 @@ namespace NextAudio.Internal;
 internal sealed class StreamToAudioStream : AudioStream
 {
     private readonly Stream _sourceStream;
+    private readonly StreamToAudioStreamOptions _options;
 
-    public StreamToAudioStream(Stream sourceStream)
+    public StreamToAudioStream(Stream sourceStream, StreamToAudioStreamOptions options) : base(options?.LoggerFactory)
     {
-        _sourceStream = sourceStream;
+        _sourceStream = sourceStream ?? throw new ArgumentNullException(nameof(sourceStream));
+        _options = options ?? throw new ArgumentNullException(nameof(options));
     }
 
     public override bool CanRead => _sourceStream.CanRead;
@@ -26,11 +28,15 @@ internal sealed class StreamToAudioStream : AudioStream
         set => _sourceStream.Position = value;
     }
 
-    public override RecommendedSynchronicity RecommendedSynchronicity => RecommendedSynchronicity.Any;
+    public override RecommendedSynchronicity RecommendedSynchronicity => _options.RecommendedSynchronicity;
 
     public override StreamToAudioStream Clone()
     {
-        return new StreamToAudioStream(_sourceStream);
+        var optionsClone = _options.Clone();
+
+        _options.DisposeSourceStream = false;
+
+        return new StreamToAudioStream(_sourceStream, optionsClone);
     }
 
     public override int Read(Span<byte> buffer)
@@ -79,12 +85,20 @@ internal sealed class StreamToAudioStream : AudioStream
 
         if (disposing)
         {
-            _sourceStream.Dispose();
+            if (_options.DisposeSourceStream)
+            {
+                _sourceStream.Dispose();
+            }
         }
     }
 
     protected override ValueTask DisposeAsyncCore()
     {
-        return IsDisposed ? ValueTask.CompletedTask : _sourceStream.DisposeAsync();
+        if (IsDisposed)
+        {
+            return ValueTask.CompletedTask;
+        }
+
+        return _options.DisposeSourceStream ? _sourceStream.DisposeAsync() : ValueTask.CompletedTask;
     }
 }

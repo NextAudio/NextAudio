@@ -64,7 +64,7 @@ public class MatroskaDemuxerTests
     }
 
     [Fact]
-    public void DisposeDisposesSourceStreamIfOptionsConfigureToNotDisposeSourceStream()
+    public void DisposeDisposesSourceStreamIfOptionsConfigureToDisposeSourceStream()
     {
         // Arrange
         var stream = new MemoryStream();
@@ -84,7 +84,7 @@ public class MatroskaDemuxerTests
     }
 
     [Fact]
-    public async Task DisposeAsyncDisposesSourceStreamIfOptionsConfigureToNotDisposeSourceStream()
+    public async Task DisposeAsyncDisposesSourceStreamIfOptionsConfigureToDisposeSourceStream()
     {
         // Arrange
         var stream = new MemoryStream();
