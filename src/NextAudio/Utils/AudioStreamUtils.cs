@@ -77,7 +77,7 @@ public static class AudioStreamUtils
             SeekOrigin.Begin => offset,
             SeekOrigin.End => stream.Length + offset, // Should throw NotSupportedException if not we can continue.
             SeekOrigin.Current => position + offset,
-            _ => throw new InvalidOperationException($"Unknown SeekOrigin enum value: {origin}")
+            _ => throw new InvalidOperationException($"Unknown SeekOrigin enum value: '{origin}'.")
         };
 
         if (pos < position)
@@ -140,7 +140,7 @@ public static class AudioStreamUtils
             SeekOrigin.Begin => offset,
             SeekOrigin.End => stream.Length + offset, // Should throw NotSupportedException if not we can continue.
             SeekOrigin.Current => position + offset,
-            _ => throw new InvalidOperationException($"Unknown SeekOrigin enum value: {origin}")
+            _ => throw new InvalidOperationException($"Unknown SeekOrigin enum value: '{origin}'.")
         };
 
         if (pos < position)
