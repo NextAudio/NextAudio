@@ -17,7 +17,7 @@ public class StreamToAudioStreamOptions
     public static readonly StreamToAudioStreamOptions Default = new();
 
     /// <summary>
-    /// If the source stream should be disposed when the demuxer disposes.
+    /// If the source stream should be disposed when the audio stream disposes.
     /// </summary>
     public bool DisposeSourceStream { get; set; } = true;
 
