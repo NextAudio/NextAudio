@@ -62,7 +62,11 @@ internal static class BlockReader
                 break;
         }
 
-        return new MatroskaBlockResult(new MatroskaBlock(blockElement, trackNumber, lacingType, frameCount, frameSizes), position);
+        var block = new MatroskaBlock(blockElement, trackNumber, lacingType, frameCount, frameSizes);
+
+        logger.LogBlockParsed(block);
+
+        return new MatroskaBlockResult(block, position);
     }
 
     public static async ValueTask<MatroskaBlockResult> ReadBlockAsync(AudioStream stream, Memory<byte> buffer, MatroskaElement blockElement, long position, ulong selectedTrackNumber, ILogger logger)
@@ -118,7 +122,11 @@ internal static class BlockReader
                 break;
         }
 
-        return new MatroskaBlockResult(new MatroskaBlock(blockElement, trackNumber, lacingType, frameCount, frameSizes), position);
+        var block = new MatroskaBlock(blockElement, trackNumber, lacingType, frameCount, frameSizes);
+
+        logger.LogBlockParsed(block);
+
+        return new MatroskaBlockResult(block, position);
     }
 
     private static long ParseXiphLacing(AudioStream stream, Span<byte> buffer, long position, MatroskaElement blockElement, Span<int> frameSizes)

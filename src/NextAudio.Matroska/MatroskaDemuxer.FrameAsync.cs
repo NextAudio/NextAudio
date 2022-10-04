@@ -54,6 +54,8 @@ public partial class MatroskaDemuxer
             {
                 return result;
             }
+
+            _currentClusterElement = null;
         }
 
         return await ReadNextFrameFromSegmentAsync(buffer);
@@ -72,6 +74,7 @@ public partial class MatroskaDemuxer
                 if (result > 0)
                 {
                     _currentClusterElement = childElement;
+                    _clusterElementLogScope = _logger.ProcessingMasterElementScope(childElement.Value, _position);
                     return result;
                 }
             }
@@ -79,6 +82,7 @@ public partial class MatroskaDemuxer
             await SkipElementAsync(childElement.Value);
         }
 
+        DisposeSegmentElementLogScope();
         return 0;
     }
 
@@ -90,6 +94,8 @@ public partial class MatroskaDemuxer
         {
             if (childElement.Value.Type == MatroskaElementType.BlockGroup)
             {
+                _blockGroupElementLogScope = _logger.ProcessingMasterElementScope(childElement.Value, _position);
+
                 var result = await ReadNextFrameFromGroupAsync(buffer, childElement.Value);
 
                 if (result > 0)
@@ -101,6 +107,7 @@ public partial class MatroskaDemuxer
 
             if (childElement.Value.Type == MatroskaElementType.SimpleBlock)
             {
+                _blockElementLogScope = _logger.ProcessingMasterElementScope(childElement.Value, _position);
                 var result = await ReadFrameFromBlockElementAsync(buffer, childElement.Value);
 
                 if (result > 0)
@@ -123,6 +130,7 @@ public partial class MatroskaDemuxer
         {
             if (childElement.Value.Type == MatroskaElementType.Block)
             {
+                _blockElementLogScope = _logger.ProcessingMasterElementScope(childElement.Value, _position);
                 var result = await ReadFrameFromBlockElementAsync(buffer, childElement.Value);
 
                 if (result > 0)
@@ -134,12 +142,18 @@ public partial class MatroskaDemuxer
             await SkipElementAsync(childElement.Value);
         }
 
+        DisposeBlockGroupElementLogScope();
         return 0;
     }
 
     private async ValueTask<int> ReadFrameFromBlockElementAsync(Memory<byte> buffer, MatroskaElement blockElement)
     {
         var block = await ParseBlockAsync(buffer, blockElement);
+
+        if (!block.HasValue)
+        {
+            DisposeBlockElementLogScope();
+        }
 
         return !block.HasValue ? 0 : await ReadFrameFromBlockAsync(buffer, block.Value);
     }
@@ -160,12 +174,21 @@ public partial class MatroskaDemuxer
             var frameSize = block.GetFrameSizeByIndex(_currentBlockIndex);
             var result = await ReadSourceStreamAsync(buffer[..frameSize]);
 
+            _logger.LogFrameReaded(frameSize, _currentBlockIndex, _position);
+
             _currentBlockIndex++;
 
             _currentBlock = block;
+
+            if (result <= 0)
+            {
+                DisposeBlockElementLogScope();
+            }
+
             return result;
         }
 
+        DisposeBlockElementLogScope();
         return 0;
     }
 }

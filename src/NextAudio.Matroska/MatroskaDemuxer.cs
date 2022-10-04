@@ -24,6 +24,9 @@ public sealed partial class MatroskaDemuxer : AudioDemuxer
     private int _currentBlockIndex;
 
     private IDisposable? _segmentElementLogScope;
+    private IDisposable? _clusterElementLogScope;
+    private IDisposable? _blockGroupElementLogScope;
+    private IDisposable? _blockElementLogScope;
 
 
     /// <summary>
@@ -54,7 +57,7 @@ public sealed partial class MatroskaDemuxer : AudioDemuxer
     /// <inheritdoc/>
     public override long Position
     {
-        get => _sourceStream.CanSeek ? _sourceStream.Position : _position;
+        get => _position;
         set => throw new NotSupportedException();
     }
 
@@ -62,6 +65,16 @@ public sealed partial class MatroskaDemuxer : AudioDemuxer
     public override long Seek(long offset, SeekOrigin origin)
     {
         throw new NotSupportedException();
+    }
+
+    private void PreventSourceSeek()
+    {
+        if (_sourceStream.CanSeek && _sourceStream.Position != _position)
+        {
+            // Seek by position can break the demuxer state.
+            // With this method we can prevent the source stream seeking.
+            _ = _sourceStream.Seek(_position, SeekOrigin.Begin);
+        }
     }
 
     private bool BlockHasFrames(MatroskaBlock block)
@@ -80,11 +93,10 @@ public sealed partial class MatroskaDemuxer : AudioDemuxer
 
         if (disposing && _options.DisposeSourceStream)
         {
-            if (_segmentElementLogScope != null)
-            {
-                _segmentElementLogScope.Dispose();
-                _segmentElementLogScope = null;
-            }
+            DisposeSegmentElementLogScope();
+            DisposeClusterElementLogScope();
+            DisposeBlockGroupElementLogScope();
+            DisposeBlockElementLogScope();
 
             _sourceStream.Dispose();
         }
@@ -100,14 +112,57 @@ public sealed partial class MatroskaDemuxer : AudioDemuxer
 
         if (_options.DisposeSourceStream)
         {
-            if (_segmentElementLogScope != null)
-            {
-                _segmentElementLogScope.Dispose();
-                _segmentElementLogScope = null;
-            }
+            DisposeSegmentElementLogScope();
+            DisposeClusterElementLogScope();
+            DisposeBlockGroupElementLogScope();
+            DisposeBlockElementLogScope();
 
             await _sourceStream.DisposeAsync();
         }
+    }
+
+    private void DisposeSegmentElementLogScope()
+    {
+        if (_segmentElementLogScope == null)
+        {
+            return;
+        }
+
+        _segmentElementLogScope.Dispose();
+        _segmentElementLogScope = null;
+    }
+
+    private void DisposeClusterElementLogScope()
+    {
+        if (_clusterElementLogScope == null)
+        {
+            return;
+        }
+
+        _clusterElementLogScope.Dispose();
+        _clusterElementLogScope = null;
+    }
+
+    private void DisposeBlockGroupElementLogScope()
+    {
+        if (_blockGroupElementLogScope == null)
+        {
+            return;
+        }
+
+        _blockGroupElementLogScope.Dispose();
+        _blockGroupElementLogScope = null;
+    }
+
+    private void DisposeBlockElementLogScope()
+    {
+        if (_blockElementLogScope == null)
+        {
+            return;
+        }
+
+        _blockElementLogScope.Dispose();
+        _blockElementLogScope = null;
     }
 
     /// <inheritdoc/>

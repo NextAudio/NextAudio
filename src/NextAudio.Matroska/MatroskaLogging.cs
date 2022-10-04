@@ -24,6 +24,14 @@ internal static partial class MatroskaLogging
         }
     }
 
+    public static void LogBlockParsed(this ILogger logger, MatroskaBlock block)
+    {
+        if (logger.IsEnabled(LogLevel.Debug))
+        {
+            LogBlockParsed(logger, block.TrackNumber, block.FrameCount, block.LacingType, block.Element.Position);
+        }
+    }
+
     public static void LogElementReaded(this ILogger logger, MatroskaElement element)
     {
         LogElementReaded(logger, element.Id, element.DataSize);
@@ -69,9 +77,15 @@ internal static partial class MatroskaLogging
     [LoggerMessage(EventId = 3, Level = LogLevel.Trace, SkipEnabledCheck = true, Message = "Readed value for element of ID '0x{Id:X}' and value '{Value}'.")]
     private static partial void LogElementValueReaded(this ILogger logger, ulong id, string value);
 
-    [LoggerMessage(EventId = 4, Level = LogLevel.Trace, Message = "Readed variable size integer of ID 'Ox{Id:X}' and value '{Value}' at position '{Position}'.")]
+    [LoggerMessage(EventId = 4, Level = LogLevel.Trace, Message = "Readed EBML variable size integer of ID 'Ox{Id:X}' and value '{Value}' at position '{Position}'.")]
     public static partial void LogVIntReaded(this ILogger logger, ulong id, ulong value, long position);
 
     [LoggerMessage(EventId = 5, Level = LogLevel.Debug, Message = "Selected matroska track of number '{TrackNumber}'.")]
     public static partial void LogTrackSelected(this ILogger logger, ulong trackNumber);
+
+    [LoggerMessage(EventId = 6, Level = LogLevel.Debug, SkipEnabledCheck = true, Message = "Parsed matroska block of track number '{TrackNumber}' and with lacing type '{LacingType}' and frame count '{FrameCount}' at position '{Position}'.")]
+    public static partial void LogBlockParsed(this ILogger logger, ulong trackNumber, int frameCount, MatroskaBlockLacingType lacingType, long position);
+
+    [LoggerMessage(EventId = 7, Level = LogLevel.Debug, Message = "Readed audio frame of size '{FrameSize}' in index '{Index}' at position '{Position}'.")]
+    public static partial void LogFrameReaded(this ILogger logger, int frameSize, int index, long position);
 }

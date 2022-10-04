@@ -80,6 +80,8 @@ public partial class MatroskaDemuxer
 
     private async ValueTask<int> ReadSourceStreamAsync(Memory<byte> buffer)
     {
+        PreventSourceSeek();
+
         var result = await AudioStreamUtils.ReadFullyAudioStreamAsync(_sourceStream, buffer);
 
         _position += result;

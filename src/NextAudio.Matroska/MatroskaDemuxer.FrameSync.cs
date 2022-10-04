@@ -30,6 +30,7 @@ public partial class MatroskaDemuxer
             }
 
             _currentBlock = null;
+            DisposeBlockElementLogScope();
         }
 
         _currentBlockIndex = 0;
@@ -44,6 +45,7 @@ public partial class MatroskaDemuxer
             }
 
             _currentBlockGroupElement = null;
+            DisposeBlockGroupElementLogScope();
         }
 
         if (_currentClusterElement.HasValue)
@@ -54,6 +56,9 @@ public partial class MatroskaDemuxer
             {
                 return result;
             }
+
+            _currentClusterElement = null;
+            DisposeClusterElementLogScope();
         }
 
         return ReadNextFrameFromSegment(buffer);
@@ -79,6 +84,7 @@ public partial class MatroskaDemuxer
             SkipElement(childElement.Value);
         }
 
+        DisposeSegmentElementLogScope();
         return 0;
     }
 
@@ -159,6 +165,8 @@ public partial class MatroskaDemuxer
         {
             var frameSize = block.GetFrameSizeByIndex(_currentBlockIndex);
             var result = ReadSourceStream(buffer[..frameSize]);
+
+            _logger.LogFrameReaded(frameSize, _currentBlockIndex, _position);
 
             _currentBlockIndex++;
 

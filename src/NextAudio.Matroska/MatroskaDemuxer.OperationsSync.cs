@@ -80,6 +80,8 @@ public partial class MatroskaDemuxer
 
     private int ReadSourceStream(Span<byte> buffer)
     {
+        PreventSourceSeek();
+
         var result = AudioStreamUtils.ReadFullyAudioStream(_sourceStream, buffer);
 
         _position += result;
