@@ -164,7 +164,7 @@ public static class AudioStreamUtils
 
         try
         {
-            position += await ReadFullyAudioStreamAsync(stream, skipBuffer.AsMemory(0, numberOfBytesToSkip));
+            position += await ReadFullyAudioStreamAsync(stream, skipBuffer.AsMemory(0, numberOfBytesToSkip)).ConfigureAwait(false);
         }
         finally
         {

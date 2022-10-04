@@ -29,13 +29,13 @@ internal static class VIntReader
 
     public static async ValueTask<VInt> ReadVIntAsync(AudioStream stream, Memory<byte> buffer, long position, ILogger logger)
     {
-        _ = await AudioStreamUtils.ReadFullyAudioStreamAsync(stream, buffer[..1]);
+        _ = await AudioStreamUtils.ReadFullyAudioStreamAsync(stream, buffer[..1]).ConfigureAwait(false);
 
         var length = EbmlReader.ReadVariableSizeIntegerLength(buffer.Span[0]);
 
         if (length > 1)
         {
-            _ = await AudioStreamUtils.ReadFullyAudioStreamAsync(stream, buffer[1..length]);
+            _ = await AudioStreamUtils.ReadFullyAudioStreamAsync(stream, buffer[1..length]).ConfigureAwait(false);
         }
 
         var vInt = EbmlReader.ReadVariableSizeInteger(buffer.Span[..length], length);

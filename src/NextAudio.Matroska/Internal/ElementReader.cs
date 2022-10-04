@@ -42,10 +42,10 @@ internal static class ElementReader
 
         var initialPosition = position;
 
-        var elementId = await VIntReader.ReadVIntAsync(stream, buffer, position, logger);
+        var elementId = await VIntReader.ReadVIntAsync(stream, buffer, position, logger).ConfigureAwait(false);
         position += elementId.Length;
 
-        var elementSize = await VIntReader.ReadVIntAsync(stream, buffer[elementId.Length..], position, logger);
+        var elementSize = await VIntReader.ReadVIntAsync(stream, buffer[elementId.Length..], position, logger).ConfigureAwait(false);
         position += elementSize.Length;
 
         var headerSize = position - initialPosition;

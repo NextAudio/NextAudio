@@ -71,7 +71,7 @@ internal static class BlockReader
 
     public static async ValueTask<MatroskaBlockResult> ReadBlockAsync(AudioStream stream, Memory<byte> buffer, MatroskaElement blockElement, long position, ulong selectedTrackNumber, ILogger logger)
     {
-        var vInt = await VIntReader.ReadVIntAsync(stream, buffer, position, logger);
+        var vInt = await VIntReader.ReadVIntAsync(stream, buffer, position, logger).ConfigureAwait(false);
 
         position += vInt.Length;
 
@@ -82,9 +82,9 @@ internal static class BlockReader
             return new MatroskaBlockResult(null, position);
         }
 
-        position = await AudioStreamUtils.SeekAsync(stream, 2, SeekOrigin.Current, position);
+        position = await AudioStreamUtils.SeekAsync(stream, 2, SeekOrigin.Current, position).ConfigureAwait(false);
 
-        position += await AudioStreamUtils.ReadFullyAudioStreamAsync(stream, buffer[vInt.Length..(vInt.Length + 1)]);
+        position += await AudioStreamUtils.ReadFullyAudioStreamAsync(stream, buffer[vInt.Length..(vInt.Length + 1)]).ConfigureAwait(false);
 
         var flags = buffer.Span[vInt.Length];
         var lacingType = (MatroskaBlockLacingType)(flags & 0b0000110);
@@ -94,7 +94,7 @@ internal static class BlockReader
 
         if (lacingType != MatroskaBlockLacingType.No)
         {
-            position += await AudioStreamUtils.ReadFullyAudioStreamAsync(stream, buffer[(vInt.Length + 1)..(vInt.Length + 2)]);
+            position += await AudioStreamUtils.ReadFullyAudioStreamAsync(stream, buffer[(vInt.Length + 1)..(vInt.Length + 2)]).ConfigureAwait(false);
             frameCount = (buffer.Span[vInt.Length + 1] & 0xff) + 1;
         }
         else
@@ -112,13 +112,13 @@ internal static class BlockReader
                 break;
 
             case MatroskaBlockLacingType.Xiph:
-                position = await ParseXiphLacingAsync(stream, buffer[(vInt.Length + 2)..], position, blockElement, frameSizes);
+                position = await ParseXiphLacingAsync(stream, buffer[(vInt.Length + 2)..], position, blockElement, frameSizes).ConfigureAwait(false);
                 break;
             case MatroskaBlockLacingType.FixedSize:
                 ParseFixedSizeLacing(position, blockElement, frameSizes);
                 break;
             case MatroskaBlockLacingType.Ebml:
-                position = await ParseEbmlLacingAsync(stream, buffer[(vInt.Length + 2)..], position, blockElement, frameSizes, logger);
+                position = await ParseEbmlLacingAsync(stream, buffer[(vInt.Length + 2)..], position, blockElement, frameSizes, logger).ConfigureAwait(false);
                 break;
         }
 
@@ -165,7 +165,7 @@ internal static class BlockReader
 
             do
             {
-                position += await AudioStreamUtils.ReadFullyAudioStreamAsync(stream, buffer[bufferIndex..(bufferIndex + 1)]);
+                position += await AudioStreamUtils.ReadFullyAudioStreamAsync(stream, buffer[bufferIndex..(bufferIndex + 1)]).ConfigureAwait(false);
                 value += buffer.Span[bufferIndex] & 0xff;
             } while (value == 255);
 
@@ -219,7 +219,7 @@ internal static class BlockReader
 
     private static async ValueTask<long> ParseEbmlLacingAsync(AudioStream stream, Memory<byte> buffer, long position, MatroskaElement blockElement, Memory<int> frameSizes, ILogger logger)
     {
-        var vInt = await VIntReader.ReadVIntAsync(stream, buffer, position, logger);
+        var vInt = await VIntReader.ReadVIntAsync(stream, buffer, position, logger).ConfigureAwait(false);
 
         position += vInt.Length;
 
@@ -230,7 +230,7 @@ internal static class BlockReader
 
         for (var i = 1; i < frameSizes.Length - 1; i++)
         {
-            vInt = await VIntReader.ReadVIntAsync(stream, buffer[totalVIntLength..], position, logger);
+            vInt = await VIntReader.ReadVIntAsync(stream, buffer[totalVIntLength..], position, logger).ConfigureAwait(false);
 
             position += vInt.Length;
 

@@ -117,7 +117,7 @@ public sealed partial class MatroskaDemuxer : AudioDemuxer
             DisposeBlockGroupElementLogScope();
             DisposeBlockElementLogScope();
 
-            await _sourceStream.DisposeAsync();
+            await _sourceStream.DisposeAsync().ConfigureAwait(false);
         }
     }
 
