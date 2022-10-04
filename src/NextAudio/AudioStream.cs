@@ -53,6 +53,14 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     public abstract long Position { get; set; }
 
     /// <summary>
+    /// The recommended synchronicity when using any read/write operation.
+    /// </summary>
+    /// <remarks>
+    /// This doesn't define the synchronicity support, all must be supported.
+    /// </remarks>
+    public abstract RecommendedSynchronicity RecommendedSynchronicity { get; }
+
+    /// <summary>
     /// Creates a clone of this stream.
     /// </summary>
     /// <returns>A new cloned stream.</returns>

@@ -26,6 +26,8 @@ internal sealed class StreamToAudioStream : AudioStream
         set => _sourceStream.Position = value;
     }
 
+    public override RecommendedSynchronicity RecommendedSynchronicity => RecommendedSynchronicity.Any;
+
     public override StreamToAudioStream Clone()
     {
         return new StreamToAudioStream(_sourceStream);

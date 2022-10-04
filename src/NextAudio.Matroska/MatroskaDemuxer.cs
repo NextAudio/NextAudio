@@ -62,6 +62,9 @@ public sealed partial class MatroskaDemuxer : AudioDemuxer
     }
 
     /// <inheritdoc/>
+    public override RecommendedSynchronicity RecommendedSynchronicity => _sourceStream.RecommendedSynchronicity;
+
+    /// <inheritdoc/>
     public override long Seek(long offset, SeekOrigin origin)
     {
         throw new NotSupportedException();

@@ -82,6 +82,8 @@ public class ReadOnlyAudioStreamTests
 
         public override long Position { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+        public override RecommendedSynchronicity RecommendedSynchronicity => throw new NotImplementedException();
+
         public override AudioStream Clone()
         {
             throw new NotImplementedException();

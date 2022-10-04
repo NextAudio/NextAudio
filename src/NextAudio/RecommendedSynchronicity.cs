@@ -7,7 +7,7 @@ namespace NextAudio;
 /// The recomended synchronicity operation to use when read/write.
 /// </summary>
 /// <remarks>
-/// This doesn't define the synchronicity support, all are supported.
+/// This doesn't define the synchronicity support, all must be supported.
 /// </remarks>
 public enum RecommendedSynchronicity
 {

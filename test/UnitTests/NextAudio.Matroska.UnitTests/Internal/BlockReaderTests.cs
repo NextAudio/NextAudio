@@ -391,6 +391,8 @@ public class BlockReaderTests
 
         public override long Length => long.MaxValue;
 
+        public override RecommendedSynchronicity RecommendedSynchronicity => throw new NotImplementedException();
+
         public override AudioStream Clone()
         {
             throw new NotImplementedException();
