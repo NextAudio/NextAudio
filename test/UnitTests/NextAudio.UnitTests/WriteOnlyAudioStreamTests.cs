@@ -14,10 +14,10 @@ public class WriteOnlyAudioStreamTests
     [Fact]
     public void CanWriteReturnsTrue()
     {
-        // Act
+        // Arrange
         var stream = new WriteOnlyAudioStreamMock();
 
-        // Arrange
+        // Act
         var result = stream.CanWrite;
 
         // Assert
@@ -27,10 +27,10 @@ public class WriteOnlyAudioStreamTests
     [Fact]
     public void CanReadReturnsFalse()
     {
-        // Act
+        // Arrange
         var stream = new WriteOnlyAudioStreamMock();
 
-        // Arrange
+        // Act
         var result = stream.CanRead;
 
         // Assert
@@ -40,10 +40,10 @@ public class WriteOnlyAudioStreamTests
     [Fact]
     public void ReadThrowsNotSupportedException()
     {
-        // Act
+        // Arrange
         var stream = new WriteOnlyAudioStreamMock();
 
-        // Arrange + Assert
+        // Act + Assert
         _ = Assert.Throws<NotSupportedException>(() =>
         {
             _ = stream.Read(Span<byte>.Empty);
@@ -53,10 +53,10 @@ public class WriteOnlyAudioStreamTests
     [Fact]
     public async Task ReadAsyncThrowsNotSupportedException()
     {
-        // Act
+        // Arrange
         var stream = new WriteOnlyAudioStreamMock();
 
-        // Arrange + Assert
+        // Act + Assert
         _ = await Assert.ThrowsAsync<NotSupportedException>(async () =>
         {
             _ = await stream.ReadAsync(Memory<byte>.Empty);
@@ -81,6 +81,11 @@ public class WriteOnlyAudioStreamTests
             throw new NotImplementedException();
         }
 
+        public override void SetLength(long value)
+        {
+            throw new NotImplementedException();
+        }
+
         public override void Write(ReadOnlySpan<byte> buffer)
         {
             throw new NotImplementedException();
@@ -93,12 +98,11 @@ public class WriteOnlyAudioStreamTests
 
         protected override void Dispose(bool disposing)
         {
-            throw new NotImplementedException();
         }
 
         protected override ValueTask DisposeAsyncCore()
         {
-            throw new NotImplementedException();
+            return ValueTask.CompletedTask;
         }
     }
 }

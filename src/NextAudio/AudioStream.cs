@@ -2,6 +2,7 @@
 // NextAudio licenses this file to you under the MIT license.
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NextAudio.Internal;
 
 namespace NextAudio;
@@ -14,22 +15,15 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     /// <summary>
     /// A logger factory to log audio streaming info.
     /// </summary>
-    protected readonly ILoggerFactory? _loggerFactory;
-
-    /// <summary>
-    /// Creates an instance of <see cref="AudioStream" />
-    /// </summary>
-    protected AudioStream()
-    {
-    }
+    protected readonly ILoggerFactory _loggerFactory;
 
     /// <summary>
     /// Creates an instance of <see cref="AudioStream" />
     /// </summary>
     /// <param name="loggerFactory">A logger factory to log audio streaming info.</param>
-    protected AudioStream(ILoggerFactory loggerFactory)
+    protected AudioStream(ILoggerFactory? loggerFactory = null)
     {
-        _loggerFactory = loggerFactory;
+        _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
     }
 
     ///
@@ -66,6 +60,9 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
 
     /// <inheritdoc cref="Stream.Seek(long, SeekOrigin)" />
     public abstract long Seek(long offset, SeekOrigin origin);
+
+    /// <inheritdoc cref="Stream.SetLength(long)" />
+    public abstract void SetLength(long value);
 
     /// <inheritdoc cref="Stream.Read(Span{byte})" />
     public abstract int Read(Span<byte> buffer);
@@ -168,11 +165,20 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     }
 
     /// <summary>
-    /// Implicit cast a <see cref="Stream" /> in an <see cref="AudioStream "/>
+    /// Implicit cast a <see cref="AudioStream" /> in an <see cref="Stream "/>
     /// </summary>
     /// <param name="audioStream">The <see cref="AudioStream" /> to be cast.</param>
     public static implicit operator Stream(AudioStream audioStream)
     {
         return new AudioStreamToStream(audioStream);
+    }
+
+    /// <summary>
+    /// Implicit cast a <see cref="Stream" /> in an <see cref="AudioStream "/>
+    /// </summary>
+    /// <param name="stream">The <see cref="Stream" /> to be cast.</param>
+    public static implicit operator AudioStream(Stream stream)
+    {
+        return new StreamToAudioStream(stream);
     }
 }

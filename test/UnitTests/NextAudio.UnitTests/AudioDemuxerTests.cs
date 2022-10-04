@@ -12,9 +12,35 @@ namespace NextAudio.UnitTests;
 public class AudioDemuxerTests
 {
     [Fact]
+    public void CanSeekReturnsFalse()
+    {
+        // Arrange
+        AudioDemuxer demuxer = new AudioDemuxerMock((_) => { });
+
+        // Act
+        var result = demuxer.CanSeek;
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void SeekThrowsNotSupportedException()
+    {
+        // Arrange
+        AudioDemuxer demuxer = new AudioDemuxerMock((_) => { });
+
+        // Act + Assert
+        _ = Assert.Throws<NotSupportedException>(() =>
+        {
+            _ = demuxer.Seek(0, SeekOrigin.Begin);
+        });
+    }
+
+    [Fact]
     public void ReadCallsDemux()
     {
-        // Act
+        // Arrange
         var expectedBuffer = new byte[]
         {
             1,
@@ -31,7 +57,7 @@ public class AudioDemuxerTests
             receivedBufferCalls++;
         });
 
-        // Arrange
+        // Act
         _ = demuxer.Read(expectedBuffer);
 
         // Assert
@@ -43,7 +69,7 @@ public class AudioDemuxerTests
     [Fact]
     public async Task ReadAsyncCallsDemux()
     {
-        // Act
+        // Arrange
         var expectedBuffer = new byte[]
         {
             1,
@@ -60,7 +86,7 @@ public class AudioDemuxerTests
             receivedBufferCalls++;
         });
 
-        // Arrange
+        // Act
         _ = await demuxer.ReadAsync(expectedBuffer);
 
         // Assert
@@ -72,7 +98,7 @@ public class AudioDemuxerTests
     [Fact]
     public void DemuxByteArrayCallsSpanDemux()
     {
-        // Act
+        // Arrange
         var expectedBuffer = new byte[]
         {
             1,
@@ -89,7 +115,7 @@ public class AudioDemuxerTests
             receivedBufferCalls++;
         });
 
-        // Arrange
+        // Act
         _ = demuxer.Demux(expectedBuffer, 0, 3);
 
         // Assert
@@ -101,7 +127,7 @@ public class AudioDemuxerTests
     [Fact]
     public async Task DemuxByteArrayAsyncCallsAsyncMemoryDemux()
     {
-        // Act
+        // Arrange
         var expectedBuffer = new byte[]
         {
             1,
@@ -118,7 +144,7 @@ public class AudioDemuxerTests
             receivedBufferCalls++;
         });
 
-        // Arrange
+        // Act
         _ = await demuxer.DemuxAsync(expectedBuffer, 0, 3);
 
         // Assert
@@ -135,8 +161,6 @@ public class AudioDemuxerTests
         {
             _callback = callback;
         }
-
-        public override bool CanSeek => throw new NotImplementedException();
 
         public override long Length => throw new NotImplementedException();
 
@@ -159,19 +183,13 @@ public class AudioDemuxerTests
             return default;
         }
 
-        public override long Seek(long offset, SeekOrigin origin)
-        {
-            throw new NotImplementedException();
-        }
-
         protected override void Dispose(bool disposing)
         {
-            throw new NotImplementedException();
         }
 
         protected override ValueTask DisposeAsyncCore()
         {
-            throw new NotImplementedException();
+            return ValueTask.CompletedTask;
         }
     }
 }

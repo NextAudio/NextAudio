@@ -1,6 +1,8 @@
 // Licensed to the NextAudio under one or more agreements.
 // NextAudio licenses this file to you under the MIT license.
 
+using Microsoft.Extensions.Logging;
+
 namespace NextAudio;
 
 /// <summary>
@@ -8,6 +10,25 @@ namespace NextAudio;
 /// </summary>
 public abstract class AudioDemuxer : ReadOnlyAudioStream
 {
+    /// <summary>
+    /// Creates an instance of <see cref="AudioDemuxer" />.
+    /// </summary>
+    /// <param name="loggerFactory">A logger factory to log audio streaming info.</param>
+    protected AudioDemuxer(ILoggerFactory? loggerFactory = null) : base(loggerFactory)
+    {
+    }
+
+    // The majority of the demuxer will have broken state if
+    // Seek without a specific unit.
+    /// <inheritdoc />
+    public override bool CanSeek => false;
+
+    /// <inheritdoc />
+    public override long Seek(long offset, SeekOrigin origin)
+    {
+        throw new NotSupportedException();
+    }
+
     /// <inheritdoc />
     public override int Read(Span<byte> buffer)
     {
