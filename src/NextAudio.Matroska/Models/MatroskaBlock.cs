@@ -1,11 +1,14 @@
 // Licensed to the NextAudio under one or more agreements.
 // NextAudio licenses this file to you under the MIT license.
 
+using System.Diagnostics;
+
 namespace NextAudio.Matroska.Models;
 
 /// <summary>
 /// Represents a Matroska block of data with 1 or more frames.
 /// </summary>
+[DebuggerDisplay("{DebuggerDisplay,nq}")]
 public readonly struct MatroskaBlock
 {
     private readonly int[] _frameSizes;
@@ -59,4 +62,7 @@ public readonly struct MatroskaBlock
             ? throw new ArgumentException($"The '{nameof(index)}' cannot be equals or higher than the '{nameof(FrameCount)}'.", nameof(index))
             : _frameSizes[index];
     }
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private string DebuggerDisplay => $"{Element.Position} - {LacingType} (track number {TrackNumber}) [{FrameCount} frames]";
 }

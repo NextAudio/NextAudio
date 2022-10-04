@@ -1,5 +1,6 @@
 // Licensed to the NextAudio under one or more agreements.
 // NextAudio licenses this file to you under the MIT license.
+using System.Diagnostics;
 using NextAudio.Matroska.Utils;
 
 namespace NextAudio.Matroska.Models;
@@ -7,6 +8,7 @@ namespace NextAudio.Matroska.Models;
 /// <summary>
 /// Represents a Matroska Element
 /// </summary>
+[DebuggerDisplay(@"{DebuggerDisplay,nq}")]
 public readonly struct MatroskaElement
 {
     /// <summary>
@@ -85,4 +87,7 @@ public readonly struct MatroskaElement
     {
         return Position + HeaderSize + DataSize - position;
     }
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private string DebuggerDisplay => $"0x{Id:X} {Type} - {ValueType} [{DataSize} bytes]";
 }
