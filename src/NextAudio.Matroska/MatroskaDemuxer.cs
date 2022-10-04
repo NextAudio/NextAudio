@@ -74,12 +74,6 @@ public sealed partial class MatroskaDemuxer : AudioDemuxer
     }
 
     /// <inheritdoc/>
-    public override ValueTask<int> DemuxAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
     protected override void Dispose(bool disposing)
     {
         if (IsDisposed)

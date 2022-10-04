@@ -7,9 +7,9 @@ namespace NextAudio.Matroska;
 
 public partial class MatroskaDemuxer
 {
-    private void StartMatroskaReading(Span<byte> buffer)
+    private async ValueTask StartMatroskaReadingAsync(Memory<byte> buffer)
     {
-        var ebmlElement = ReadNextElement(buffer);
+        var ebmlElement = await ReadNextElementAsync(buffer);
 
         if (!ebmlElement.HasValue)
         {
@@ -21,9 +21,9 @@ public partial class MatroskaDemuxer
             throw new InvalidOperationException("EBML Header not the first element in the file.");
         }
 
-        SkipElement(ebmlElement.Value);
+        await SkipElementAsync(ebmlElement.Value);
 
-        var segmentElement = ReadNextElement(buffer);
+        var segmentElement = await ReadNextElementAsync(buffer);
 
         if (!segmentElement.HasValue)
         {
@@ -39,18 +39,18 @@ public partial class MatroskaDemuxer
 
         _segmentElementLogScope = _logger.ProcessingMasterElementScope(_segmentElement, _position);
 
-        ParseSegmentElement(buffer, _segmentElement);
+        await ParseSegmentElementAsync(buffer, _segmentElement);
     }
 
-    private void ParseSegmentElement(Span<byte> buffer, MatroskaElement segmentElement)
+    private async ValueTask ParseSegmentElementAsync(Memory<byte> buffer, MatroskaElement segmentElement)
     {
         MatroskaElement? childElement;
 
-        while ((childElement = ReadNextElement(buffer, segmentElement)) != null)
+        while ((childElement = await ReadNextElementAsync(buffer, segmentElement)) != null)
         {
             if (childElement.Value.Type == MatroskaElementType.Tracks)
             {
-                ParseTracksElement(buffer, childElement.Value);
+                await ParseTracksElementAsync(buffer, childElement.Value);
             }
             if (childElement.Value.Type == MatroskaElementType.Cluster)
             {
@@ -58,11 +58,11 @@ public partial class MatroskaDemuxer
                 break;
             }
 
-            SkipElement(childElement.Value);
+            await SkipElementAsync(childElement.Value);
         }
     }
 
-    private void ParseTracksElement(Span<byte> buffer, MatroskaElement tracksElement)
+    private async ValueTask ParseTracksElementAsync(Memory<byte> buffer, MatroskaElement tracksElement)
     {
         using var _ = _logger.ProcessingMasterElementScope(tracksElement, _position);
 
@@ -70,14 +70,14 @@ public partial class MatroskaDemuxer
 
         var tracks = new List<MatroskaTrack>();
 
-        while ((childElement = ReadNextElement(buffer, tracksElement)) != null)
+        while ((childElement = await ReadNextElementAsync(buffer, tracksElement)) != null)
         {
             if (childElement.Value.Type == MatroskaElementType.TrackEntry)
             {
-                tracks.Add(ParseTrackElement(buffer, childElement.Value));
+                tracks.Add(await ParseTrackElementAsync(buffer, childElement.Value));
             }
 
-            SkipElement(childElement.Value);
+            await SkipElementAsync(childElement.Value);
         }
 
         var selectedTrackNumber = _options.TrackSelector(tracks);
@@ -87,7 +87,7 @@ public partial class MatroskaDemuxer
         SelectedTrack = tracks.First(track => track.TrackNumber == selectedTrackNumber);
     }
 
-    private MatroskaTrack ParseTrackElement(Span<byte> buffer, MatroskaElement trackElement)
+    private async ValueTask<MatroskaTrack> ParseTrackElementAsync(Memory<byte> buffer, MatroskaElement trackElement)
     {
         using var _ = _logger.ProcessingMasterElementScope(trackElement, _position);
 
@@ -101,31 +101,33 @@ public partial class MatroskaDemuxer
         byte[]? codecPrivate = null;
         MatroskaAudioSettings? audioSettings = null;
 
-        while ((childElement = ReadNextElement(buffer, trackElement)) != null)
+        while ((childElement = await ReadNextElementAsync(buffer, trackElement)) != null)
         {
             if (childElement.Value.Type == MatroskaElementType.TrackNumber)
             {
-                trackNumber = ReadUlong(childElement.Value, buffer);
+                trackNumber = await ReadUlongAsync(childElement.Value, buffer);
             }
             if (childElement.Value.Type == MatroskaElementType.TrackUid)
             {
-                trackUid = ReadUlong(childElement.Value, buffer);
+                trackUid = await ReadUlongAsync(childElement.Value, buffer);
             }
             if (childElement.Value.Type == MatroskaElementType.Name)
             {
-                name = ReadUtf8String(childElement.Value, buffer);
+                name = await ReadUtf8StringAsync(childElement.Value, buffer);
             }
             if (childElement.Value.Type == MatroskaElementType.CodecId)
             {
-                codecID = ReadAsciiString(childElement.Value, buffer);
+                codecID = await ReadAsciiStringAsync(childElement.Value, buffer);
             }
             if (childElement.Value.Type == MatroskaElementType.TrackType)
             {
-                type = (MatroskaTrackType)ReadUlong(childElement.Value, buffer);
+                var typeUlong = await ReadUlongAsync(childElement.Value, buffer);
+
+                type = (MatroskaTrackType)typeUlong;
             }
             if (childElement.Value.Type == MatroskaElementType.CodecPrivate)
             {
-                var slicedBuffer = ReadBytes(childElement.Value, buffer);
+                var slicedBuffer = await ReadBytesAsync(childElement.Value, buffer);
 
                 codecPrivate = new byte[slicedBuffer.Length];
 
@@ -133,10 +135,10 @@ public partial class MatroskaDemuxer
             }
             if (childElement.Value.Type == MatroskaElementType.Audio)
             {
-                audioSettings = ParseAudioElement(buffer, childElement.Value);
+                audioSettings = await ParseAudioElementAsync(buffer, childElement.Value);
             }
 
-            SkipElement(childElement.Value);
+            await SkipElementAsync(childElement.Value);
         }
 
         return new MatroskaTrack(codecID)
@@ -150,7 +152,7 @@ public partial class MatroskaDemuxer
         };
     }
 
-    private MatroskaAudioSettings ParseAudioElement(Span<byte> buffer, MatroskaElement audioElement)
+    private async ValueTask<MatroskaAudioSettings> ParseAudioElementAsync(Memory<byte> buffer, MatroskaElement audioElement)
     {
         using var _ = _logger.ProcessingMasterElementScope(audioElement, _position);
 
@@ -161,26 +163,28 @@ public partial class MatroskaDemuxer
         ulong channels = 0;
         ulong? bitDepth = null;
 
-        while ((childElement = ReadNextElement(buffer, audioElement)) != null)
+        while ((childElement = await ReadNextElementAsync(buffer, audioElement)) != null)
         {
             if (childElement.Value.Type == MatroskaElementType.SamplingFrequency)
             {
-                samplingFrequency = (float)ReadFloat(childElement.Value, buffer);
+                var samplingFrequencyDouble = await ReadFloatAsync(childElement.Value, buffer);
+                samplingFrequency = (float)samplingFrequencyDouble;
             }
             if (childElement.Value.Type == MatroskaElementType.OutputSamplingFrequency)
             {
-                outputSamplingFrequency = (float)ReadFloat(childElement.Value, buffer);
+                var outputSamplingFrequencyDouble = await ReadFloatAsync(childElement.Value, buffer);
+                outputSamplingFrequency = (float)outputSamplingFrequencyDouble;
             }
             if (childElement.Value.Type == MatroskaElementType.Channels)
             {
-                channels = ReadUlong(childElement.Value, buffer);
+                channels = await ReadUlongAsync(childElement.Value, buffer);
             }
             if (childElement.Value.Type == MatroskaElementType.BitDepth)
             {
-                bitDepth = ReadUlong(childElement.Value, buffer);
+                bitDepth = await ReadUlongAsync(childElement.Value, buffer);
             }
 
-            SkipElement(childElement.Value);
+            await SkipElementAsync(childElement.Value);
         }
 
         return new MatroskaAudioSettings

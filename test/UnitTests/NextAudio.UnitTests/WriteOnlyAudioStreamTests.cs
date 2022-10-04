@@ -98,12 +98,11 @@ public class WriteOnlyAudioStreamTests
 
         protected override void Dispose(bool disposing)
         {
-            throw new NotImplementedException();
         }
 
         protected override ValueTask DisposeAsyncCore()
         {
-            throw new NotImplementedException();
+            return ValueTask.CompletedTask;
         }
     }
 }
