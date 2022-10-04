@@ -75,7 +75,13 @@ public class BlockReaderTests
             11117,
             2,
             11121,
-            new MatroskaBlock(2, MatroskaBlockLacingType.No, 1, new int[] { 672 }),
+            new MatroskaBlock(
+                new MatroskaElement(163, 2, 11114, 3, 676),
+                2,
+                MatroskaBlockLacingType.No,
+                1,
+                new int[] { 672 }
+            ),
         };
         yield return new object[]
         {
@@ -85,7 +91,13 @@ public class BlockReaderTests
             26519,
             2,
             26523,
-            new MatroskaBlock(2, MatroskaBlockLacingType.No, 1, new int[] { 576 }),
+            new MatroskaBlock(
+                new MatroskaElement(163, 2, 26516, 3, 580),
+                2,
+                MatroskaBlockLacingType.No,
+                1,
+                new int[] { 576 }
+            ),
         };
     }
 
@@ -135,7 +147,13 @@ public class BlockReaderTests
             91706,
             10,
             91718,
-            new MatroskaBlock(10, MatroskaBlockLacingType.Xiph, 8, new int[] { 145, 145, 143, 150, 140, 150, 156, 140 }),
+            new MatroskaBlock(
+                new MatroskaElement(163, 2, 91703, 3, 1181),
+                10,
+                MatroskaBlockLacingType.Xiph,
+                8,
+                new int[] { 145, 145, 143, 150, 140, 150, 156, 140 }
+            ),
         };
         yield return new object[]
         {
@@ -145,7 +163,13 @@ public class BlockReaderTests
             4267179,
             10,
             4267191,
-            new MatroskaBlock(10, MatroskaBlockLacingType.Xiph, 7, new int[] { 187, 236, 269, 152, 141, 151, 143 }),
+            new MatroskaBlock(
+                new MatroskaElement(163, 2, 4267176, 3, 1291),
+                10,
+                MatroskaBlockLacingType.Xiph,
+                7,
+                new int[] { 187, 236, 269, 152, 141, 151, 143 }
+            ),
         };
     }
 
@@ -195,7 +219,13 @@ public class BlockReaderTests
             31581,
             2,
             31586,
-            new MatroskaBlock(2, MatroskaBlockLacingType.FixedSize, 4, new int[] { 768, 768, 768, 768 }),
+            new MatroskaBlock(
+                new MatroskaElement(163, 2, 31578, 3, 3077),
+                2,
+                MatroskaBlockLacingType.FixedSize,
+                4,
+                new int[] { 768, 768, 768, 768 }
+            ),
         };
         yield return new object[]
         {
@@ -205,7 +235,13 @@ public class BlockReaderTests
             5590759,
             2,
             5590764,
-            new MatroskaBlock(2, MatroskaBlockLacingType.FixedSize, 8, new int[] { 576, 576, 576, 576, 576, 576, 576, 576 }),
+            new MatroskaBlock(
+                new MatroskaElement(163, 2, 5590756, 3, 4613),
+                2,
+                MatroskaBlockLacingType.FixedSize,
+                8,
+                new int[] { 576, 576, 576, 576, 576, 576, 576, 576 }
+            ),
         };
     }
 
@@ -255,7 +291,13 @@ public class BlockReaderTests
             816,
             2,
             832,
-            new MatroskaBlock(2, MatroskaBlockLacingType.Ebml, 8, new int[] { 480, 576, 672, 672, 672, 672, 576, 672 }),
+            new MatroskaBlock(
+                new MatroskaElement(163, 2, 813, 3, 5008),
+                2,
+                MatroskaBlockLacingType.Ebml,
+                8,
+                new int[] { 480, 576, 672, 672, 672, 672, 576, 672 }
+            ),
         };
         yield return new object[]
         {
@@ -265,7 +307,13 @@ public class BlockReaderTests
             14264,
             2,
             14274,
-            new MatroskaBlock(2, MatroskaBlockLacingType.Ebml, 4, new int[] { 672, 672, 768, 672 }),
+            new MatroskaBlock(
+                new MatroskaElement(163, 2, 14261, 3, 2794),
+                2,
+                MatroskaBlockLacingType.Ebml,
+                4,
+                new int[] { 672, 672, 768, 672 }
+            ),
         };
     }
 
