@@ -12,6 +12,27 @@ namespace NextAudio.UnitTests;
 public class AudioDemuxerTests
 {
     [Fact]
+    public void CanSeekReturnsFalse()
+    {
+        AudioDemuxer demuxer = new AudioDemuxerMock((_) => { });
+
+        var result = demuxer.CanSeek;
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void SeekThrowsNotSupportedException()
+    {
+        AudioDemuxer demuxer = new AudioDemuxerMock((_) => { });
+
+        _ = Assert.Throws<NotSupportedException>(() =>
+        {
+            _ = demuxer.Seek(0, SeekOrigin.Begin);
+        });
+    }
+
+    [Fact]
     public void ReadCallsDemux()
     {
         // Act
@@ -136,8 +157,6 @@ public class AudioDemuxerTests
             _callback = callback;
         }
 
-        public override bool CanSeek => throw new NotImplementedException();
-
         public override long Length => throw new NotImplementedException();
 
         public override long Position { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -157,11 +176,6 @@ public class AudioDemuxerTests
         {
             _callback(buffer.ToArray());
             return default;
-        }
-
-        public override long Seek(long offset, SeekOrigin origin)
-        {
-            throw new NotImplementedException();
         }
 
         protected override void Dispose(bool disposing)
