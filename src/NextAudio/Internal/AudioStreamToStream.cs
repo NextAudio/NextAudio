@@ -8,10 +8,12 @@ namespace NextAudio.Internal;
 internal sealed class AudioStreamToStream : Stream
 {
     private readonly AudioStream _sourceStream;
+    private readonly AudioStreamToStreamOptions _options;
 
-    public AudioStreamToStream(AudioStream sourceStream)
+    public AudioStreamToStream(AudioStream sourceStream, AudioStreamToStreamOptions options)
     {
-        _sourceStream = sourceStream;
+        _sourceStream = sourceStream ?? throw new ArgumentNullException(nameof(sourceStream));
+        _options = options ?? throw new ArgumentNullException(nameof(options));
     }
 
     public override bool CanRead => _sourceStream.CanRead;
@@ -136,14 +138,21 @@ internal sealed class AudioStreamToStream : Stream
 
         if (disposing)
         {
-            _sourceStream.Dispose();
+            if (_options.DisposeSourceStream)
+            {
+                _sourceStream.Dispose();
+            }
         }
     }
 
     public override async ValueTask DisposeAsync()
     {
         await base.DisposeAsync().ConfigureAwait(false);
-        await _sourceStream.DisposeAsync().ConfigureAwait(false);
+
+        if (_options.DisposeSourceStream)
+        {
+            await _sourceStream.DisposeAsync().ConfigureAwait(false);
+        }
     }
 
     // Extracted from https://github.com/dotnet/runtime/blob/fb5f07f9c580bdcd5d0726d1391c2a52a01030f8/src/libraries/Common/src/System/Threading/Tasks/TaskToApm.cs#L79

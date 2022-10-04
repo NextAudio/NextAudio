@@ -190,7 +190,7 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     /// <param name="audioStream">The <see cref="AudioStream" /> to be cast.</param>
     public static implicit operator Stream(AudioStream audioStream)
     {
-        return new AudioStreamToStream(audioStream);
+        return CastToStream(audioStream);
     }
 
     /// <summary>
@@ -211,5 +211,16 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     public static AudioStream CreateFromStream(Stream stream, StreamToAudioStreamOptions? options = null)
     {
         return new StreamToAudioStream(stream, options ?? StreamToAudioStreamOptions.Default);
+    }
+
+    /// <summary>
+    /// Casts a <see cref="Stream" /> from an <see cref="AudioStream" />.
+    /// </summary>
+    /// <param name="audioStream">The <see cref="AudioStream" /> to be cast.</param>
+    /// <param name="options">The options for the cast.</param>
+    /// <returns>A new <see cref="Stream" /> created from the <paramref name="audioStream" />.</returns>
+    public static Stream CastToStream(AudioStream audioStream, AudioStreamToStreamOptions? options = null)
+    {
+        return new AudioStreamToStream(audioStream, options ?? AudioStreamToStreamOptions.Default);
     }
 }

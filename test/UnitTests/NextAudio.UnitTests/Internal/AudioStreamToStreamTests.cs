@@ -20,7 +20,7 @@ public class AudioStreamToStreamTests
         // Arrange
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
-        var castStream = new AudioStreamToStream(audioStream);
+        var castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
         // Act
         _ = castStream.CanRead;
@@ -35,7 +35,7 @@ public class AudioStreamToStreamTests
         // Arrange
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
-        var castStream = new AudioStreamToStream(audioStream);
+        var castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
         // Act
         _ = castStream.CanSeek;
@@ -50,7 +50,7 @@ public class AudioStreamToStreamTests
         // Arrange
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
-        var castStream = new AudioStreamToStream(audioStream);
+        var castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
         // Act
         _ = castStream.CanWrite;
@@ -65,7 +65,7 @@ public class AudioStreamToStreamTests
         // Arrange
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
-        var castStream = new AudioStreamToStream(audioStream);
+        var castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
         // Act
         _ = castStream.Length;
@@ -80,7 +80,7 @@ public class AudioStreamToStreamTests
         // Arrange
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
-        var castStream = new AudioStreamToStream(audioStream)
+        var castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default)
         {
             Position = 1
         };
@@ -98,7 +98,7 @@ public class AudioStreamToStreamTests
     {
         // Arrange
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
-        var castStream = new AudioStreamToStream(audioStream);
+        var castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
         // Act
         castStream.SetLength(0);
@@ -113,7 +113,7 @@ public class AudioStreamToStreamTests
         // Arrange
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
-        var castStream = new AudioStreamToStream(audioStream);
+        var castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
         // Act
         _ = castStream.Seek(0, SeekOrigin.Begin);
@@ -135,7 +135,7 @@ public class AudioStreamToStreamTests
             totalReadCalls++;
         });
 
-        var castStream = new AudioStreamToStream(audioStream);
+        var castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
         // Act
         _ = castStream.ReadByte();
@@ -162,7 +162,7 @@ public class AudioStreamToStreamTests
             totalWriteCalls++;
         });
 
-        var castStream = new AudioStreamToStream(audioStream);
+        var castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
         // Act
         castStream.WriteByte(expectedByteValue);
@@ -179,7 +179,7 @@ public class AudioStreamToStreamTests
         // Arrange
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
-        Stream castStream = new AudioStreamToStream(audioStream);
+        Stream castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
         Memory<byte> expectedMemory = new byte[]
         {
@@ -202,7 +202,7 @@ public class AudioStreamToStreamTests
         // Arrange
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
-        Stream castStream = new AudioStreamToStream(audioStream);
+        Stream castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
         Memory<byte> expectedMemory = new byte[]
         {
@@ -236,7 +236,7 @@ public class AudioStreamToStreamTests
             byteArray = buffer;
         });
 
-        Stream castStream = new AudioStreamToStream(audioStream);
+        Stream castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
         Span<byte> spanRead = expectedByteArray;
 
@@ -265,7 +265,7 @@ public class AudioStreamToStreamTests
             byteArray = buffer;
         });
 
-        Stream castStream = new AudioStreamToStream(audioStream);
+        Stream castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
         ReadOnlySpan<byte> spanRead = expectedByteArray;
 
@@ -290,7 +290,7 @@ public class AudioStreamToStreamTests
             disposeCallsCount++;
         });
 
-        Stream castStream = new AudioStreamToStream(audioStream);
+        Stream castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
         // Act
         castStream.Dispose();
@@ -313,7 +313,7 @@ public class AudioStreamToStreamTests
             disposeAsyncCallsCount++;
         });
 
-        Stream castStream = new AudioStreamToStream(audioStream);
+        Stream castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
         // Act
         await castStream.DisposeAsync();
