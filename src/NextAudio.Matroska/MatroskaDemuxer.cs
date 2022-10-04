@@ -46,7 +46,7 @@ public sealed partial class MatroskaDemuxer : AudioDemuxer
     public MatroskaTrack? SelectedTrack { get; private set; }
 
     /// <inheritdoc/>
-    public override bool CanSeek => _sourceStream.CanSeek;
+    public override bool CanSeek => false;
 
     /// <inheritdoc/>
     public override long Length => _sourceStream.Length;
@@ -54,18 +54,14 @@ public sealed partial class MatroskaDemuxer : AudioDemuxer
     /// <inheritdoc/>
     public override long Position
     {
-        get => CanSeek ? _sourceStream.Position : _position;
-        set => Seek(value, SeekOrigin.Begin);
+        get => _sourceStream.CanSeek ? _sourceStream.Position : _position;
+        set => throw new NotSupportedException();
     }
 
     /// <inheritdoc/>
     public override long Seek(long offset, SeekOrigin origin)
     {
-        var result = InternalSeek(offset, origin);
-
-        CheckCurrentStatePostSeek();
-
-        return result;
+        throw new NotSupportedException();
     }
 
     private bool BlockHasFrames(MatroskaBlock block)
