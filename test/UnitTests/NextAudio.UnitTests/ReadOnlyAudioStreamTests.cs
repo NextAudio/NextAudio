@@ -14,10 +14,10 @@ public class ReadOnlyAudioStreamTests
     [Fact]
     public void CanWriteReturnsFalse()
     {
-        // Act
+        // Arrange
         var stream = new ReadOnlyAudioStreamMock();
 
-        // Arrange
+        // Act
         var result = stream.CanWrite;
 
         // Assert
@@ -27,10 +27,10 @@ public class ReadOnlyAudioStreamTests
     [Fact]
     public void CanReadReturnsTrue()
     {
-        // Act
+        // Arrange
         var stream = new ReadOnlyAudioStreamMock();
 
-        // Arrange
+        // Act
         var result = stream.CanRead;
 
         // Assert
@@ -40,10 +40,10 @@ public class ReadOnlyAudioStreamTests
     [Fact]
     public void WriteThrowsNotSupportedException()
     {
-        // Act
+        // Arrange
         var stream = new ReadOnlyAudioStreamMock();
 
-        // Arrange + Assert
+        // Act + Assert
         _ = Assert.Throws<NotSupportedException>(() =>
         {
             stream.Write(ReadOnlySpan<byte>.Empty);
@@ -53,10 +53,10 @@ public class ReadOnlyAudioStreamTests
     [Fact]
     public async Task WriteAsyncThrowsNotSupportedException()
     {
-        // Act
+        // Arrange
         var stream = new ReadOnlyAudioStreamMock();
 
-        // Arrange + Assert
+        // Act + Assert
         _ = await Assert.ThrowsAsync<NotSupportedException>(async () =>
         {
             await stream.WriteAsync(ReadOnlyMemory<byte>.Empty);

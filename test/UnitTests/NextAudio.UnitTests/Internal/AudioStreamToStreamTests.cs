@@ -17,12 +17,12 @@ public class AudioStreamToStreamTests
     [Fact]
     public void CanReadCallsSourceAudioStreamCanRead()
     {
-        // Act
+        // Arrange
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         var castStream = new AudioStreamToStream(audioStream);
 
-        // Arrange
+        // Act
         _ = castStream.CanRead;
 
         // Assert
@@ -32,12 +32,12 @@ public class AudioStreamToStreamTests
     [Fact]
     public void CanSeekCallsSourceAudioStreamCanSeek()
     {
-        // Act
+        // Arrange
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         var castStream = new AudioStreamToStream(audioStream);
 
-        // Arrange
+        // Act
         _ = castStream.CanSeek;
 
         // Assert
@@ -47,12 +47,12 @@ public class AudioStreamToStreamTests
     [Fact]
     public void CanWriteCallsSourceAudioStreamCanWrite()
     {
-        // Act
+        // Arrange
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         var castStream = new AudioStreamToStream(audioStream);
 
-        // Arrange
+        // Act
         _ = castStream.CanWrite;
 
         // Assert
@@ -62,12 +62,12 @@ public class AudioStreamToStreamTests
     [Fact]
     public void LengthCallsSourceAudioStreamLength()
     {
-        // Act
+        // Arrange
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         var castStream = new AudioStreamToStream(audioStream);
 
-        // Arrange
+        // Act
         _ = castStream.Length;
 
         // Assert
@@ -77,7 +77,7 @@ public class AudioStreamToStreamTests
     [Fact]
     public void PositionCallsSourceAudioStreamPosition()
     {
-        // Act + Arrange
+        // Arrange
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         var castStream = new AudioStreamToStream(audioStream)
@@ -85,6 +85,7 @@ public class AudioStreamToStreamTests
             Position = 1
         };
 
+        // Act
         _ = castStream.Position;
 
         // Assert
@@ -95,24 +96,26 @@ public class AudioStreamToStreamTests
     [Fact]
     public void SetLengthCallsSourceAudioStreamSetLength()
     {
-        // Act
+        // Arrange
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
         var castStream = new AudioStreamToStream(audioStream);
 
+        // Act
         castStream.SetLength(0);
 
+        // Assert
         audioStream.Received(1).SetLength(0);
     }
 
     [Fact]
     public void SeekCallsSourceAudioStreamSeek()
     {
-        // Act
+        // Arrange
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         var castStream = new AudioStreamToStream(audioStream);
 
-        // Arrange
+        // Act
         _ = castStream.Seek(0, SeekOrigin.Begin);
 
         // Assert
@@ -122,7 +125,7 @@ public class AudioStreamToStreamTests
     [Fact]
     public void ReadByteCallsAudioStreamReadWithASpanWithLengthEqualsTo1()
     {
-        // Act
+        // Arrange
         var totalReadCalls = 0;
         var isValidReadCall = false;
 
@@ -134,7 +137,7 @@ public class AudioStreamToStreamTests
 
         var castStream = new AudioStreamToStream(audioStream);
 
-        // Arrange
+        // Act
         _ = castStream.ReadByte();
 
         // Assert
@@ -145,7 +148,7 @@ public class AudioStreamToStreamTests
     [Fact]
     public void WriteByteCallsAudioStreamReadWithASpanWithLengthEqualsTo1AndSameByteValue()
     {
-        // Act
+        // Arrange
         byte expectedByteValue = 123;
 
         var totalWriteCalls = 0;
@@ -161,7 +164,7 @@ public class AudioStreamToStreamTests
 
         var castStream = new AudioStreamToStream(audioStream);
 
-        // Arrange
+        // Act
         castStream.WriteByte(expectedByteValue);
 
         // Assert
@@ -173,7 +176,7 @@ public class AudioStreamToStreamTests
     [Fact]
     public async Task ReadAsyncValueTaskCallsAudioStreamReadAsyncValueTask()
     {
-        // Act
+        // Arrange
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         Stream castStream = new AudioStreamToStream(audioStream);
@@ -186,7 +189,7 @@ public class AudioStreamToStreamTests
         };
         var expectedCancellationToken = CancellationToken.None;
 
-        // Arrange
+        // Act
         _ = await castStream.ReadAsync(expectedMemory, expectedCancellationToken);
 
         // Assert
@@ -196,7 +199,7 @@ public class AudioStreamToStreamTests
     [Fact]
     public async Task WriteAsyncValueTaskCallsAudioStreamWriteAsyncValueTask()
     {
-        // Act
+        // Arrange
         var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         Stream castStream = new AudioStreamToStream(audioStream);
@@ -209,7 +212,7 @@ public class AudioStreamToStreamTests
         };
         var expectedCancellationToken = CancellationToken.None;
 
-        // Arrange
+        // Act
         await castStream.WriteAsync(expectedMemory, expectedCancellationToken);
 
         // Assert
@@ -219,7 +222,7 @@ public class AudioStreamToStreamTests
     [Fact]
     public void SpanReadCallsAudioStreamSpanRead()
     {
-        // Act
+        // Arrange
         var expectedByteArray = new byte[]
         {
             1,
@@ -237,7 +240,7 @@ public class AudioStreamToStreamTests
 
         Span<byte> spanRead = expectedByteArray;
 
-        // Arrange
+        // Act
         _ = castStream.Read(spanRead);
 
         // Assert
@@ -248,7 +251,7 @@ public class AudioStreamToStreamTests
     [Fact]
     public void ReadOnlySpanWriteCallsAudioStreamReadOnlySpanWrite()
     {
-        // Act
+        // Arrange
         var expectedByteArray = new byte[]
         {
             1,
@@ -266,7 +269,7 @@ public class AudioStreamToStreamTests
 
         ReadOnlySpan<byte> spanRead = expectedByteArray;
 
-        // Arrange
+        // Act
         castStream.Write(spanRead);
 
         // Assert
@@ -277,7 +280,7 @@ public class AudioStreamToStreamTests
     [Fact]
     public void DisposeCallsAudioStreamDispose()
     {
-        // Act
+        // Arrange
         var disposeCalled = false;
         var disposeCallsCount = 0;
 
@@ -289,7 +292,7 @@ public class AudioStreamToStreamTests
 
         Stream castStream = new AudioStreamToStream(audioStream);
 
-        // Arrange
+        // Act
         castStream.Dispose();
 
         // Assert
@@ -300,7 +303,7 @@ public class AudioStreamToStreamTests
     [Fact]
     public async Task DisposeAsyncCallsAudioStreamDisposeAsync()
     {
-        // Act
+        // Arrange
         var disposeAsyncCalled = false;
         var disposeAsyncCallsCount = 0;
 
@@ -312,7 +315,7 @@ public class AudioStreamToStreamTests
 
         Stream castStream = new AudioStreamToStream(audioStream);
 
-        // Arrange
+        // Act
         await castStream.DisposeAsync();
 
         // Assert

@@ -38,10 +38,13 @@ public class MatroskaDemuxerOptionsTests
     [MemberData(nameof(DefaultTrackSelectorChooseSelectFirstAudioTrackWhenHasAudioTracksData))]
     public void DefaultTrackSelectorChooseSelectFirstAudioTrackWhenHasAudioTracks(IEnumerable<MatroskaTrack> tracks, ulong expectedTrackNumber)
     {
+        // Arrange
         var options = new MatroskaDemuxerOptions();
 
+        // Act
         var result = options.TrackSelector(tracks);
 
+        // Assert
         Assert.Equal(expectedTrackNumber, result);
     }
 
@@ -71,10 +74,13 @@ public class MatroskaDemuxerOptionsTests
     [MemberData(nameof(DefaultTrackSelectorChooseSelectFirstTrackWhenDoesntHasAnyAudioTracksData))]
     public void DefaultTrackSelectorChooseSelectFirstTrackWhenDoesntHasAnyAudioTracks(IEnumerable<MatroskaTrack> tracks, ulong expectedTrackNumber)
     {
+        // Arrange
         var options = new MatroskaDemuxerOptions();
 
+        // Act
         var result = options.TrackSelector(tracks);
 
+        // Assert
         Assert.Equal(expectedTrackNumber, result);
     }
 }

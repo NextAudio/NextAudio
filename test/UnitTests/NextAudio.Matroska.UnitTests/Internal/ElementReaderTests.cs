@@ -70,8 +70,10 @@ public class ElementReaderTests
     [MemberData(nameof(ReadNextElementWithParentWithoutRemainingParentReturnsNullData))]
     public void ReadNextElementWithParentWithoutRemainingParentReturnsNull(AudioStream stream, long position, byte[] buffer, MatroskaElement parent)
     {
+        // Act
         var result = ElementReader.ReadNextElement(stream, position, buffer, NullLogger.Instance, parent);
 
+        // Assert
         Assert.False(result.Element.HasValue);
         Assert.Equal(position, result.NewPosition);
     }
@@ -80,10 +82,13 @@ public class ElementReaderTests
     [MemberData(nameof(ReadNextElementWithoutParentReadsNextElementData))]
     public void ReadNextElementWithoutParentReadsNextElement(AudioStream stream, long position, byte[] buffer, MatroskaElement expectedElement)
     {
+        // Arrange
         var expectedPosition = position + expectedElement.HeaderSize;
 
+        // Act
         var result = ElementReader.ReadNextElement(stream, position, buffer, NullLogger.Instance);
 
+        // Assert
         Assert.True(result.Element.HasValue);
         Assert.Equal(expectedElement, result.Element.Value);
         Assert.Equal(result.NewPosition, expectedPosition);
@@ -93,10 +98,13 @@ public class ElementReaderTests
     [MemberData(nameof(ReadNextElementWithParentReadsNextElementData))]
     public void ReadNextElementWithParentReadsNextElement(AudioStream stream, long position, byte[] buffer, MatroskaElement parent, MatroskaElement expectedElement)
     {
+        // Arrange
         var expectedPosition = position + expectedElement.HeaderSize;
 
+        // Act
         var result = ElementReader.ReadNextElement(stream, position, buffer, NullLogger.Instance, parent);
 
+        // Assert
         Assert.True(result.Element.HasValue);
         Assert.Equal(expectedElement, result.Element.Value);
         Assert.Equal(result.NewPosition, expectedPosition);
@@ -106,8 +114,10 @@ public class ElementReaderTests
     [MemberData(nameof(ReadNextElementWithParentWithoutRemainingParentReturnsNullData))]
     public async Task ReadNextElementAsyncWithParentWithoutRemainingParentReturnsNull(AudioStream stream, long position, byte[] buffer, MatroskaElement parent)
     {
+        // Act
         var result = await ElementReader.ReadNextElementAsync(stream, position, buffer, NullLogger.Instance, parent);
 
+        // Assert
         Assert.False(result.Element.HasValue);
         Assert.Equal(position, result.NewPosition);
     }
@@ -116,10 +126,13 @@ public class ElementReaderTests
     [MemberData(nameof(ReadNextElementWithoutParentReadsNextElementData))]
     public async Task ReadNextElementAsyncWithoutParentReadsNextElement(AudioStream stream, long position, byte[] buffer, MatroskaElement expectedElement)
     {
+        // Arrange
         var expectedPosition = position + expectedElement.HeaderSize;
 
+        // Act
         var result = await ElementReader.ReadNextElementAsync(stream, position, buffer, NullLogger.Instance);
 
+        // Assert
         Assert.True(result.Element.HasValue);
         Assert.Equal(expectedElement, result.Element.Value);
         Assert.Equal(result.NewPosition, expectedPosition);
@@ -129,10 +142,13 @@ public class ElementReaderTests
     [MemberData(nameof(ReadNextElementWithParentReadsNextElementData))]
     public async Task ReadNextElementAsyncWithParentReadsNextElement(AudioStream stream, long position, byte[] buffer, MatroskaElement parent, MatroskaElement expectedElement)
     {
+        // Arrange
         var expectedPosition = position + expectedElement.HeaderSize;
 
+        // Act
         var result = await ElementReader.ReadNextElementAsync(stream, position, buffer, NullLogger.Instance, parent);
 
+        // Assert
         Assert.True(result.Element.HasValue);
         Assert.Equal(expectedElement, result.Element.Value);
         Assert.Equal(result.NewPosition, expectedPosition);

@@ -14,7 +14,7 @@ public class MatroskaUtilsTests
     [InlineData(MatroskaElementType.Block, EbmlValueType.Binary)]
     public void GetEbmlValueTypeWithMappedMatroskaElementTypeReturnsCorrespondentEbmlValueType(MatroskaElementType elementType, EbmlValueType expectedValue)
     {
-        // Arrange
+        // Act
         var result = MatroskaUtils.GetEbmlValueType(elementType);
 
         // Assert
@@ -24,10 +24,10 @@ public class MatroskaUtilsTests
     [Fact]
     public void GetEbmlValueTypeWithUnmappedMatroskaElementTypeReturnsNone()
     {
-        // Act
+        // Arrange
         var elementType = MatroskaElementType.Unknown;
 
-        // Arrange
+        // Act
         var result = MatroskaUtils.GetEbmlValueType(elementType);
 
         // Assert
@@ -40,7 +40,7 @@ public class MatroskaUtilsTests
     [InlineData(0xA3)]
     public void IsEbmlIdMappedForMatroskaElementTypeReturnsTrueForMappedElements(ulong id)
     {
-        // Arrange
+        // Act
         var result = MatroskaUtils.IsEbmlIdMappedForMatroskaElementType(id);
 
         // Assert
@@ -53,7 +53,7 @@ public class MatroskaUtilsTests
     [InlineData(0x4285)]
     public void IsEbmlIdMappedForMatroskaElementTypeReturnsFalseForUnmappedElements(ulong id)
     {
-        // Arrange
+        // Act
         var result = MatroskaUtils.IsEbmlIdMappedForMatroskaElementType(id);
 
         // Assert
@@ -66,7 +66,7 @@ public class MatroskaUtilsTests
     [InlineData(0xA3, MatroskaElementType.SimpleBlock)]
     public void GetMatroskaElementTypeReturnsWithMappedElementTypeReturnsCorrespondentElementType(ulong id, MatroskaElementType expectedValue)
     {
-        // Arrange
+        // Act
         var result = MatroskaUtils.GetMatroskaElementType(id);
 
         // Assert
@@ -79,7 +79,7 @@ public class MatroskaUtilsTests
     [InlineData(0x4285)]
     public void GetMatroskaElementTypeReturnsWithUnmappedElementTypeReturnsUnknow(ulong id)
     {
-        // Arrange
+        // Act
         var result = MatroskaUtils.GetMatroskaElementType(id);
 
         // Assert
@@ -92,7 +92,7 @@ public class MatroskaUtilsTests
     [InlineData(0xA3, MatroskaElementType.SimpleBlock)]
     public void TryGetMatroskaElementTypeWithMappedElementTypeReturnsTrueAndTheCorrespondentElementType(ulong id, MatroskaElementType expectedValue)
     {
-        // Arrange
+        // Act
         var result = MatroskaUtils.TryGetMatroskaElementType(id, out var resultValue);
 
         // Assert
@@ -106,7 +106,7 @@ public class MatroskaUtilsTests
     [InlineData(0x4285)]
     public void TryGetMatroskaElementTypeWithUnmappedElementTypeReturnsFalseAndTheUnknow(ulong id)
     {
-        // Arrange
+        // Act
         var result = MatroskaUtils.TryGetMatroskaElementType(id, out var resultValue);
 
         // Assert

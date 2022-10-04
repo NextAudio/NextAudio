@@ -43,8 +43,10 @@ public class BlockReaderTests
         ulong selectedTrackNumber,
         long expectedPosition)
     {
+        // Act
         var result = BlockReader.ReadBlock(stream, buffer, blockElement, position, selectedTrackNumber, NullLogger.Instance);
 
+        // Assert
         Assert.False(result.Block.HasValue);
         Assert.Equal(expectedPosition, result.NewPosition);
     }
@@ -59,8 +61,10 @@ public class BlockReaderTests
         ulong selectedTrackNumber,
         long expectedPosition)
     {
+        // Act
         var result = await BlockReader.ReadBlockAsync(stream, buffer, blockElement, position, selectedTrackNumber, NullLogger.Instance);
 
+        // Assert
         Assert.False(result.Block.HasValue);
         Assert.Equal(expectedPosition, result.NewPosition);
     }
@@ -112,8 +116,10 @@ public class BlockReaderTests
         long expectedPosition,
         MatroskaBlock expectedBlock)
     {
+        // Act
         var result = BlockReader.ReadBlock(stream, buffer, blockElement, position, selectedTrackNumber, NullLogger.Instance);
 
+        // Assert
         Assert.True(result.Block.HasValue);
         Assert.Equal(expectedPosition, result.NewPosition);
         Assert.Equal(expectedBlock, result.Block.Value, BlockEqualityComparer.Instance);
@@ -130,8 +136,10 @@ public class BlockReaderTests
         long expectedPosition,
         MatroskaBlock expectedBlock)
     {
+        // Act
         var result = await BlockReader.ReadBlockAsync(stream, buffer, blockElement, position, selectedTrackNumber, NullLogger.Instance);
 
+        // Assert
         Assert.True(result.Block.HasValue);
         Assert.Equal(expectedPosition, result.NewPosition);
         Assert.Equal(expectedBlock, result.Block.Value, BlockEqualityComparer.Instance);
@@ -184,8 +192,10 @@ public class BlockReaderTests
         long expectedPosition,
         MatroskaBlock expectedBlock)
     {
+        // Act
         var result = BlockReader.ReadBlock(stream, buffer, blockElement, position, selectedTrackNumber, NullLogger.Instance);
 
+        // Assert
         Assert.True(result.Block.HasValue);
         Assert.Equal(expectedPosition, result.NewPosition);
         Assert.Equal(expectedBlock, result.Block.Value, BlockEqualityComparer.Instance);
@@ -202,8 +212,10 @@ public class BlockReaderTests
         long expectedPosition,
         MatroskaBlock expectedBlock)
     {
+        // Act
         var result = await BlockReader.ReadBlockAsync(stream, buffer, blockElement, position, selectedTrackNumber, NullLogger.Instance);
 
+        // Assert
         Assert.True(result.Block.HasValue);
         Assert.Equal(expectedPosition, result.NewPosition);
         Assert.Equal(expectedBlock, result.Block.Value, BlockEqualityComparer.Instance);
@@ -256,8 +268,10 @@ public class BlockReaderTests
         long expectedPosition,
         MatroskaBlock expectedBlock)
     {
+        // Act
         var result = BlockReader.ReadBlock(stream, buffer, blockElement, position, selectedTrackNumber, NullLogger.Instance);
 
+        // Assert
         Assert.True(result.Block.HasValue);
         Assert.Equal(expectedPosition, result.NewPosition);
         Assert.Equal(expectedBlock, result.Block.Value, BlockEqualityComparer.Instance);
@@ -274,8 +288,10 @@ public class BlockReaderTests
         long expectedPosition,
         MatroskaBlock expectedBlock)
     {
+        // Act
         var result = await BlockReader.ReadBlockAsync(stream, buffer, blockElement, position, selectedTrackNumber, NullLogger.Instance);
 
+        // Assert
         Assert.True(result.Block.HasValue);
         Assert.Equal(expectedPosition, result.NewPosition);
         Assert.Equal(expectedBlock, result.Block.Value, BlockEqualityComparer.Instance);
@@ -328,8 +344,10 @@ public class BlockReaderTests
         long expectedPosition,
         MatroskaBlock expectedBlock)
     {
+        // Act
         var result = BlockReader.ReadBlock(stream, buffer, blockElement, position, selectedTrackNumber, NullLogger.Instance);
 
+        // Assert
         Assert.True(result.Block.HasValue);
         Assert.Equal(expectedPosition, result.NewPosition);
         Assert.Equal(expectedBlock, result.Block.Value, BlockEqualityComparer.Instance);
@@ -346,8 +364,10 @@ public class BlockReaderTests
         long expectedPosition,
         MatroskaBlock expectedBlock)
     {
+        // Act
         var result = await BlockReader.ReadBlockAsync(stream, buffer, blockElement, position, selectedTrackNumber, NullLogger.Instance);
 
+        // Assert
         Assert.True(result.Block.HasValue);
         Assert.Equal(expectedPosition, result.NewPosition);
         Assert.Equal(expectedBlock, result.Block.Value, BlockEqualityComparer.Instance);

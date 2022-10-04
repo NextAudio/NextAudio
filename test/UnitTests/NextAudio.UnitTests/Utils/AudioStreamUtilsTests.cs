@@ -44,8 +44,10 @@ public class AudioStreamUtilsTests
     [MemberData(nameof(ReadFullyAudioStreamReadsCurrentAudioStreamData))]
     public void ReadFullyAudioStreamReadsCurrentAudioStream(AudioStream stream, byte[] buffer)
     {
+        // Act
         var result = AudioStreamUtils.ReadFullyAudioStream(stream, buffer);
 
+        // Assert
         Assert.Equal(buffer.Length, result);
     }
 
@@ -53,63 +55,79 @@ public class AudioStreamUtilsTests
     [MemberData(nameof(ReadFullyAudioStreamReadsCurrentAudioStreamData))]
     public async Task ReadFullyAudioStreamAsyncReadsCurrentAudioStream(AudioStream stream, byte[] buffer)
     {
+        // Act
         var result = await AudioStreamUtils.ReadFullyAudioStreamAsync(stream, buffer);
 
+        // Assert
         Assert.Equal(buffer.Length, result);
     }
 
     [Fact]
     public void ReadFullyAudioStreamNotReadsIfAudioStreamEnded()
     {
+        // Arrange
         AudioStream stream = new MemoryStream(Array.Empty<byte>());
 
+        // Act
         var result = AudioStreamUtils.ReadFullyAudioStream(stream, new byte[10]);
 
+        // Assert
         Assert.Equal(0, result);
     }
 
     [Fact]
     public async Task ReadFullyAudioStreamAsyncNotReadsIfAudioStreamEnded()
     {
+        // Arrange
         AudioStream stream = new MemoryStream(Array.Empty<byte>());
 
+        // Act
         var result = await AudioStreamUtils.ReadFullyAudioStreamAsync(stream, new byte[10]);
 
+        // Assert
         Assert.Equal(0, result);
     }
 
     [Fact]
     public void SeekCallsSourceStreamSeekIfCanSeek()
     {
+        // Arrange
         var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         _ = stream.CanSeek.Returns(true);
 
+        // Act
         _ = AudioStreamUtils.Seek(stream, 1000, SeekOrigin.Current, 0);
 
+        // Assert
         _ = stream.Received(1).Seek(1000, SeekOrigin.Current);
     }
 
     [Fact]
     public async Task SeekAsyncCallsSourceStreamSeekIfCanSeek()
     {
+        // Arrange
         var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         _ = stream.CanSeek.Returns(true);
 
+        // Act
         _ = await AudioStreamUtils.SeekAsync(stream, 1000, SeekOrigin.Current, 0);
 
+        // Assert
         _ = stream.Received(1).Seek(1000, SeekOrigin.Current);
     }
 
     [Fact]
     public void SeekThrowsNotSupportedExceptionIfSourceCantSeekAndSeekOriginIsEndAndLengthThrows()
     {
+        // Arrange
         var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         _ = stream.CanSeek.Returns(false);
         _ = stream.Length.Returns((x) => throw new NotSupportedException());
 
+        // Act + Assert
         _ = Assert.Throws<NotSupportedException>(() =>
         {
             _ = AudioStreamUtils.Seek(stream, 1000, SeekOrigin.End, 0);
@@ -119,11 +137,13 @@ public class AudioStreamUtilsTests
     [Fact]
     public async Task SeekAsyncThrowsNotSupportedExceptionIfSourceCantSeekAndSeekOriginIsEndAndLengthThrows()
     {
+        // Arrange
         var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         _ = stream.CanSeek.Returns(false);
         _ = stream.Length.Returns((x) => throw new NotSupportedException());
 
+        // Act + Assert
         _ = await Assert.ThrowsAsync<NotSupportedException>(async () =>
         {
             _ = await AudioStreamUtils.SeekAsync(stream, 1000, SeekOrigin.End, 0);
@@ -133,10 +153,12 @@ public class AudioStreamUtilsTests
     [Fact]
     public void SeekThrowsIfSeekOriginIsUnknownAndSourceCantSeek()
     {
+        // Arrange
         var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         _ = stream.CanSeek.Returns(false);
 
+        // Act + Assert
         _ = Assert.Throws<InvalidOperationException>(() =>
         {
             _ = AudioStreamUtils.Seek(stream, 1000, (SeekOrigin)10, 0);
@@ -146,10 +168,12 @@ public class AudioStreamUtilsTests
     [Fact]
     public async Task SeekAsyncThrowsIfSeekOriginIsUnknownAndSourceCantSeek()
     {
+        // Arrange
         var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         _ = stream.CanSeek.Returns(false);
 
+        // Act + Assert
         _ = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
             _ = await AudioStreamUtils.SeekAsync(stream, 1000, (SeekOrigin)10, 0);
@@ -159,10 +183,12 @@ public class AudioStreamUtilsTests
     [Fact]
     public void SeekThrowsIfSourceCantSeekAndNewPositionIsLowerThanCurrentPosition()
     {
+        // Arrange
         var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         _ = stream.CanSeek.Returns(false);
 
+        // Act + Assert
         _ = Assert.Throws<NotSupportedException>(() =>
         {
             _ = AudioStreamUtils.Seek(stream, 500, SeekOrigin.Begin, 1000);
@@ -172,10 +198,12 @@ public class AudioStreamUtilsTests
     [Fact]
     public async Task SeekAsyncThrowsIfSourceCantSeekAndNewPositionIsLowerThanCurrentPosition()
     {
+        // Arrange
         var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         _ = stream.CanSeek.Returns(false);
 
+        // Act + Assert
         _ = await Assert.ThrowsAsync<NotSupportedException>(async () =>
         {
             _ = await AudioStreamUtils.SeekAsync(stream, 500, SeekOrigin.Begin, 1000);
@@ -185,10 +213,12 @@ public class AudioStreamUtilsTests
     [Fact]
     public void SeekThrowsIfSourceCantSeekAndNewPositionIsHigherThanIntMaxValue()
     {
+        // Arrange
         var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         _ = stream.CanSeek.Returns(false);
 
+        // Act + Assert
         _ = Assert.Throws<InvalidOperationException>(() =>
         {
             _ = AudioStreamUtils.Seek(stream, ((long)int.MaxValue) + 1, SeekOrigin.Current, 0);
@@ -198,10 +228,12 @@ public class AudioStreamUtilsTests
     [Fact]
     public async Task SeekAsyncThrowsIfSourceCantSeekAndNewPositionIsHigherThanIntMaxValue()
     {
+        // Arrange
         var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
         _ = stream.CanSeek.Returns(false);
 
+        // Act + Assert
         _ = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
             _ = await AudioStreamUtils.SeekAsync(stream, ((long)int.MaxValue) + 1, SeekOrigin.Current, 0);
@@ -214,10 +246,13 @@ public class AudioStreamUtilsTests
     [InlineData(-100, SeekOrigin.End, 500, 1000, 900)]
     public void SeekForcellySeekIfSourceCantSeek(long offset, SeekOrigin origin, long currentPosition, long length, long expectedPosition)
     {
+        // Arrange
         var stream = new PartialReadAudioStreamMock(false, length);
 
+        // Act
         var result = AudioStreamUtils.Seek(stream, offset, origin, currentPosition);
 
+        // Assert
         Assert.Equal(expectedPosition, result);
     }
 
@@ -227,10 +262,13 @@ public class AudioStreamUtilsTests
     [InlineData(-100, SeekOrigin.End, 500, 1000, 900)]
     public async Task SeekAsyncForcellySeekIfSourceCantSeek(long offset, SeekOrigin origin, long currentPosition, long length, long expectedPosition)
     {
+        // Arrange
         var stream = new PartialReadAudioStreamMock(false, length);
 
+        // Act
         var result = await AudioStreamUtils.SeekAsync(stream, offset, origin, currentPosition);
 
+        // Assert
         Assert.Equal(expectedPosition, result);
     }
 

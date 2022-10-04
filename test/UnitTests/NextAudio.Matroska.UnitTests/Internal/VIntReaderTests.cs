@@ -42,8 +42,10 @@ public class VIntReaderTests
     [MemberData(nameof(ReadVIntReadsVIntData))]
     public void ReadVIntReadsVInt(AudioStream stream, byte[] buffer, VInt expectedVInt)
     {
+        // Act
         var result = VIntReader.ReadVInt(stream, buffer, 0, NullLogger.Instance);
 
+        // Assert
         Assert.Equal(expectedVInt, result);
     }
 
@@ -51,8 +53,10 @@ public class VIntReaderTests
     [MemberData(nameof(ReadVIntReadsVIntData))]
     public async Task ReadVIntAsyncReadsVInt(AudioStream stream, byte[] buffer, VInt expectedVInt)
     {
+        // Act
         var result = await VIntReader.ReadVIntAsync(stream, buffer, 0, NullLogger.Instance);
 
+        // Assert
         Assert.Equal(expectedVInt, result);
     }
 }

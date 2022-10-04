@@ -32,6 +32,7 @@ public class MatroskaDemuxerTests
     [MemberData(nameof(MatroskaFileData))]
     public void CanSyncDemuxAnyMatroskaFile(string path, TrackSelector trackSelector, int expectedLastFrameSize)
     {
+        // Arrange
         using var file = File.Open(path, FileMode.Open, FileAccess.Read);
         using var demuxer = new MatroskaDemuxer(file, new()
         {
@@ -43,10 +44,13 @@ public class MatroskaDemuxerTests
         var bytesReaded = 0;
         var lastFrameSize = 0;
 
+        // Act
         while ((bytesReaded = demuxer.Demux(buffer)) > 0)
         {
             lastFrameSize = bytesReaded;
         }
+
+        // Assert
 
         // It's basically impossible to check if all frames are readed correct
         // We will just check the last because if the last are correct,
@@ -59,6 +63,7 @@ public class MatroskaDemuxerTests
     [MemberData(nameof(MatroskaFileData))]
     public async Task CanAsyncDemuxAnyMatroskaFile(string path, TrackSelector trackSelector, int expectedLastFrameSize)
     {
+        // Arrange
         using var file = File.Open(path, FileMode.Open, FileAccess.Read);
         using var demuxer = new MatroskaDemuxer(file, new()
         {
@@ -70,10 +75,13 @@ public class MatroskaDemuxerTests
         var bytesReaded = 0;
         var lastFrameSize = 0;
 
+        // Act
         while ((bytesReaded = await demuxer.DemuxAsync(buffer)) > 0)
         {
             lastFrameSize = bytesReaded;
         }
+
+        // Assert
 
         // It's basically impossible to check if all frames are readed correct
         // We will just check the last because if the last are correct,
