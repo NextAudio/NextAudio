@@ -10,7 +10,7 @@ internal static class ElementReader
 {
     public static ElementReadResult ReadNextElement(AudioStream stream, long position, Span<byte> buffer, ILogger logger, MatroskaElement? parent = null)
     {
-        if (parent.HasValue && parent.Value.GetRemaining(position) == 0)
+        if (parent.HasValue && parent.Value.GetRemaining(position) <= 0)
         {
             return new ElementReadResult(null, position);
         }
@@ -35,7 +35,7 @@ internal static class ElementReader
 
     public static async ValueTask<ElementReadResult> ReadNextElementAsync(AudioStream stream, long position, Memory<byte> buffer, ILogger logger, MatroskaElement? parent = null)
     {
-        if (parent.HasValue && parent.Value.GetRemaining(position) == 0)
+        if (parent.HasValue && parent.Value.GetRemaining(position) <= 0)
         {
             return new ElementReadResult(null, position);
         }

@@ -13,17 +13,24 @@ public readonly struct MatroskaBlock
     /// <summary>
     /// Creates a new instance of <see cref="MatroskaBlock" />.
     /// </summary>
+    /// <param name="element">The element which this block is for.</param>
     /// <param name="trackNumber">The track number which this block is for.</param>
     /// <param name="lacingType">The lacing type that block uses.</param>
     /// <param name="frameCount">The number of frames in this block.</param>
     /// <param name="frameSizes">All frames sizes in this block.</param>
-    public MatroskaBlock(ulong trackNumber, MatroskaBlockLacingType lacingType, int frameCount, int[] frameSizes)
+    public MatroskaBlock(MatroskaElement element, ulong trackNumber, MatroskaBlockLacingType lacingType, int frameCount, int[] frameSizes)
     {
+        Element = element;
         TrackNumber = trackNumber;
         LacingType = lacingType;
         FrameCount = frameCount;
         _frameSizes = frameSizes;
     }
+
+    /// <summary>
+    /// The element which this block is for.
+    /// </summary>
+    public MatroskaElement Element { get; }
 
     /// <summary>
     /// The track number which this block is for.
