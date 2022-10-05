@@ -95,7 +95,7 @@ OBS: Goals will change as new lib versions come out.
 #### Decoders support:
 - Opus (.opus)
 - Vorbis (.ogg/.oga)
-- AAC (.m4a/.m4b/m4p/m4v/.m4r/.aac/.3gp/.mp4)
+- AAC (.m4a/.m4b/.m4p/.m4v/.m4r/.aac/.3gp/.mp4)
 - MPEG-1/2 Audio Layer 3 (.mp3/.mp4)
 
 #### Encoders support:
