@@ -119,6 +119,7 @@ OBS: Goals will change as new lib versions come out.
 - Audio Pipelines (less complexity when wanna a specific output format)
 - Support for `Microsoft.Extensions.DependencyInjection`
 - Writing to output formats (`PipelineWriter`/`Stream`)
+- An Audio Player structure to control play/queue/pause/seek/volume operations
 
 # Contributing
 
