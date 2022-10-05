@@ -1,6 +1,7 @@
 // Licensed to the NextAudio under one or more agreements.
 // NextAudio licenses this file to you under the MIT license.
 
+using System.ComponentModel;
 using Microsoft.Extensions.Logging;
 using NextAudio.Matroska.Models;
 
@@ -49,9 +50,11 @@ public sealed partial class MatroskaDemuxer : AudioDemuxer
     public MatroskaTrack? SelectedTrack { get; private set; }
 
     /// <inheritdoc/>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public override bool CanSeek => false;
 
     /// <inheritdoc/>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public override long Length => _sourceStream.Length;
 
     /// <inheritdoc/>
@@ -65,6 +68,7 @@ public sealed partial class MatroskaDemuxer : AudioDemuxer
     public override RecommendedSynchronicity RecommendedSynchronicity => _sourceStream.RecommendedSynchronicity;
 
     /// <inheritdoc/>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public override long Seek(long offset, SeekOrigin origin)
     {
         throw new NotSupportedException();

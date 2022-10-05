@@ -1,6 +1,7 @@
 // Licensed to the NextAudio under one or more agreements.
 // NextAudio licenses this file to you under the MIT license.
 
+using System.ComponentModel;
 using Microsoft.Extensions.Logging;
 
 namespace NextAudio;
@@ -19,24 +20,29 @@ public abstract class ReadOnlyAudioStream : AudioStream
     }
 
     /// <inheritdoc/>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public override bool CanRead => true;
 
     /// <inheritdoc/>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public override bool CanWrite => false;
 
     /// <inheritdoc/>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public override void SetLength(long value)
     {
         throw new NotSupportedException();
     }
 
     /// <inheritdoc/>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public override void Write(ReadOnlySpan<byte> buffer)
     {
         throw new NotSupportedException();
     }
 
     /// <inheritdoc/>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
     {
         throw new NotSupportedException();

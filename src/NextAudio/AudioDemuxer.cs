@@ -1,6 +1,7 @@
 // Licensed to the NextAudio under one or more agreements.
 // NextAudio licenses this file to you under the MIT license.
 
+using System.ComponentModel;
 using Microsoft.Extensions.Logging;
 
 namespace NextAudio;
@@ -21,9 +22,11 @@ public abstract class AudioDemuxer : ReadOnlyAudioStream
     // The majority of the demuxers will have broken state if
     // Seek without a specific unit.
     /// <inheritdoc />
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public override bool CanSeek => false;
 
     /// <inheritdoc />
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public override long Seek(long offset, SeekOrigin origin)
     {
         throw new NotSupportedException();
@@ -32,18 +35,21 @@ public abstract class AudioDemuxer : ReadOnlyAudioStream
     // The majority of the demuxers will have broken state if
     // Seek without a specific unit.
     /// <inheritdoc />
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public override ValueTask<long> SeekAsync(long offset, SeekOrigin origin, CancellationToken cancellationToken = default)
     {
         throw new NotSupportedException();
     }
 
     /// <inheritdoc />
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public override int Read(Span<byte> buffer)
     {
         return Demux(buffer);
     }
 
     /// <inheritdoc />
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
     {
         return DemuxAsync(buffer, cancellationToken);
