@@ -104,7 +104,7 @@ public class AudioStreamUtilsTests
     }
 
     [Fact]
-    public async Task SeekAsyncCallsSourceStreamSeekIfCanSeek()
+    public async Task SeekAsyncCallsSourceStreamSeekAsyncIfCanSeek()
     {
         // Arrange
         var stream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
@@ -115,7 +115,7 @@ public class AudioStreamUtilsTests
         _ = await AudioStreamUtils.SeekAsync(stream, 1000, SeekOrigin.Current, 0);
 
         // Assert
-        _ = stream.Received(1).Seek(1000, SeekOrigin.Current);
+        _ = await stream.Received(1).SeekAsync(1000, SeekOrigin.Current);
     }
 
     [Fact]
