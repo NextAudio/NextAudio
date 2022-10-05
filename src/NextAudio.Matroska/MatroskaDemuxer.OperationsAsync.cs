@@ -80,7 +80,7 @@ public partial class MatroskaDemuxer
 
     private async ValueTask<int> ReadSourceStreamAsync(Memory<byte> buffer)
     {
-        PreventSourceSeek();
+        await PreventSourceSeekAsync().ConfigureAwait(false);
 
         var result = await AudioStreamUtils.ReadFullyAudioStreamAsync(_sourceStream, buffer).ConfigureAwait(false);
 
@@ -96,5 +96,15 @@ public partial class MatroskaDemuxer
         _position = result;
 
         return result;
+    }
+
+    private async ValueTask PreventSourceSeekAsync()
+    {
+        if (_sourceStream.CanSeek && _sourceStream.Position != _position)
+        {
+            // Seek by position can break the demuxer state.
+            // With this method we can prevent the source stream seeking.
+            _ = await _sourceStream.SeekAsync(_position, SeekOrigin.Begin).ConfigureAwait(false);
+        }
     }
 }

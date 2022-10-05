@@ -132,7 +132,7 @@ public static class AudioStreamUtils
     {
         if (stream.CanSeek)
         {
-            return stream.Seek(offset, origin);
+            return await stream.SeekAsync(offset, origin).ConfigureAwait(false);
         }
 
         var pos = origin switch

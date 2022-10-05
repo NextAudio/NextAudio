@@ -74,16 +74,6 @@ public sealed partial class MatroskaDemuxer : AudioDemuxer
         throw new NotSupportedException();
     }
 
-    private void PreventSourceSeek()
-    {
-        if (_sourceStream.CanSeek && _sourceStream.Position != _position)
-        {
-            // Seek by position can break the demuxer state.
-            // With this method we can prevent the source stream seeking.
-            _ = _sourceStream.Seek(_position, SeekOrigin.Begin);
-        }
-    }
-
     private bool BlockHasFrames(MatroskaBlock block)
     {
         return _currentBlockIndex < block.FrameCount;
