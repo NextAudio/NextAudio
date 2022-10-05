@@ -98,7 +98,7 @@ OBS: Goals will change as new lib versions come out.
 - AAC (.m4a/.m4b/m4p/m4v/.m4r/.aac/.3gp/.mp4)
 - MPEG-1/2 Audio Layer 3 (.mp3/.mp4)
 
-### Encoders support:
+#### Encoders support:
 - Opus (.opus)
 
 #### Containers probe support:
@@ -108,13 +108,13 @@ OBS: Goals will change as new lib versions come out.
 - MPEG-4 Part 14 (.mp4)
 - Flac (.flac)
 
-### Others audio operations
+#### Others audio operations
 - Seeking (by timestamp)
 - Volume
 - Resampling
 - Mono to Stereo
 
-### Others
+#### Others
 - Package with all lib individual components
 - Audio Pipelines (less complexity when wanna a specific output format)
 - Support for `Microsoft.Extensions.DependencyInjection`
