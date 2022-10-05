@@ -2,7 +2,7 @@
 See [Documentation](https://nextaudio.github.io/)
 
 # Installation
-You can add this libray via nuget package manager.
+You can add this lib via nuget package manager.
 
 dotnet cli example:
 
