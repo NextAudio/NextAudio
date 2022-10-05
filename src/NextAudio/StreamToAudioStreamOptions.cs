@@ -9,7 +9,7 @@ namespace NextAudio;
 /// <summary>
 /// Options when creating an <see cref="AudioStream" /> from a <see cref="Stream" />.
 /// </summary>
-public class StreamToAudioStreamOptions
+public sealed class StreamToAudioStreamOptions
 {
     /// <summary>
     /// The default options <see cref="StreamToAudioStreamOptions" /> instance.
@@ -18,6 +18,7 @@ public class StreamToAudioStreamOptions
 
     /// <summary>
     /// If the source stream should be disposed when the audio stream disposes.
+    /// The default value is <see langword="true" />.
     /// </summary>
     public bool DisposeSourceStream { get; set; } = true;
 

@@ -214,6 +214,41 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     }
 
     /// <summary>
+    /// Create an <see cref="AudioStream" /> from the specified file path.
+    /// </summary>
+    /// <param name="path">The specified file path to create the <see cref="AudioStream" />.</param>
+    /// <returns>A new <see cref="AudioStream" /> from the specified <paramref name="path" />.</returns>
+    public static AudioStream CreateFromFile(string path)
+    {
+        return CreateFromFile(path, FileAudioStreamOptions.Default);
+    }
+
+    /// <summary>
+    /// Create an <see cref="AudioStream" /> from the specified file path with the choosen file options.
+    /// </summary>
+    /// <param name="path">The specified file path to create the <see cref="AudioStream" />.</param>
+    /// <param name="options">The choosen file options.</param>
+    /// <returns>A new <see cref="AudioStream" /> from the specified <paramref name="path" />
+    /// with the choosen <paramref name="options" />.</returns>
+    public static AudioStream CreateFromFile(string path, FileStreamOptions options)
+    {
+        return CreateFromFile(path, new FileAudioStreamOptions(options));
+    }
+
+    /// <summary>
+    /// Create an <see cref="AudioStream" /> from the specified file path with the choosen file stream options.
+    /// </summary>
+    /// <param name="path">The specified file path to create the <see cref="AudioStream" />.</param>
+    /// <param name="options">The choosen file stream options.</param>
+    /// <returns>A new <see cref="AudioStream" /> from the specified <paramref name="path" />
+    /// with the choosen <paramref name="options" />.</returns>
+    public static AudioStream CreateFromFile(string path, FileAudioStreamOptions options)
+    {
+        var fileStream = File.Open(path, options.GetFileStreamOptions());
+        return CreateFromStream(fileStream, options.GetStreamToAudioStreamOptions());
+    }
+
+    /// <summary>
     /// Casts a <see cref="Stream" /> from an <see cref="AudioStream" />.
     /// </summary>
     /// <param name="audioStream">The <see cref="AudioStream" /> to be cast.</param>

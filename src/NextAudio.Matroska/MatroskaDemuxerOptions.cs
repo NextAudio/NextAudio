@@ -15,7 +15,7 @@ public delegate ulong TrackSelector(IEnumerable<MatroskaTrack> tracks);
 /// <summary>
 /// Represents some options to a <see cref="MatroskaDemuxer" />.
 /// </summary>
-public class MatroskaDemuxerOptions
+public sealed class MatroskaDemuxerOptions
 {
     /// <summary>
     /// The default instance of <see cref="MatroskaDemuxerOptions" />.
