@@ -7,6 +7,12 @@
       "commands": [
         "dotnet-format"
       ]
+    },
+    "husky": {
+      "version": "0.5.1",
+      "commands": [
+        "husky"
+      ]
     }
   }
 }
