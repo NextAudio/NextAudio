@@ -12,8 +12,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Description>Audio dependency inversion lib for developing audio applications.</Description>
-    <PackageTags>audio, music, next, nextaudio, stream, streaming, csharp, dotnet, vb-net, fsharp</PackageTags>
+    <Description>The Matroska Container support for NextAudio library.</Description>
+    <PackageTags>transcoder, encoder, decoder, player, muxer, demuxer, demultiplexer, multiplexer, audio, music, next, nextaudio, stream, streaming, csharp, dotnet, vb-net, fsharp, matroska, webm, mkv</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,6 +24,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NextAudio\NextAudio.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 
 </Project>

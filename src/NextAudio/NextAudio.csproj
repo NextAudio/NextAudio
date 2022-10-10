@@ -12,8 +12,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Description>Audio dependency inversion lib for developing audio applications.</Description>
-    <PackageTags>audio, music, next, nextaudio, stream, streaming, csharp, dotnet, vb-net, fsharp</PackageTags>
+    <Description>The core components for the NextAudio library.</Description>
+    <PackageTags>transcoder, encoder, decoder, player, muxer, demuxer, demultiplexer, multiplexer, audio, music, next, nextaudio, stream, streaming, csharp, dotnet, vb-net, fsharp</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,6 +24,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 
   <Target Name="Husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' != 0 And !Exists('../../.husky/_')">
