@@ -1,9 +1,10 @@
-name: .NET
+name: Build-Test-Lint
 
 on:
   pull_request:
     branches:
       - "**"
+  workflow_call:
 
 jobs:
   build:
@@ -18,7 +19,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build -c Release --no-restore
 
   test:
     needs: build
@@ -34,7 +35,7 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test -c Release --no-build --verbosity normal
 
   lint:
     needs: test
