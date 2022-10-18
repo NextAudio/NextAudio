@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     if: "!contains(format('{0} {1}', github.event.head_commit.message, github.event.pull_request.title), '[deploy-skip]')"
     env:
-        BuildNumber: ${{ GITHUB_RUN_ID }}
+        BuildNumber: ${{ github.GITHUB_RUN_ID }}
 
     steps:
       - name: Checkout repo
