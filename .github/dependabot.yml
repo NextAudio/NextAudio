@@ -6,3 +6,10 @@ updates:
     interval: weekly
   labels:
     - dependencies
+  assignees:
+    - "renanrcp"
+  reviewers:
+    - "renanrcp"
+  milestone: 5
+  commit-message:
+    prefix: "chore"
