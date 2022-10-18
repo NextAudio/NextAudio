@@ -2,10 +2,13 @@
   <img src="banner.png" />
 	</br>
 	<a href="https://github.com/NextAudio/NextAudio/actions">
-	<img src="https://img.shields.io/endpoint?label=BUILD%20STATUS&logo=github&logoWidth=20&labelColor=0d0d0d&style=for-the-badge&url=https://github-workflow-status-badge.vercel.app/api/NextAudio/NextAudio/build-test-lint.yml" />
+	  <img src="https://img.shields.io/endpoint?label=BUILD%20STATUS&logo=github&logoWidth=20&labelColor=0d0d0d&style=for-the-badge&url=https://github-workflow-status-badge.vercel.app/api/NextAudio/NextAudio/build-test-lint.yml" />
 	</a>
 	<a href="https://dotnet.microsoft.com/download">
 		<img src="https://img.shields.io/badge/dotnet-6+-blueviolet?label=.NET&logo=.net&style=for-the-badge&logoWidth=20&labelColor=0d0d0d" />
+	</a>
+  <a href="https://www.myget.org/feed/Packages/next-audio/">
+		<img src="https://img.shields.io/myget/next-audio/vpre/NextAudio.svg?label=Dev-Version&logo=nuget&style=for-the-badge&logoWidth=20&labelColor=0d0d0d" />
 	</a>
 	<a href="https://www.nuget.org/packages/NextAudio/">
 		<img src="https://img.shields.io/nuget/v/NextAudio.svg?label=Version&logo=nuget&style=for-the-badge&logoWidth=20&labelColor=0d0d0d" />
@@ -13,7 +16,7 @@
 	<a href="https://www.nuget.org/packages/NextAudio/">
 		<img src="https://img.shields.io/nuget/dt/NextAudio.svg?label=Downloads&logo=nuget&style=for-the-badge&logoWidth=20&labelColor=0d0d0d" />
 	</a>
-    <a href="https://github.com/renanrcp/NextAudio/NextAudio/blob/main/LICENSE">
+  <a href="https://github.com/renanrcp/NextAudio/NextAudio/blob/main/LICENSE">
 		<img src="https://img.shields.io/badge/License-MIT-yellow.svg?label=License&style=for-the-badge&logoWidth=20&labelColor=0d0d0d" />
 	</a>
     <p align="center">
