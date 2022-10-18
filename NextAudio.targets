@@ -6,6 +6,8 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugType>Portable</DebugType>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -14,8 +16,8 @@
     <Company>NextAudio</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/NextAudio/NextAudio</PackageProjectUrl>
-    <!-- <PackageIconUrl></PackageIconUrl>
-    <PackageIcon></PackageIcon> -->
+    <PackageIconUrl>https://github.com/NextAudio/NextAudio/blob/main/icon.png</PackageIconUrl>
+    <PackageIcon>icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/NextAudio/NextAudio</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
   </PropertyGroup>
@@ -43,7 +45,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- <None Include="NextAudio.png" Pack="true" PackagePath="/" /> -->
+    <None Include="../../icon.png" Pack="true" PackagePath="/" />
   </ItemGroup>
 
 </Project>
