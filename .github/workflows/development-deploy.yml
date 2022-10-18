@@ -17,9 +17,12 @@ jobs:
         BuildNumber: GITHUB_RUN_ID
 
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
       - name: "Build Packages"
         run: "dotnet pack NextAudio.sln -c Release -o ./artifacts --no-restore --no-build --version-suffix=dev"
-        
+
       - name: "Deploy Packages"
         run: "dotnet nuget push \"./artifacts/*\" -s https://www.myget.org/F/next-audio/api/v3/index.json -k ${{ secrets.MYGET_API_KEY }} --skip-duplicate"
 
