@@ -13,15 +13,15 @@ jobs:
     needs: build-test-lint
     runs-on: ubuntu-latest
     if: "!contains(format('{0} {1}', github.event.head_commit.message, github.event.pull_request.title), '[deploy-skip]')"
+    env:
+        BuildNumber: GITHUB_RUN_ID
 
     steps:
       - name: "Build Packages"
         run: "dotnet pack NextAudio.sln -c Release -o ./artifacts --no-restore --no-build --version-suffix=dev"
-      env:
-        BuildNumber: GITHUB_RUN_ID
-
+        
       - name: "Deploy Packages"
-        run: "dotnet nuget push "./artifacts/*" -s https://www.myget.org/F/next-audio/api/v3/index.json -k ${{ secrets.MYGET_API_KEY }} --skip-duplicate"
+        run: "dotnet nuget push \"./artifacts/*\" -s https://www.myget.org/F/next-audio/api/v3/index.json -k ${{ secrets.MYGET_API_KEY }} --skip-duplicate"
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
