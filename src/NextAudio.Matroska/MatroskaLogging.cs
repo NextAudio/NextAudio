@@ -8,12 +8,12 @@ namespace NextAudio.Matroska;
 
 internal static partial class MatroskaLogging
 {
-    private static readonly Func<ILogger, string, long, IDisposable> _processingMasterElementScope
-        = LoggerMessage.DefineScope<string, long>("Processing master element '{string}' in position '{position}'.");
+    private static readonly Func<ILogger, string, ulong, long, IDisposable> _processingMasterElementScope
+        = LoggerMessage.DefineScope<string, ulong, long>("MasterElementType:{String}, Id:0x{Ulong:X}, Position:{Long}");
 
-    public static IDisposable ProcessingMasterElementScope(this ILogger logger, MatroskaElement element, long position)
+    public static IDisposable ProcessingMasterElementScope(this ILogger logger, MatroskaElement element)
     {
-        return _processingMasterElementScope(logger, element.Type.ToString(), position);
+        return _processingMasterElementScope(logger, element.Type.ToString(), element.Id, element.Position);
     }
 
     public static void LogReadBufferSize(this ILogger logger, ReadOnlySpan<byte> buffer)

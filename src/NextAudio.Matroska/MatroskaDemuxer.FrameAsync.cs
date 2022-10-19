@@ -74,7 +74,7 @@ public partial class MatroskaDemuxer
                 if (result > 0)
                 {
                     _currentClusterElement = childElement;
-                    _clusterElementLogScope = _logger.ProcessingMasterElementScope(childElement.Value, _position);
+                    _clusterElementLogScope = _logger.ProcessingMasterElementScope(childElement.Value);
                     return result;
                 }
             }
@@ -94,7 +94,7 @@ public partial class MatroskaDemuxer
         {
             if (childElement.Value.Type == MatroskaElementType.BlockGroup)
             {
-                _blockGroupElementLogScope = _logger.ProcessingMasterElementScope(childElement.Value, _position);
+                _blockGroupElementLogScope = _logger.ProcessingMasterElementScope(childElement.Value);
 
                 var result = await ReadNextFrameFromGroupAsync(buffer, childElement.Value).ConfigureAwait(false);
 
@@ -107,7 +107,8 @@ public partial class MatroskaDemuxer
 
             if (childElement.Value.Type == MatroskaElementType.SimpleBlock)
             {
-                _blockElementLogScope = _logger.ProcessingMasterElementScope(childElement.Value, _position);
+                _blockElementLogScope = _logger.ProcessingMasterElementScope(childElement.Value);
+
                 var result = await ReadFrameFromBlockElementAsync(buffer, childElement.Value).ConfigureAwait(false);
 
                 if (result > 0)
@@ -119,6 +120,7 @@ public partial class MatroskaDemuxer
             await SkipElementAsync(childElement.Value).ConfigureAwait(false);
         }
 
+        DisposeClusterElementLogScope();
         return 0;
     }
 
@@ -130,7 +132,8 @@ public partial class MatroskaDemuxer
         {
             if (childElement.Value.Type == MatroskaElementType.Block)
             {
-                _blockElementLogScope = _logger.ProcessingMasterElementScope(childElement.Value, _position);
+                _blockElementLogScope = _logger.ProcessingMasterElementScope(childElement.Value);
+
                 var result = await ReadFrameFromBlockElementAsync(buffer, childElement.Value).ConfigureAwait(false);
 
                 if (result > 0)

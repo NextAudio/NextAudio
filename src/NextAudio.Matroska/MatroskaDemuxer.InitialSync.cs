@@ -37,7 +37,7 @@ public partial class MatroskaDemuxer
             throw new InvalidOperationException("Segment not the second element in the file.");
         }
 
-        _segmentElementLogScope = _logger.ProcessingMasterElementScope(_segmentElement, _position);
+        _segmentElementLogScope = _logger.ProcessingMasterElementScope(_segmentElement);
 
         ParseSegmentElement(buffer, _segmentElement);
     }
@@ -64,7 +64,7 @@ public partial class MatroskaDemuxer
 
     private void ParseTracksElement(Span<byte> buffer, MatroskaElement tracksElement)
     {
-        using var _ = _logger.ProcessingMasterElementScope(tracksElement, _position);
+        using var _ = _logger.ProcessingMasterElementScope(tracksElement);
 
         MatroskaElement? childElement;
 
@@ -89,7 +89,7 @@ public partial class MatroskaDemuxer
 
     private MatroskaTrack ParseTrackElement(Span<byte> buffer, MatroskaElement trackElement)
     {
-        using var _ = _logger.ProcessingMasterElementScope(trackElement, _position);
+        using var _ = _logger.ProcessingMasterElementScope(trackElement);
 
         MatroskaElement? childElement;
 
@@ -152,7 +152,7 @@ public partial class MatroskaDemuxer
 
     private MatroskaAudioSettings ParseAudioElement(Span<byte> buffer, MatroskaElement audioElement)
     {
-        using var _ = _logger.ProcessingMasterElementScope(audioElement, _position);
+        using var _ = _logger.ProcessingMasterElementScope(audioElement);
 
         MatroskaElement? childElement;
 

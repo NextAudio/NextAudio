@@ -30,7 +30,6 @@ public partial class MatroskaDemuxer
             }
 
             _currentBlock = null;
-            DisposeBlockElementLogScope();
         }
 
         _currentBlockIndex = 0;
@@ -45,7 +44,6 @@ public partial class MatroskaDemuxer
             }
 
             _currentBlockGroupElement = null;
-            DisposeBlockGroupElementLogScope();
         }
 
         if (_currentClusterElement.HasValue)
@@ -58,7 +56,6 @@ public partial class MatroskaDemuxer
             }
 
             _currentClusterElement = null;
-            DisposeClusterElementLogScope();
         }
 
         return ReadNextFrameFromSegment(buffer);
@@ -77,6 +74,7 @@ public partial class MatroskaDemuxer
                 if (result > 0)
                 {
                     _currentClusterElement = childElement;
+                    _clusterElementLogScope = _logger.ProcessingMasterElementScope(childElement.Value);
                     return result;
                 }
             }
@@ -96,6 +94,8 @@ public partial class MatroskaDemuxer
         {
             if (childElement.Value.Type == MatroskaElementType.BlockGroup)
             {
+                _blockGroupElementLogScope = _logger.ProcessingMasterElementScope(childElement.Value);
+
                 var result = ReadNextFrameFromGroup(buffer, childElement.Value);
 
                 if (result > 0)
@@ -107,6 +107,8 @@ public partial class MatroskaDemuxer
 
             if (childElement.Value.Type == MatroskaElementType.SimpleBlock)
             {
+                _blockElementLogScope = _logger.ProcessingMasterElementScope(childElement.Value);
+
                 var result = ReadFrameFromBlockElement(buffer, childElement.Value);
 
                 if (result > 0)
@@ -118,6 +120,7 @@ public partial class MatroskaDemuxer
             SkipElement(childElement.Value);
         }
 
+        DisposeClusterElementLogScope();
         return 0;
     }
 
@@ -129,6 +132,8 @@ public partial class MatroskaDemuxer
         {
             if (childElement.Value.Type == MatroskaElementType.Block)
             {
+                _blockElementLogScope = _logger.ProcessingMasterElementScope(childElement.Value);
+
                 var result = ReadFrameFromBlockElement(buffer, childElement.Value);
 
                 if (result > 0)
@@ -140,12 +145,18 @@ public partial class MatroskaDemuxer
             SkipElement(childElement.Value);
         }
 
+        DisposeBlockGroupElementLogScope();
         return 0;
     }
 
     private int ReadFrameFromBlockElement(Span<byte> buffer, MatroskaElement blockElement)
     {
         var block = ParseBlock(buffer, blockElement);
+
+        if (!block.HasValue)
+        {
+            DisposeBlockElementLogScope();
+        }
 
         return !block.HasValue ? 0 : ReadFrameFromBlock(buffer, block.Value);
     }
@@ -171,9 +182,16 @@ public partial class MatroskaDemuxer
             _currentBlockIndex++;
 
             _currentBlock = block;
+
+            if (result <= 0)
+            {
+                DisposeBlockElementLogScope();
+            }
+
             return result;
         }
 
+        DisposeBlockElementLogScope();
         return 0;
     }
 }
