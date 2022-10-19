@@ -18,7 +18,7 @@ public partial class MatroskaDemuxer
 
         if (ebmlElement.Value.Type != MatroskaElementType.Ebml)
         {
-            throw new InvalidOperationException("EBML Header not the first element in the file.");
+            throw new InvalidOperationException("EBML Header not is the first element in the file.");
         }
 
         await SkipElementAsync(ebmlElement.Value).ConfigureAwait(false);
@@ -34,7 +34,7 @@ public partial class MatroskaDemuxer
 
         if (_segmentElement.Type != MatroskaElementType.Segment)
         {
-            throw new InvalidOperationException("Segment not the second element in the file.");
+            throw new InvalidOperationException("Segment not is the second element in the file.");
         }
 
         _segmentElementLogScope = _logger.ProcessingMasterElementScope(_segmentElement);
