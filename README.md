@@ -16,7 +16,7 @@
 	<a href="https://www.nuget.org/packages/NextAudio/">
 		<img src="https://img.shields.io/nuget/dt/NextAudio.svg?label=Downloads&logo=nuget&style=for-the-badge&logoWidth=20&labelColor=0d0d0d" />
 	</a>
-  <a href="https://github.com/renanrcp/NextAudio/NextAudio/blob/main/LICENSE">
+  <a href="https://github.com/NextAudio/NextAudio/blob/main/LICENSE">
 		<img src="https://img.shields.io/badge/License-MIT-yellow.svg?label=License&style=for-the-badge&logoWidth=20&labelColor=0d0d0d" />
 	</a>
     <p align="center">

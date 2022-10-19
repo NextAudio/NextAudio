@@ -18,18 +18,6 @@
       </ul>
     </div>
     {{/_disableContribution}}
-    <div class="toggle-mode">
-      <div class="icon">
-        <i aria-hidden="true">☀</i>
-      </div>
-      <label class="switch">
-        <input type="checkbox" id="switch-style">
-        <span class="slider round"></span>
-      </label>
-      <div class="icon">
-        <i aria-hidden="true">☾</i>
-      </div>
-    </div>
 
     <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
     <h5>{{__global.inThisArticle}}</h5>

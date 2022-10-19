@@ -1,2 +1,2 @@
 # API Reference
-Welcome to NextAudio API reference. To begin, select a namespace, then a class, from the table of contents on the left.
+Welcome to NextAudio API reference. Select a class / method / property from the tree on the left side to see more.
