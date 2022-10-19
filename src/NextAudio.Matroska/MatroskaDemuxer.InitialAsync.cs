@@ -147,7 +147,7 @@ public partial class MatroskaDemuxer
             TrackUID = trackUid,
             Name = name,
             Type = type,
-            CodecPrivate = codecPrivate != null ? Array.AsReadOnly(codecPrivate) : null,
+            CodecPrivate = codecPrivate ?? ReadOnlyMemory<byte>.Empty,
             Audio = audioSettings,
         };
     }

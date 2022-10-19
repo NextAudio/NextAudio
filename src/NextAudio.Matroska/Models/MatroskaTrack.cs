@@ -1,8 +1,6 @@
 // Licensed to the NextAudio under one or more agreements.
 // NextAudio licenses this file to you under the MIT license.
 
-using System.Collections.ObjectModel;
-
 namespace NextAudio.Matroska.Models;
 
 /// <summary>
@@ -47,7 +45,7 @@ public record class MatroskaTrack
     /// <summary>
     /// The private data only known to the audio codec.
     /// </summary>
-    public ReadOnlyCollection<byte>? CodecPrivate { get; init; }
+    public ReadOnlyMemory<byte> CodecPrivate { get; init; }
 
     /// <summary>
     /// The audio details for this Matroska Audio Track.
