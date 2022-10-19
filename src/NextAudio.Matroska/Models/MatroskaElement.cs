@@ -14,11 +14,11 @@ public readonly struct MatroskaElement
     /// <summary>
     /// Creates a new instance of <see cref="MatroskaElement" />.
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="depth"></param>
-    /// <param name="position"></param>
-    /// <param name="headerSize"></param>
-    /// <param name="dataSize"></param>
+    /// <param name="id">The Ebml id of the element.</param>
+    /// <param name="depth">The depth of this element (elements can be inside each other).</param>
+    /// <param name="position">The position of this element in the <see cref="AudioStream" />.</param>
+    /// <param name="headerSize">The size of the header containing in this element.</param>
+    /// <param name="dataSize">The size of the data containing in this element.</param>
     public MatroskaElement(ulong id, int depth, long position, int headerSize, int dataSize)
     {
         Id = id;
