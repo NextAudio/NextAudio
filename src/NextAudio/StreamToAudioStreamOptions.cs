@@ -23,7 +23,7 @@ public sealed class StreamToAudioStreamOptions
     public bool DisposeSourceStream { get; set; } = true;
 
     /// <summary>
-    /// The recomended synchronicity operation to use when read/write the source <see cref="Stream" />.
+    /// The recommended synchronicity operation to use when read/write the source <see cref="Stream" />.
     /// </summary>
     public RecommendedSynchronicity RecommendedSynchronicity { get; set; }
 

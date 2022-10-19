@@ -244,7 +244,7 @@ public class AudioStreamUtilsTests
     [InlineData(100, SeekOrigin.Begin, 10, 0, 100)]
     [InlineData(100, SeekOrigin.Current, 10, 0, 110)]
     [InlineData(-100, SeekOrigin.End, 500, 1000, 900)]
-    public void SeekForcellySeekIfSourceCantSeek(long offset, SeekOrigin origin, long currentPosition, long length, long expectedPosition)
+    public void SeekForcefullySeekIfSourceCantSeek(long offset, SeekOrigin origin, long currentPosition, long length, long expectedPosition)
     {
         // Arrange
         var stream = new PartialReadAudioStreamMock(false, length);
@@ -260,7 +260,7 @@ public class AudioStreamUtilsTests
     [InlineData(100, SeekOrigin.Begin, 10, 0, 100)]
     [InlineData(100, SeekOrigin.Current, 10, 0, 110)]
     [InlineData(-100, SeekOrigin.End, 500, 1000, 900)]
-    public async Task SeekAsyncForcellySeekIfSourceCantSeek(long offset, SeekOrigin origin, long currentPosition, long length, long expectedPosition)
+    public async Task SeekAsyncForcefullySeekIfSourceCantSeek(long offset, SeekOrigin origin, long currentPosition, long length, long expectedPosition)
     {
         // Arrange
         var stream = new PartialReadAudioStreamMock(false, length);

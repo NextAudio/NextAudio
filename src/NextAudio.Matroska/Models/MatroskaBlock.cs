@@ -51,15 +51,15 @@ public readonly struct MatroskaBlock
     public int FrameCount { get; }
 
     /// <summary>
-    /// Get the frame size by the especified <paramref name="index" />.
+    /// Get the frame size by the specified <paramref name="index" />.
     /// </summary>
     /// <param name="index">The index of the frame to be retained.</param>
-    /// <exception cref="ArgumentException">The <paramref name="index" /> cannot be equals or higher than the <see cref="FrameCount" />.</exception>
+    /// <exception cref="ArgumentException">The <paramref name="index" /> cannot be equal or higher than the <see cref="FrameCount" />.</exception>
     /// <returns>The frame size of the especified <paramref name="index" />.</returns>
     public int GetFrameSizeByIndex(int index)
     {
         return index >= FrameCount
-            ? throw new ArgumentException($"The '{nameof(index)}' cannot be equals or higher than the '{nameof(FrameCount)}'.", nameof(index))
+            ? throw new ArgumentException($"The '{nameof(index)}' cannot be equal or higher than the '{nameof(FrameCount)}'.", nameof(index))
             : _frameSizes[index];
     }
 

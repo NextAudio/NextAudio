@@ -22,7 +22,7 @@ internal static class VIntReader
 
         var vInt = EbmlReader.ReadVariableSizeInteger(buffer[..length], length);
 
-        logger.LogVIntReaded(vInt, position + vInt.Length);
+        logger.LogVIntRead(vInt, position + vInt.Length);
 
         return vInt;
     }
@@ -40,7 +40,7 @@ internal static class VIntReader
 
         var vInt = EbmlReader.ReadVariableSizeInteger(buffer.Span[..length], length);
 
-        logger.LogVIntReaded(vInt, position + vInt.Length);
+        logger.LogVIntRead(vInt, position + vInt.Length);
 
         return vInt;
     }

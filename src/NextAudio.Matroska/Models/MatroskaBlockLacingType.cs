@@ -4,12 +4,12 @@
 namespace NextAudio.Matroska.Models;
 
 /// <summary>
-/// Represents wich lacing type a <see cref="MatroskaBlock" /> is using.
+/// Represents which lacing type a <see cref="MatroskaBlock" /> is using.
 /// </summary>
 public enum MatroskaBlockLacingType : byte
 {
     /// <summary>
-    /// The block don't uses any lacing type.
+    /// The block doesn't use any lacing type.
     /// </summary>
     No = 0,
 

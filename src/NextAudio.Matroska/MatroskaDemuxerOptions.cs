@@ -6,14 +6,14 @@ using NextAudio.Matroska.Models;
 namespace NextAudio.Matroska;
 
 /// <summary>
-/// Represents a delegate which select a <see cref="MatroskaTrack.TrackNumber" /> to be demuxed.
+/// Represents a delegate which selects a <see cref="MatroskaTrack.TrackNumber" /> to be demuxed.
 /// </summary>
-/// <param name="tracks">An enumerable with <see cref="MatroskaTrack" /> to be choosen.</param>
+/// <param name="tracks">An enumerable of <see cref="MatroskaTrack" /> to be chosen.</param>
 /// <returns>The <see cref="MatroskaTrack.TrackNumber" /> to be demuxed.</returns>
 public delegate ulong TrackSelector(IEnumerable<MatroskaTrack> tracks);
 
 /// <summary>
-/// Represents some options to a <see cref="MatroskaDemuxer" />.
+/// Represents some options of <see cref="MatroskaDemuxer" />.
 /// </summary>
 public sealed class MatroskaDemuxerOptions
 {
@@ -28,7 +28,7 @@ public sealed class MatroskaDemuxerOptions
     public bool DisposeSourceStream { get; set; }
 
     /// <summary>
-    /// The track selector to be used to choose wich track will be demuxed.
+    /// The track selector to be used to choose which track will be demuxed.
     /// </summary>
     public TrackSelector TrackSelector { get; set; } = DefaultTrackSelector;
 

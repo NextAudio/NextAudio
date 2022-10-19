@@ -33,7 +33,6 @@ public enum MatroskaTrackType : ulong
     /// </summary>
     Logo = 16,
 
-
     /// <summary>
     /// The Matroska track type is a subtitle.
     /// </summary>

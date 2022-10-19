@@ -41,18 +41,18 @@ public class MatroskaDemuxerTests
 
         var buffer = new byte[1024];
 
-        var bytesReaded = 0;
+        var bytesRead = 0;
         var lastFrameSize = 0;
 
         // Act
-        while ((bytesReaded = demuxer.Demux(buffer)) > 0)
+        while ((bytesRead = demuxer.Demux(buffer)) > 0)
         {
-            lastFrameSize = bytesReaded;
+            lastFrameSize = bytesRead;
         }
 
         // Assert
 
-        // It's basically impossible to check if all frames are readed correct
+        // It's basically impossible to check if all frames are read correct
         // We will just check the last because if the last are correct,
         // the others are probably correct too.
         // Also the elements, blocks and VInt reading are covering in unit tests.
@@ -72,18 +72,18 @@ public class MatroskaDemuxerTests
 
         var buffer = new byte[1024];
 
-        var bytesReaded = 0;
+        var bytesRead = 0;
         var lastFrameSize = 0;
 
         // Act
-        while ((bytesReaded = await demuxer.DemuxAsync(buffer)) > 0)
+        while ((bytesRead = await demuxer.DemuxAsync(buffer)) > 0)
         {
-            lastFrameSize = bytesReaded;
+            lastFrameSize = bytesRead;
         }
 
         // Assert
 
-        // It's basically impossible to check if all frames are readed correct
+        // It's basically impossible to check if all frames are read correct
         // We will just check the last because if the last are correct,
         // the others are probably correct too.
         // Also the elements, blocks and VInt reading are covering in unit tests.

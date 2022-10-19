@@ -91,7 +91,7 @@ public sealed class FileAudioStreamOptions
     public long PreallocationSize { get; set; }
 
     /// <summary>
-    /// The size of the buffer used by System.IO.FileStream for buffering. The default
+    /// The size of the buffer used by <see cref="FileStream" /> for buffering. The default
     /// buffer size is 4096. 0 or 1 means that buffering should be disabled. Negative
     /// values are not allowed.
     /// </summary>
@@ -109,7 +109,7 @@ public sealed class FileAudioStreamOptions
     public bool DisposeSourceStream { get; set; } = true;
 
     /// <summary>
-    /// The recomended synchronicity operation to use when read/write the source <see cref="Stream" />.
+    /// The recommended synchronicity operation to use when read/write the source <see cref="Stream" />.
     /// </summary>
     public RecommendedSynchronicity RecommendedSynchronicity
     {

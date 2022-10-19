@@ -177,7 +177,7 @@ public partial class MatroskaDemuxer
             var frameSize = block.GetFrameSizeByIndex(_currentBlockIndex);
             var result = ReadSourceStream(buffer[..frameSize]);
 
-            _logger.LogFrameReaded(frameSize, _currentBlockIndex, _position);
+            _logger.LogFrameRead(frameSize, _currentBlockIndex, _position);
 
             _currentBlockIndex++;
 

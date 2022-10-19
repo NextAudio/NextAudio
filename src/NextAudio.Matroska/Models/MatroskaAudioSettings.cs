@@ -19,7 +19,7 @@ public record class MatroskaAudioSettings
     public float? OutputSamplingFrequency { get; init; }
 
     /// <summary>
-    /// The numbers of channels in the track.
+    /// The number of channels in the track.
     /// </summary>
     public ulong Channels { get; init; }
 

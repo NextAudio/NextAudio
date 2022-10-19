@@ -24,7 +24,7 @@ public partial class MatroskaDemuxer
 
         var value = buffer[..element.DataSize];
 
-        _logger.LogElementValueReaded(element, value);
+        _logger.LogElementValueRead(element, value);
 
         return value;
     }
@@ -35,7 +35,7 @@ public partial class MatroskaDemuxer
 
         var value = EbmlReader.ReadFloat(buffer[..element.DataSize]);
 
-        _logger.LogElementValueReaded(element, value);
+        _logger.LogElementValueRead(element, value);
 
         return value;
     }
@@ -46,7 +46,7 @@ public partial class MatroskaDemuxer
 
         var value = EbmlReader.ReadAsciiString(buffer[..element.DataSize]).ToString();
 
-        _logger.LogElementValueReaded(element, value);
+        _logger.LogElementValueRead(element, value);
 
         return value;
     }
@@ -57,7 +57,7 @@ public partial class MatroskaDemuxer
 
         var value = EbmlReader.ReadUtf8String(buffer[..element.DataSize]).ToString();
 
-        _logger.LogElementValueReaded(element, value);
+        _logger.LogElementValueRead(element, value);
 
         return value;
     }
@@ -68,7 +68,7 @@ public partial class MatroskaDemuxer
 
         var value = EbmlReader.ReadUnsignedInteger(buffer[..element.DataSize]);
 
-        _logger.LogElementValueReaded(element, value);
+        _logger.LogElementValueRead(element, value);
 
         return value;
     }

@@ -28,7 +28,7 @@ internal static class ElementReader
 
         var element = new MatroskaElement(elementId.EncodedValue, depth, initialPosition, (int)headerSize, (int)elementSize.Value);
 
-        logger.LogElementReaded(element);
+        logger.LogElementRead(element);
 
         return new ElementReadResult(element, position);
     }
@@ -53,7 +53,7 @@ internal static class ElementReader
 
         var element = new MatroskaElement(elementId.EncodedValue, depth, initialPosition, (int)headerSize, (int)elementSize.Value);
 
-        logger.LogElementReaded(element);
+        logger.LogElementRead(element);
 
         return new ElementReadResult(element, position);
     }

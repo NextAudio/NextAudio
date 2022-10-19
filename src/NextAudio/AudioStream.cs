@@ -77,7 +77,7 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     /// used to obtaint he new position.</param>
     /// <param name="cancellationToken">The token to monitor for cancellation requests.
     /// The default value is <see cref="CancellationToken.None" />.</param>
-    /// <returns>A <see cref="ValueTask" /> that represents an that represents an asynchronous operation
+    /// <returns>A <see cref="ValueTask" /> that represents an asynchronous operation
     /// where the result is the new position within the current stream.</returns>
     public abstract ValueTask<long> SeekAsync(long offset, SeekOrigin origin, CancellationToken cancellationToken = default);
 
@@ -224,24 +224,24 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     }
 
     /// <summary>
-    /// Create an <see cref="AudioStream" /> from the specified file path with the choosen file options.
+    /// Create an <see cref="AudioStream" /> from the specified file path with the chosen file options.
     /// </summary>
     /// <param name="path">The specified file path to create the <see cref="AudioStream" />.</param>
-    /// <param name="options">The choosen file options.</param>
+    /// <param name="options">The chosen file options.</param>
     /// <returns>A new <see cref="AudioStream" /> from the specified <paramref name="path" />
-    /// with the choosen <paramref name="options" />.</returns>
+    /// with the chosen <paramref name="options" />.</returns>
     public static AudioStream CreateFromFile(string path, FileStreamOptions options)
     {
         return CreateFromFile(path, new FileAudioStreamOptions(options));
     }
 
     /// <summary>
-    /// Create an <see cref="AudioStream" /> from the specified file path with the choosen file stream options.
+    /// Create an <see cref="AudioStream" /> from the specified file path with the chosen file stream options.
     /// </summary>
     /// <param name="path">The specified file path to create the <see cref="AudioStream" />.</param>
-    /// <param name="options">The choosen file stream options.</param>
+    /// <param name="options">The chosen file stream options.</param>
     /// <returns>A new <see cref="AudioStream" /> from the specified <paramref name="path" />
-    /// with the choosen <paramref name="options" />.</returns>
+    /// with the chosen <paramref name="options" />.</returns>
     public static AudioStream CreateFromFile(string path, FileAudioStreamOptions options)
     {
         var fileStream = File.Open(path, options.GetFileStreamOptions());
