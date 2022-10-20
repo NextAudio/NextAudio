@@ -40,7 +40,7 @@ jobs:
       env:
         SSH_DEPLOY_KEY: ${{ secrets.SSH_DOCS_DEPLOY_KEY }}
       with:
-        source-directory: '/docs/_site'
+        source-directory: './docs/_site'
         destination-github-username: 'NextAudio'
         destination-repository-name: 'NextAudio.github.io'
         target-branch: main
