@@ -1,0 +1,33 @@
+name: Docs-Deploy
+
+on:
+  push:
+    branches:
+      - 74-create-the-docs-auto-deployment
+  workflow_call:
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+    - name: Build
+      run: dotnet build -c Release
+    - uses: nikeee/docfx-action@v1.0.0
+      name: Build Documentation
+      with:
+        args: docs/docfx.json
+    - name: Pushes to another repository
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          source-directory: '/docs/_site'
+          destination-github-username: 'NextAudio'
+          destination-repository-name: 'NextAudio.github.io'
+          target-branch: main
