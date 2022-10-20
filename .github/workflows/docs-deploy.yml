@@ -8,7 +8,7 @@ on:
 
 jobs:
   deploy-docs:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -16,14 +16,20 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
+    - name: Setup DocFX
+      uses: crazy-max/ghaction-chocolatey@v1
+      with:
+        args: install docfx
     - name: Dotnet Clean
       run: dotnet clean
+    - name: Dotnet Restore
+      run: dotnet restore
     - name: Dotnet Build
-      run: dotnet build -c Release
-    - uses: nikeee/docfx-action@v1.0.0
-      name: Build Documentation
-      with:
-        args: docs/docfx.json
+      run: dotnet build -c Release --no-restore
+    - name: Build Documentation
+      working-directory: docs
+      run: docfx docfx.json
+      continue-on-error: false
     - name: Pushes to another repository
       uses: cpina/github-action-push-to-another-repository@main
       env:
