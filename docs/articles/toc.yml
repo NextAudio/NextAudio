@@ -10,9 +10,9 @@
     href: getting_started/usage.md
 - name: Matroska
   items:
-    - name: Introduction
+  - name: Introduction
     href: matroska/introduction.md
-    - name: Installation
+  - name: Installation
     href: matroska/installation.md
-    - name: Usage
+  - name: Usage
     href: matroska/usage.md
