@@ -20,12 +20,6 @@ jobs:
       uses: crazy-max/ghaction-chocolatey@v1
       with:
         args: install docfx
-    - name: Dotnet Clean
-      run: dotnet clean
-    - name: Dotnet Restore
-      run: dotnet restore
-    - name: Dotnet Build
-      run: dotnet build -c Release --no-restore
     - name: Build Documentation
       working-directory: docs
       run: docfx docfx.json
