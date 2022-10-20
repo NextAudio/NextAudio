@@ -1,9 +1,6 @@
 name: Docs-Deploy
 
 on:
-  push:
-    branches:
-      - 74-create-the-docs-auto-deployment
   workflow_call:
 
 jobs:
