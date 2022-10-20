@@ -1,5 +1,5 @@
 # Documentation
-See [Documentation](https://nextaudio.github.io/)
+See [Documentation](https://nextaudio.github.io/articles/matroska)
 
 # Installation
 You can add this lib via nuget package manager.
@@ -26,19 +26,19 @@ using var output = new MemoryStream();
 using var file = AudioStream.CreateFromFile("test1.mkv");
 using var demuxer = new MatroskaDemuxer(file);
 
-var bytesReaded = 0;
+var bytesRead = 0;
 Span<byte> buffer = new byte[1024];
 
-while ((bytesReaded = demuxer.Demux(buffer)) > 0)
+while ((bytesRead = demuxer.Demux(buffer)) > 0)
 {
-    // Always slice the buffer to bytesReaded,
+    // Always slice the buffer to bytesRead,
     // the lib always will return an audio frame
     // when using a read operation.
-    var frame = buffer.Slice(0, bytesReaded);
+    var frame = buffer.Slice(0, bytesRead);
     output.Write(frame);
 }
 ```
-For more usage and guides check the [documentation](https://nextaudio.github.io/)
+For more usage and guides check the [documentation](https://nextaudio.github.io/articles/matroska)
 
 # Features
 - Demuxing

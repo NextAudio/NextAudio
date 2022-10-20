@@ -2,7 +2,7 @@
   <img class="logo" src="images/banner.png" />
 </p>
 
-## Documentation
+## NextAudio Documentation
 
 NextAudio is a library focused in audio operations like encoding, decoding, muxing, demuxing, resampling, etc.
 
