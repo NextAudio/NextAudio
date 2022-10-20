@@ -1,6 +1,8 @@
 // Licensed to the NextAudio under one or more agreements.
 // NextAudio licenses this file to you under the MIT license.
 
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NextAudio.Matroska.Models;
 
 namespace NextAudio.Matroska;
@@ -33,6 +35,11 @@ public sealed class MatroskaDemuxerOptions
     public TrackSelector TrackSelector { get; set; } = DefaultTrackSelector;
 
     /// <summary>
+    /// A logger factory to log audio streaming info.
+    /// </summary>
+    public ILoggerFactory LoggerFactory { get; set; } = NullLoggerFactory.Instance;
+
+    /// <summary>
     /// Creates a clone of the current <see cref="MatroskaDemuxerOptions" />.
     /// </summary>
     /// <returns>A clone of the current <see cref="MatroskaDemuxerOptions" />.</returns>
@@ -42,6 +49,7 @@ public sealed class MatroskaDemuxerOptions
         {
             TrackSelector = TrackSelector,
             DisposeSourceStream = DisposeSourceStream,
+            LoggerFactory = LoggerFactory,
         };
     }
 

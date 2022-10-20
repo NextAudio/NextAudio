@@ -35,9 +35,8 @@ public sealed partial class MatroskaDemuxer : AudioDemuxer
     /// </summary>
     /// <param name="sourceStream">The source stream with Matroska data to be demuxed.</param>
     /// <param name="options">The options for this demuxer.</param>
-    /// <param name="loggerFactory">A logger factory to log audio streaming info.</param>
-    public MatroskaDemuxer(AudioStream sourceStream, MatroskaDemuxerOptions? options = null, ILoggerFactory? loggerFactory = null)
-        : base(loggerFactory)
+    public MatroskaDemuxer(AudioStream sourceStream, MatroskaDemuxerOptions? options = null)
+        : base(options?.LoggerFactory)
     {
         _sourceStream = sourceStream ?? throw new ArgumentNullException(nameof(sourceStream));
         _options = options ?? MatroskaDemuxerOptions.Default;
@@ -167,7 +166,7 @@ public sealed partial class MatroskaDemuxer : AudioDemuxer
     {
         var optionsClone = _options.Clone();
 
-        var copy = new MatroskaDemuxer(_sourceStream, optionsClone, _loggerFactory);
+        var copy = new MatroskaDemuxer(_sourceStream, optionsClone);
 
         _options.DisposeSourceStream = false;
 
