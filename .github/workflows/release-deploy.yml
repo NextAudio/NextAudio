@@ -23,10 +23,10 @@ jobs:
           ref: "main"
           ssh-key: ${{ secrets.DEPLOY_KEY }}
 
-      - name: Make release changes
+      - name: Make Release Changes
         run: . .github/release-changes.sh "${{ github.event.release.tag_name }}" "${{ github.event.release.body }}"
 
-      - name: Commit release changes
+      - name: Commit Release Changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           branch: "main"
