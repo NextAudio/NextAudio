@@ -31,7 +31,7 @@ jobs:
         unzip -d .docfx docfx.zip
 
     - name: Build docs
-      run:  mono .docfx/docfx.exe ./docs/_site
+      run:  mono .docfx/docfx.exe ./docs/docfx.json
 
     - name: Pushes to another repository
       uses: cpina/github-action-push-to-another-repository@main
