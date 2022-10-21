@@ -2,6 +2,7 @@
 // NextAudio licenses this file to you under the MIT license.
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NextAudio.Internal;
 
 namespace NextAudio;
@@ -14,22 +15,15 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     /// <summary>
     /// A logger factory to log audio streaming info.
     /// </summary>
-    protected readonly ILoggerFactory? _loggerFactory;
-
-    /// <summary>
-    /// Creates an instance of <see cref="AudioStream" />
-    /// </summary>
-    protected AudioStream()
-    {
-    }
+    protected readonly ILoggerFactory _loggerFactory;
 
     /// <summary>
     /// Creates an instance of <see cref="AudioStream" />
     /// </summary>
     /// <param name="loggerFactory">A logger factory to log audio streaming info.</param>
-    protected AudioStream(ILoggerFactory loggerFactory)
+    protected AudioStream(ILoggerFactory? loggerFactory = null)
     {
-        _loggerFactory = loggerFactory;
+        _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
     }
 
     ///
@@ -59,6 +53,14 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     public abstract long Position { get; set; }
 
     /// <summary>
+    /// The recommended synchronicity when using any read/write operation.
+    /// </summary>
+    /// <remarks>
+    /// This doesn't define the synchronicity support, all must be supported.
+    /// </remarks>
+    public abstract RecommendedSynchronicity RecommendedSynchronicity { get; }
+
+    /// <summary>
     /// Creates a clone of this stream.
     /// </summary>
     /// <returns>A new cloned stream.</returns>
@@ -66,6 +68,21 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
 
     /// <inheritdoc cref="Stream.Seek(long, SeekOrigin)" />
     public abstract long Seek(long offset, SeekOrigin origin);
+
+    /// <summary>
+    /// When overridden in a derived class, asynchronously sets the position within the current stream.
+    /// </summary>
+    /// <param name="offset">A byte offset relative to the origin parameter.</param>
+    /// <param name="origin">A value of type <see cref="SeekOrigin" /> indicating the reference point
+    /// used to obtaint he new position.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests.
+    /// The default value is <see cref="CancellationToken.None" />.</param>
+    /// <returns>A <see cref="ValueTask" /> that represents an asynchronous operation
+    /// where the result is the new position within the current stream.</returns>
+    public abstract ValueTask<long> SeekAsync(long offset, SeekOrigin origin, CancellationToken cancellationToken = default);
+
+    /// <inheritdoc cref="Stream.SetLength(long)" />
+    public abstract void SetLength(long value);
 
     /// <inheritdoc cref="Stream.Read(Span{byte})" />
     public abstract int Read(Span<byte> buffer);
@@ -98,7 +115,7 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     /// <param name="count">The maximum number of bytes to read.</param>
     /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None" />.</param>
     /// <returns>
-    /// A <see cref="Task" /> that represents the asynchronous read operation. The value of the TResult
+    /// A <see cref="ValueTask" /> that represents the asynchronous read operation. The value of the TResult
     /// parameter contains the total number of bytes read into the buffer. The result
     /// value can be less than the number of bytes requested if the number of bytes currently
     /// available is less than the requested number, or it can be 0 (zero) if the end
@@ -168,11 +185,77 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     }
 
     /// <summary>
-    /// Implicit cast a <see cref="Stream" /> in an <see cref="AudioStream "/>
+    /// Implicit cast a <see cref="AudioStream" /> in an <see cref="Stream "/>
     /// </summary>
     /// <param name="audioStream">The <see cref="AudioStream" /> to be cast.</param>
     public static implicit operator Stream(AudioStream audioStream)
     {
-        return new AudioStreamToStream(audioStream);
+        return CastToStream(audioStream);
+    }
+
+    /// <summary>
+    /// Implicit cast a <see cref="Stream" /> in an <see cref="AudioStream "/>
+    /// </summary>
+    /// <param name="stream">The <see cref="Stream" /> to be cast.</param>
+    public static implicit operator AudioStream(Stream stream)
+    {
+        return CreateFromStream(stream);
+    }
+
+    /// <summary>
+    /// Creates an <see cref="AudioStream" /> from a <see cref="Stream" />.
+    /// </summary>
+    /// <param name="stream">The <see cref="Stream" /> to create from.</param>
+    /// <param name="options">The options for the cast.</param>
+    /// <returns>A new <see cref="AudioStream" /> created from the <paramref name="stream" />.</returns>
+    public static AudioStream CreateFromStream(Stream stream, StreamToAudioStreamOptions? options = null)
+    {
+        return new StreamToAudioStream(stream, options ?? StreamToAudioStreamOptions.Default);
+    }
+
+    /// <summary>
+    /// Create an <see cref="AudioStream" /> from the specified file path.
+    /// </summary>
+    /// <param name="path">The specified file path to create the <see cref="AudioStream" />.</param>
+    /// <returns>A new <see cref="AudioStream" /> from the specified <paramref name="path" />.</returns>
+    public static AudioStream CreateFromFile(string path)
+    {
+        return CreateFromFile(path, FileAudioStreamOptions.Default);
+    }
+
+    /// <summary>
+    /// Create an <see cref="AudioStream" /> from the specified file path with the chosen file options.
+    /// </summary>
+    /// <param name="path">The specified file path to create the <see cref="AudioStream" />.</param>
+    /// <param name="options">The chosen file options.</param>
+    /// <returns>A new <see cref="AudioStream" /> from the specified <paramref name="path" />
+    /// with the chosen <paramref name="options" />.</returns>
+    public static AudioStream CreateFromFile(string path, FileStreamOptions options)
+    {
+        return CreateFromFile(path, new FileAudioStreamOptions(options));
+    }
+
+    /// <summary>
+    /// Create an <see cref="AudioStream" /> from the specified file path with the chosen file stream options.
+    /// </summary>
+    /// <param name="path">The specified file path to create the <see cref="AudioStream" />.</param>
+    /// <param name="options">The chosen file stream options.</param>
+    /// <returns>A new <see cref="AudioStream" /> from the specified <paramref name="path" />
+    /// with the chosen <paramref name="options" />.</returns>
+    public static AudioStream CreateFromFile(string path, FileAudioStreamOptions options)
+    {
+        var fileStream = File.Open(path, options.GetFileStreamOptions());
+        return CreateFromStream(fileStream, options.GetStreamToAudioStreamOptions());
+    }
+
+    /// <summary>
+    /// Casts a <see cref="Stream" /> from an <see cref="AudioStream" />.
+    /// </summary>
+    /// <param name="audioStream">The <see cref="AudioStream" /> to be cast.</param>
+    /// <param name="options">The options for the cast.</param>
+    /// <returns>A new <see cref="Stream" /> created from the <paramref name="audioStream" />.</returns>
+    public static Stream CastToStream(AudioStream audioStream, AudioStreamToStreamOptions? options = null)
+    {
+        return new AudioStreamToStream(audioStream, options ?? AudioStreamToStreamOptions.Default);
     }
 }
