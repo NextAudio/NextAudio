@@ -19,6 +19,8 @@
             "**/.git/subtree-cache/**": true,
             "**/obj": true,
             "**/bin": true,
+            "**/_site": true,
+            "**/docs/api/**.yml": true,
         }
     }
 }

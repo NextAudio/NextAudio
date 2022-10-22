@@ -32,6 +32,8 @@ using var demuxer = new MatroskaDemuxer(file, new MatroskaDemuxerOptions()
 
 In this example we select the first audio track with the `Opus` codec or return the first track.
 
+The demuxer have a `SelectedTrack` property where you can find the selected track returned from the `TrackSelector` and your parsed `AudioCoding`.
+
 `MatroskaDemuxer` has a lot of debugging logging if you need, don't forget to pass the `ILoggerFactory` instance in the `MatroskaDemuxerOptions` options.
 
 #### Manually demuxing
