@@ -1,0 +1,56 @@
+name: "Release-Deploy"
+on:
+  release:
+    types: ["published"]
+
+jobs:
+  build-test-lint:
+    uses: NextAudio/NextAudio/.github/workflows/build-test-lint.yml@main
+
+  deploy-docs:
+    needs: build-test-lint
+    uses: NextAudio/NextAudio/.github/workflows/docs-deploy.yml@main
+
+  deploy-nuget:
+    needs: deploy-docs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: "main"
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+
+      - name: Make Release Changes
+        run: . .github/release-changes.sh "${{ github.event.release.tag_name }}" "${{ github.event.release.body }}"
+
+      - name: Commit Release Changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: "main"
+          commit_message: "Version ${{ env.version }}"
+          commit_user_name: "NextAudio"
+
+      - name: "Build Packages"
+        run: "dotnet pack NextAudio.sln -c Release -o ./artifacts"
+
+      - name: "Deploy Packages"
+        run: "dotnet nuget push \"./artifacts/*\" -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate"
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts
+          path: ./artifacts/
+
+      - name: "Upload Artifacts to Release"
+        uses: "ncipollo/release-action@v1"
+        with:
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          artifacts: "artifacts/*"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true

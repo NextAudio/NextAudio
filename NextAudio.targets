@@ -12,7 +12,7 @@
 
   <PropertyGroup>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <Authors>Renanrcp, NextAudio contributors</Authors>
+    <Authors>renanrcp, NextAudio contributors</Authors>
     <Company>NextAudio</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/NextAudio/NextAudio</PackageProjectUrl>
