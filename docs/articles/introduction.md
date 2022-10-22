@@ -1,7 +1,7 @@
 ## Introduction
 NextAudio is a library focused in audio operations like encoding, decoding, muxing, demuxing, resampling, etc.
 
-It is designed to have simple usage but with streamming support and high performance.
+It's designed to be to simple to use, but with streaming support and high performance.
 
 ## Why use NextAudio?
 All audio operations like encoding, demuxing, resampling and format conversions is a lot complex to do in your multimedia app,

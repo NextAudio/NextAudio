@@ -75,7 +75,7 @@ Any `Seek/SeekAsync` operation for streams positions is not supported.
 #### RecommendedSynchronicity
 The property `RecommendedSynchronicity` is present in any `AudioStream` it says to you or for the internal lib what is the recommended synchronicity when reading from the `AudioStream` or writing in.
 
-Obs: The lib supports both synchronicitys but some streams doesn't recommend some synchronicitys, (e.g an async-only stream will have your sync operations using `.GetAwaiter().GetResult()`).
+Obs: The lib supports both synchronicitys but some streams don't recommend some synchronicitys, (e.g an async-only stream will have your sync operations using `.GetAwaiter().GetResult()`).
 
 #### Manually reading/writing
 
