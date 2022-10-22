@@ -7,7 +7,7 @@ using var file = AudioStream.CreateFromFile("test1.mkv");
 using var demuxer = new MatroskaDemuxer(file);
 ```
 
-Matroska supports many tracks inside the container, NextAudio will always select the first audio track inside the container, you change this behavior in the `MatroskaDemuxerOptions#TrackSelector`.
+Matroska supports many tracks inside the container, NextAudio will always select the first audio track inside the container, you can change this behavior in the `MatroskaDemuxerOptions#TrackSelector`.
 
 ```csharp
 using var file = AudioStream.CreateFromFile("test1.mkv");

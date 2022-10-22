@@ -14,10 +14,10 @@ public class ReadOnlyAudioStreamTests
     [Fact]
     public void CanWriteReturnsFalse()
     {
-        // Act
+        // Arrange
         var stream = new ReadOnlyAudioStreamMock();
 
-        // Arrange
+        // Act
         var result = stream.CanWrite;
 
         // Assert
@@ -27,10 +27,10 @@ public class ReadOnlyAudioStreamTests
     [Fact]
     public void CanReadReturnsTrue()
     {
-        // Act
+        // Arrange
         var stream = new ReadOnlyAudioStreamMock();
 
-        // Arrange
+        // Act
         var result = stream.CanRead;
 
         // Assert
@@ -40,10 +40,10 @@ public class ReadOnlyAudioStreamTests
     [Fact]
     public void WriteThrowsNotSupportedException()
     {
-        // Act
+        // Arrange
         var stream = new ReadOnlyAudioStreamMock();
 
-        // Arrange + Assert
+        // Act + Assert
         _ = Assert.Throws<NotSupportedException>(() =>
         {
             stream.Write(ReadOnlySpan<byte>.Empty);
@@ -53,13 +53,24 @@ public class ReadOnlyAudioStreamTests
     [Fact]
     public async Task WriteAsyncThrowsNotSupportedException()
     {
-        // Act
+        // Arrange
         var stream = new ReadOnlyAudioStreamMock();
 
-        // Arrange + Assert
+        // Act + Assert
         _ = await Assert.ThrowsAsync<NotSupportedException>(async () =>
         {
             await stream.WriteAsync(ReadOnlyMemory<byte>.Empty);
+        });
+    }
+
+    [Fact]
+    public void SetLengthThrowsNotSupportedException()
+    {
+        var stream = new ReadOnlyAudioStreamMock();
+
+        _ = Assert.Throws<NotSupportedException>(() =>
+        {
+            stream.SetLength(0);
         });
     }
 
@@ -70,6 +81,8 @@ public class ReadOnlyAudioStreamTests
         public override long Length => throw new NotImplementedException();
 
         public override long Position { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public override RecommendedSynchronicity RecommendedSynchronicity => throw new NotImplementedException();
 
         public override AudioStream Clone()
         {
@@ -91,14 +104,18 @@ public class ReadOnlyAudioStreamTests
             throw new NotImplementedException();
         }
 
-        protected override void Dispose(bool disposing)
+        public override ValueTask<long> SeekAsync(long offset, SeekOrigin origin, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
+        protected override void Dispose(bool disposing)
+        {
+        }
+
         protected override ValueTask DisposeAsyncCore()
         {
-            throw new NotImplementedException();
+            return ValueTask.CompletedTask;
         }
     }
 }

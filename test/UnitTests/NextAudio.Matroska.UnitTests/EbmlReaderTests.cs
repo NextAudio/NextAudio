@@ -19,7 +19,7 @@ public class EbmlReaderTests
     [InlineData(new byte[] { 254, 212, 221, 57 }, -19604167)]
     public void ReadSignedIntegerReadsEbmlSignedInteger(byte[] buffer, long expectedValue)
     {
-        // Arrange
+        // Act
         var result = EbmlReader.ReadSignedInteger(buffer);
 
         // Assert
@@ -33,7 +33,7 @@ public class EbmlReaderTests
     [InlineData(new byte[] { 6, 43, 224, 88, 94, 166, 71 }, 1737092415530567)]
     public void ReadUnsignedIntegerReadsEbmlUnsignedInteger(byte[] buffer, ulong expectedValue)
     {
-        // Arrange
+        // Act
         var result = EbmlReader.ReadUnsignedInteger(buffer);
 
         // Assert
@@ -46,7 +46,7 @@ public class EbmlReaderTests
     [InlineData(new byte[] { 71, 59, 128, 167, 234, 242, 12, 23, 13 })] // more than 8
     public void ReadFloatWithBufferSizeDifferentThan4Or8ThrowsArgumentOutOfRangeException(byte[] buffer)
     {
-        // Arrange + Assert
+        // Act + Assert
         _ = Assert.Throws<ArgumentOutOfRangeException>(() =>
         {
             _ = EbmlReader.ReadFloat(buffer);
@@ -60,7 +60,7 @@ public class EbmlReaderTests
     [InlineData(new byte[] { 255, 223, 255, 255, 255, 255, 255, 255 }, -8.988465674311579E+307)] // double
     public void ReadFloatReadsEbmlFloat(byte[] buffer, double expectedValue)
     {
-        // Arrange
+        // Act
         var result = EbmlReader.ReadFloat(buffer);
 
         // Assert
@@ -87,7 +87,7 @@ public class EbmlReaderTests
     [MemberData(nameof(ReadDateReadsEbmlDateData))]
     public void ReadDateReadsEbmlDate(byte[] buffer, DateTime expectedValue)
     {
-        // Arrange
+        // Act
         var result = EbmlReader.ReadDate(buffer);
 
         // Assert
@@ -99,7 +99,7 @@ public class EbmlReaderTests
     [InlineData(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 })] // more than 8
     public void ReadDateWithBufferSizeDifferentThan8ThrowsArgumentOutOfRangeException(byte[] buffer)
     {
-        // Arrange + Assert
+        // Act + Assert
         _ = Assert.Throws<ArgumentOutOfRangeException>(() =>
         {
             _ = EbmlReader.ReadDate(buffer);
@@ -116,7 +116,7 @@ public class EbmlReaderTests
     [InlineData(new byte[] { 65, 95, 77, 80, 69, 71, 47, 76, 51 }, "A_MPEG/L3")]
     public void ReadAsciiStringReadsEbmlAsciiString(byte[] buffer, string expectedValue)
     {
-        // Arrange
+        // Act
         var result = EbmlReader.ReadAsciiString(buffer);
 
         // Assert
@@ -131,7 +131,7 @@ public class EbmlReaderTests
     [InlineData(new byte[] { 78, 101, 120, 116, 65, 117, 100, 105, 111, 0, 0 }, "NextAudio")] // Check if desconsider additional zeros
     public void ReadUtf8StringReadsEbmlUtf8tring(byte[] buffer, string expectedValue)
     {
-        // Arrange
+        // Act
         var result = EbmlReader.ReadUtf8String(buffer);
 
         // Assert
@@ -143,7 +143,7 @@ public class EbmlReaderTests
     [InlineData(159, 1)]
     public void ReadVariableSizeIntegerLengthReadsEbmlVariableSizeIntegerLength(byte inputByte, int expectedValue)
     {
-        // Arrange
+        // Act
         var result = EbmlReader.ReadVariableSizeIntegerLength(inputByte);
 
         // Asser
@@ -160,7 +160,7 @@ public class EbmlReaderTests
     [MemberData(nameof(ReadVariableSizeIntegerWithLengthReadsEbmlVariableSizeIntegerData))]
     public void ReadVariableSizeIntegerWithLengthReadsEbmlVariableSizeInteger(byte[] buffer, int length, VInt expectedValue)
     {
-        // Arrange
+        // Act
         var result = EbmlReader.ReadVariableSizeInteger(buffer, length);
 
         // Assert
@@ -172,7 +172,7 @@ public class EbmlReaderTests
     [InlineData(new byte[] { 66, 134, 129, 1, 66, 247, 29 }, 10)]
     public void ReadVariableSizeIntegerWithLengthThrowsInvalidOperationExceptionIfSizeIsHigherThan8(byte[] buffer, int length)
     {
-        // Arrange + Assert
+        // Act + Assert
         _ = Assert.Throws<InvalidOperationException>(() =>
         {
             _ = EbmlReader.ReadVariableSizeInteger(buffer, length);
@@ -189,7 +189,7 @@ public class EbmlReaderTests
     [MemberData(nameof(ReadVariableSizeIntegerWithoutLengthReadsEbmlVariableSizeIntegerData))]
     public void ReadVariableSizeIntegerWithoutLengthReadsEbmlVariableSizeInteger(byte[] buffer, VInt expectedValue)
     {
-        // Arrange
+        // Act
         var result = EbmlReader.ReadVariableSizeInteger(buffer);
 
         // Assert
@@ -201,7 +201,7 @@ public class EbmlReaderTests
     [InlineData(new byte[] { 0, 66, 134, 129, 1, 66, 247, 29 })]
     public void ReadVariableSizeIntegerWithoutLengthThrowsInvalidOperationExceptionIfSizeIsHigherThan8(byte[] buffer)
     {
-        // Arrange + Assert
+        // Act + Assert
         _ = Assert.Throws<InvalidOperationException>(() =>
         {
             _ = EbmlReader.ReadVariableSizeInteger(buffer);
