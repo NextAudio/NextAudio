@@ -9,6 +9,11 @@ namespace NextAudio.Formats;
 public record class AudioCoding
 {
     /// <summary>
+    /// An unknown instance of an <see cref="AudioCoding" />.
+    /// </summary>
+    public static readonly AudioCoding Unknown = new("Unknown", AudioCodingType.Unknown, 0, 0, null);
+
+    /// <summary>
     /// Creates a new instance of <see cref="AudioCoding" />.
     /// </summary>
     /// <param name="name">The full name of the coding format.</param>
