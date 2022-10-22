@@ -2,6 +2,7 @@
 // NextAudio licenses this file to you under the MIT license.
 
 using NextAudio.Matroska.Models;
+using NextAudio.Matroska.Utils;
 
 namespace NextAudio.Matroska;
 
@@ -149,6 +150,7 @@ public partial class MatroskaDemuxer
             Type = type,
             CodecPrivate = codecPrivate ?? ReadOnlyMemory<byte>.Empty,
             Audio = audioSettings,
+            AudioCoding = audioSettings != null ? MatroskaUtils.GetAudioCoding(codecID, audioSettings) : null,
         };
     }
 
