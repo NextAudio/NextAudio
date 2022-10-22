@@ -27,10 +27,10 @@ public record class AudioContainer
     /// <summary>
     /// The full name of the container.
     /// </summary>
-    public string Name { get; init; }
+    public virtual string Name { get; init; }
 
     /// <summary>
     /// The container type identifier.
     /// </summary>
-    public AudioContainerType Type { get; init; }
+    public virtual AudioContainerType Type { get; init; }
 }

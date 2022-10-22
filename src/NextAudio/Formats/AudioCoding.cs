@@ -33,12 +33,12 @@ public record class AudioCoding
     /// <summary>
     /// The full name of the coding format.
     /// </summary>
-    public string Name { get; init; }
+    public virtual string Name { get; init; }
 
     /// <summary>
     /// The coding type identifier.
     /// </summary>
-    public AudioCodingType Type { get; init; }
+    public virtual AudioCodingType Type { get; init; }
 
     /// <summary>
     /// The sample rate of the audio stream.
