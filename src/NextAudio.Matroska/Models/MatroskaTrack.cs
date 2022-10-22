@@ -1,6 +1,8 @@
 // Licensed to the NextAudio under one or more agreements.
 // NextAudio licenses this file to you under the MIT license.
 
+using NextAudio.Formats;
+
 namespace NextAudio.Matroska.Models;
 
 /// <summary>
@@ -51,4 +53,9 @@ public record class MatroskaTrack
     /// The audio details for this Matroska Audio Track.
     /// </summary>
     public MatroskaAudioSettings? Audio { get; init; }
+
+    /// <summary>
+    /// The audio coding for this Matroska Audio Track.
+    /// </summary>
+    public AudioCoding? AudioCoding { get; init; }
 }

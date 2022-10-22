@@ -1,6 +1,11 @@
 // Licensed to the NextAudio under one or more agreements.
 // NextAudio licenses this file to you under the MIT license.
 
+using System.Globalization;
+using NextAudio.Formats;
+using NextAudio.Formats.Codings.Mpeg;
+using NextAudio.Formats.Codings.Opus;
+using NextAudio.Formats.Codings.PCM;
 using NextAudio.Matroska.Models;
 
 namespace NextAudio.Matroska.Utils;
@@ -98,5 +103,61 @@ public static class MatroskaUtils
     {
         matroskaElementType = GetMatroskaElementType(id);
         return matroskaElementType != MatroskaElementType.Unknown;
+    }
+
+    /// <summary>
+    /// Returns an <see cref="AudioCoding" /> from a Matroska track entry.
+    /// </summary>
+    /// <param name="codecID">The Matroska CodecID.</param>
+    /// <param name="audioSettings">The Matroska audio details.</param>
+    /// <returns>An <see cref="AudioCoding" /> from a Matroska track entry.</returns>
+    public static AudioCoding GetAudioCoding(string codecID, MatroskaAudioSettings audioSettings)
+    {
+        var splittedCodec = codecID.Split('/');
+
+        var codingIdentifier = splittedCodec[0].Replace("A_", string.Empty);
+
+        var sampleRate = (int)audioSettings.SamplingFrequency;
+        var channels = (int)audioSettings.Channels;
+        var bitDepth = (int?)audioSettings.BitDepth;
+
+        return !Enum.TryParse<AudioCodingType>(codingIdentifier, true, out var codingType)
+            ? AudioCoding.Unknown
+            : codingType switch
+            {
+                AudioCodingType.PCM => GetPCMAudioCoding(splittedCodec, sampleRate, channels, bitDepth),
+                AudioCodingType.Mpeg => GetMpegAudioCoding(splittedCodec, sampleRate, channels),
+                AudioCodingType.Opus => new OpusAudioCoding(sampleRate, channels, bitDepth),
+                _ => new AudioCoding(Enum.GetName(codingType)!, codingType, sampleRate, channels, bitDepth)
+            };
+    }
+
+    private static PCMAudioCoding GetPCMAudioCoding(string[] splittedCodec, int sampleRate, int channels, int? bitDepth)
+    {
+        if (!bitDepth.HasValue)
+        {
+            throw new InvalidOperationException("A PCM Audio Coding cannot have null BitDepth.");
+        }
+
+        var format = splittedCodec[1].Equals("INT")
+            ? PCMFormat.SignedInteger
+            : PCMFormat.FloatingPoint;
+
+        var endianess = splittedCodec[2] switch
+        {
+            "BIG" => PCMEndianness.BigEndian,
+            "LIT" => PCMEndianness.LittleEndian,
+            "IEEE" => PCMEndianness.Indeterminate,
+            _ => throw new InvalidOperationException($"Invalid endianess for a PCM format: '{splittedCodec[2]}'."),
+        };
+
+        return new PCMAudioCoding(endianess, format, sampleRate, channels, bitDepth.Value);
+    }
+
+    private static MpegAudioCoding GetMpegAudioCoding(string[] splittedCodec, int sampleRate, int channels)
+    {
+        var layer = int.Parse(splittedCodec[1].Replace("L", string.Empty), CultureInfo.InvariantCulture);
+
+        return new MpegAudioCoding(layer, sampleRate, channels);
     }
 }
