@@ -10,6 +10,7 @@ jobs:
   deploy-docs:
     needs: build-test-lint
     uses: NextAudio/NextAudio/.github/workflows/docs-deploy.yml@main
+    secrets: inherit
 
   deploy-nuget:
     needs: deploy-docs
