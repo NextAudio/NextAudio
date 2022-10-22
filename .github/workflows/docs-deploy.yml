@@ -1,0 +1,43 @@
+name: Docs-Deploy
+
+on:
+  workflow_call:
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3.0.2
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Get mono
+      run: |
+        sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+        echo "deb https://download.mono-project.com/repo/ubuntu stable-bionic main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
+        sudo apt-get update
+        sudo apt-get install mono-complete --yes
+
+    - name: Get docfx
+      run: |
+        curl -L https://github.com/dotnet/docfx/releases/download/v2.59.4/docfx.zip -o docfx.zip
+        unzip -d .docfx docfx.zip
+
+    - name: Build docs
+      run:  mono .docfx/docfx.exe ./docs/docfx.json
+
+    - name: Pushes to another repository
+      uses: cpina/github-action-push-to-another-repository@main
+      env:
+        SSH_DEPLOY_KEY: ${{ secrets.SSH_DOCS_DEPLOY_KEY }}
+      with:
+        source-directory: './docs/_site'
+        destination-github-username: 'NextAudio'
+        destination-repository-name: 'NextAudio.github.io'
+        target-branch: main
