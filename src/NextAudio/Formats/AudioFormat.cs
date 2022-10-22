@@ -8,13 +8,17 @@ namespace NextAudio.Formats;
 /// </summary>
 public record class AudioFormat
 {
+    /// <summary>
+    /// An unknown instance of an <see cref="AudioFormat" />.
+    /// </summary>
+    public static readonly AudioFormat Unknown = new();
 
     /// <summary>
     /// Creates a new instance of <see cref="AudioFormat" />.
     /// </summary>
     /// <param name="coding">The audio coding of this format.</param>
     /// <param name="container">The audio container of this format.</param>
-    public AudioFormat(AudioCoding coding, AudioContainer? container = null)
+    public AudioFormat(AudioCoding? coding = null, AudioContainer? container = null)
     {
         Coding = coding;
         Container = container;
@@ -23,7 +27,7 @@ public record class AudioFormat
     /// <summary>
     /// The audio coding of this format.
     /// </summary>
-    public AudioCoding Coding { get; init; }
+    public AudioCoding? Coding { get; init; }
 
     /// <summary>
     /// The audio container of this format.
