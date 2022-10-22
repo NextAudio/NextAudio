@@ -1,5 +1,6 @@
 // Licensed to the NextAudio under one or more agreements.
 // NextAudio licenses this file to you under the MIT license.
+using System.Diagnostics;
 using NextAudio.Matroska.Utils;
 
 namespace NextAudio.Matroska.Models;
@@ -7,16 +8,17 @@ namespace NextAudio.Matroska.Models;
 /// <summary>
 /// Represents a Matroska Element
 /// </summary>
+[DebuggerDisplay(@"{DebuggerDisplay,nq}")]
 public readonly struct MatroskaElement
 {
     /// <summary>
     /// Creates a new instance of <see cref="MatroskaElement" />.
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="depth"></param>
-    /// <param name="position"></param>
-    /// <param name="headerSize"></param>
-    /// <param name="dataSize"></param>
+    /// <param name="id">The Ebml id of the element.</param>
+    /// <param name="depth">The depth of this element (elements can be inside each other).</param>
+    /// <param name="position">The position of this element in the <see cref="AudioStream" />.</param>
+    /// <param name="headerSize">The size of the header containing in this element.</param>
+    /// <param name="dataSize">The size of the data containing in this element.</param>
     public MatroskaElement(ulong id, int depth, long position, int headerSize, int dataSize)
     {
         Id = id;
@@ -24,6 +26,7 @@ public readonly struct MatroskaElement
         Position = position;
         HeaderSize = headerSize;
         DataSize = dataSize;
+        DataPosition = Position + HeaderSize;
         EndPosition = Position + HeaderSize + DataSize;
 
         Type = MatroskaUtils.GetMatroskaElementType(Id);
@@ -66,6 +69,11 @@ public readonly struct MatroskaElement
     public int DataSize { get; }
 
     /// <summary>
+    /// The position of this element data in the <see cref="AudioStream" />.
+    /// </summary>
+    public long DataPosition { get; }
+
+    /// <summary>
     /// The end position of this element in the <see cref="AudioStream" />.
     /// </summary>
     public long EndPosition { get; }
@@ -79,4 +87,7 @@ public readonly struct MatroskaElement
     {
         return Position + HeaderSize + DataSize - position;
     }
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private string DebuggerDisplay => $"0x{Id:X} {Type} - {ValueType} [{DataSize} bytes]";
 }

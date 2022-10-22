@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Abstractions;
 using NextAudio.Internal;
 using NSubstitute;
 using Xunit;
@@ -16,12 +17,12 @@ public class AudioStreamToStreamTests
     [Fact]
     public void CanReadCallsSourceAudioStreamCanRead()
     {
-        // Act
-        var audioStream = Substitute.For<AudioStream>();
-
-        var castStream = new AudioStreamToStream(audioStream);
-
         // Arrange
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
+
+        var castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
+
+        // Act
         _ = castStream.CanRead;
 
         // Assert
@@ -31,12 +32,12 @@ public class AudioStreamToStreamTests
     [Fact]
     public void CanSeekCallsSourceAudioStreamCanSeek()
     {
-        // Act
-        var audioStream = Substitute.For<AudioStream>();
-
-        var castStream = new AudioStreamToStream(audioStream);
-
         // Arrange
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
+
+        var castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
+
+        // Act
         _ = castStream.CanSeek;
 
         // Assert
@@ -46,12 +47,12 @@ public class AudioStreamToStreamTests
     [Fact]
     public void CanWriteCallsSourceAudioStreamCanWrite()
     {
-        // Act
-        var audioStream = Substitute.For<AudioStream>();
-
-        var castStream = new AudioStreamToStream(audioStream);
-
         // Arrange
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
+
+        var castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
+
+        // Act
         _ = castStream.CanWrite;
 
         // Assert
@@ -61,12 +62,12 @@ public class AudioStreamToStreamTests
     [Fact]
     public void LengthCallsSourceAudioStreamLength()
     {
-        // Act
-        var audioStream = Substitute.For<AudioStream>();
-
-        var castStream = new AudioStreamToStream(audioStream);
-
         // Arrange
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
+
+        var castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
+
+        // Act
         _ = castStream.Length;
 
         // Assert
@@ -76,14 +77,15 @@ public class AudioStreamToStreamTests
     [Fact]
     public void PositionCallsSourceAudioStreamPosition()
     {
-        // Act + Arrange
-        var audioStream = Substitute.For<AudioStream>();
+        // Arrange
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
-        var castStream = new AudioStreamToStream(audioStream)
+        var castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default)
         {
             Position = 1
         };
 
+        // Act
         _ = castStream.Position;
 
         // Assert
@@ -92,28 +94,28 @@ public class AudioStreamToStreamTests
     }
 
     [Fact]
-    public void SetLengthThrowsNotSupportedException()
+    public void SetLengthCallsSourceAudioStreamSetLength()
     {
-        // Act
-        var audioStream = Substitute.For<AudioStream>();
-        var castStream = new AudioStreamToStream(audioStream);
+        // Arrange
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
+        var castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
-        // Arrange + Assert
-        _ = Assert.Throws<NotSupportedException>(() =>
-        {
-            castStream.SetLength(0);
-        });
+        // Act
+        castStream.SetLength(0);
+
+        // Assert
+        audioStream.Received(1).SetLength(0);
     }
 
     [Fact]
     public void SeekCallsSourceAudioStreamSeek()
     {
-        // Act
-        var audioStream = Substitute.For<AudioStream>();
-
-        var castStream = new AudioStreamToStream(audioStream);
-
         // Arrange
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
+
+        var castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
+
+        // Act
         _ = castStream.Seek(0, SeekOrigin.Begin);
 
         // Assert
@@ -123,7 +125,7 @@ public class AudioStreamToStreamTests
     [Fact]
     public void ReadByteCallsAudioStreamReadWithASpanWithLengthEqualsTo1()
     {
-        // Act
+        // Arrange
         var totalReadCalls = 0;
         var isValidReadCall = false;
 
@@ -133,9 +135,9 @@ public class AudioStreamToStreamTests
             totalReadCalls++;
         });
 
-        var castStream = new AudioStreamToStream(audioStream);
+        var castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
-        // Arrange
+        // Act
         _ = castStream.ReadByte();
 
         // Assert
@@ -146,7 +148,7 @@ public class AudioStreamToStreamTests
     [Fact]
     public void WriteByteCallsAudioStreamReadWithASpanWithLengthEqualsTo1AndSameByteValue()
     {
-        // Act
+        // Arrange
         byte expectedByteValue = 123;
 
         var totalWriteCalls = 0;
@@ -160,9 +162,9 @@ public class AudioStreamToStreamTests
             totalWriteCalls++;
         });
 
-        var castStream = new AudioStreamToStream(audioStream);
+        var castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
-        // Arrange
+        // Act
         castStream.WriteByte(expectedByteValue);
 
         // Assert
@@ -172,36 +174,12 @@ public class AudioStreamToStreamTests
     }
 
     [Fact]
-    public void ReadCallsAudioStreamRead()
-    {
-        // Act
-        var audioStream = Substitute.For<AudioStream>();
-
-        var castStream = new AudioStreamToStream(audioStream);
-
-        var expectedByteArray = new byte[]
-        {
-            1,
-            2,
-            3
-        };
-        var expectedOffset = 0;
-        var expectedCount = 3;
-
-        // Arrange
-        _ = castStream.Read(expectedByteArray, expectedOffset, expectedCount);
-
-        // Assert
-        _ = audioStream.Received(1).Read(expectedByteArray, expectedOffset, expectedCount);
-    }
-
-    [Fact]
     public async Task ReadAsyncValueTaskCallsAudioStreamReadAsyncValueTask()
     {
-        // Act
-        var audioStream = Substitute.For<AudioStream>();
+        // Arrange
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
-        Stream castStream = new AudioStreamToStream(audioStream);
+        Stream castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
         Memory<byte> expectedMemory = new byte[]
         {
@@ -211,7 +189,7 @@ public class AudioStreamToStreamTests
         };
         var expectedCancellationToken = CancellationToken.None;
 
-        // Arrange
+        // Act
         _ = await castStream.ReadAsync(expectedMemory, expectedCancellationToken);
 
         // Assert
@@ -219,63 +197,12 @@ public class AudioStreamToStreamTests
     }
 
     [Fact]
-    public async Task ReadAsyncTaskCallsAudioStreamReadAsyncValueTask()
+    public async Task WriteAsyncValueTaskCallsAudioStreamWriteAsyncValueTask()
     {
-        // Act
-        var audioStream = Substitute.For<AudioStream>();
-
-        Stream castStream = new AudioStreamToStream(audioStream);
-
-        var expectedByteArray = new byte[]
-        {
-            1,
-            2,
-            3
-        };
-        var expectedOffset = 0;
-        var expectedCount = 3;
-        var expectedCancellationToken = CancellationToken.None;
-
         // Arrange
-#pragma warning disable CA1835
-        _ = await castStream.ReadAsync(expectedByteArray, expectedOffset, expectedCount, expectedCancellationToken);
+        var audioStream = Substitute.For<AudioStream>(NullLoggerFactory.Instance);
 
-        // Assert
-        _ = await audioStream.Received(1).ReadAsync(expectedByteArray, expectedOffset, expectedCount, expectedCancellationToken);
-#pragma warning restore CA1835
-    }
-
-    [Fact]
-    public void WriteCallsAudioStreamWrite()
-    {
-        // Act
-        var audioStream = Substitute.For<AudioStream>();
-
-        var castStream = new AudioStreamToStream(audioStream);
-
-        var expectedByteArray = new byte[]
-        {
-            1,
-            2,
-            3
-        };
-        var expectedOffset = 0;
-        var expectedCount = 3;
-
-        // Arrange
-        castStream.Write(expectedByteArray, expectedOffset, expectedCount);
-
-        // Assert
-        audioStream.Received(1).Write(expectedByteArray, expectedOffset, expectedCount);
-    }
-
-    [Fact]
-    public async Task WrtieAsyncValueTaskCallsAudioStreamWriteAsyncValueTask()
-    {
-        // Act
-        var audioStream = Substitute.For<AudioStream>();
-
-        Stream castStream = new AudioStreamToStream(audioStream);
+        Stream castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
         Memory<byte> expectedMemory = new byte[]
         {
@@ -285,7 +212,7 @@ public class AudioStreamToStreamTests
         };
         var expectedCancellationToken = CancellationToken.None;
 
-        // Arrange
+        // Act
         await castStream.WriteAsync(expectedMemory, expectedCancellationToken);
 
         // Assert
@@ -293,36 +220,9 @@ public class AudioStreamToStreamTests
     }
 
     [Fact]
-    public async Task WriteAsyncTaskCallsAudioStreamWriteAsyncValueTask()
-    {
-        // Act
-        var audioStream = Substitute.For<AudioStream>();
-
-        Stream castStream = new AudioStreamToStream(audioStream);
-
-        var expectedByteArray = new byte[]
-        {
-            1,
-            2,
-            3
-        };
-        var expectedOffset = 0;
-        var expectedCount = 3;
-        var expectedCancellationToken = CancellationToken.None;
-
-        // Arrange
-#pragma warning disable CA1835
-        await castStream.WriteAsync(expectedByteArray, expectedOffset, expectedCount, expectedCancellationToken);
-
-        // Assert
-        await audioStream.Received(1).WriteAsync(expectedByteArray, expectedOffset, expectedCount, expectedCancellationToken);
-#pragma warning restore CA1835
-    }
-
-    [Fact]
     public void SpanReadCallsAudioStreamSpanRead()
     {
-        // Act
+        // Arrange
         var expectedByteArray = new byte[]
         {
             1,
@@ -336,11 +236,11 @@ public class AudioStreamToStreamTests
             byteArray = buffer;
         });
 
-        Stream castStream = new AudioStreamToStream(audioStream);
+        Stream castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
         Span<byte> spanRead = expectedByteArray;
 
-        // Arrange
+        // Act
         _ = castStream.Read(spanRead);
 
         // Assert
@@ -351,7 +251,7 @@ public class AudioStreamToStreamTests
     [Fact]
     public void ReadOnlySpanWriteCallsAudioStreamReadOnlySpanWrite()
     {
-        // Act
+        // Arrange
         var expectedByteArray = new byte[]
         {
             1,
@@ -365,11 +265,11 @@ public class AudioStreamToStreamTests
             byteArray = buffer;
         });
 
-        Stream castStream = new AudioStreamToStream(audioStream);
+        Stream castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
         ReadOnlySpan<byte> spanRead = expectedByteArray;
 
-        // Arrange
+        // Act
         castStream.Write(spanRead);
 
         // Assert
@@ -380,7 +280,7 @@ public class AudioStreamToStreamTests
     [Fact]
     public void DisposeCallsAudioStreamDispose()
     {
-        // Act
+        // Arrange
         var disposeCalled = false;
         var disposeCallsCount = 0;
 
@@ -390,9 +290,9 @@ public class AudioStreamToStreamTests
             disposeCallsCount++;
         });
 
-        Stream castStream = new AudioStreamToStream(audioStream);
+        Stream castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
-        // Arrange
+        // Act
         castStream.Dispose();
 
         // Assert
@@ -403,7 +303,7 @@ public class AudioStreamToStreamTests
     [Fact]
     public async Task DisposeAsyncCallsAudioStreamDisposeAsync()
     {
-        // Act
+        // Arrange
         var disposeAsyncCalled = false;
         var disposeAsyncCallsCount = 0;
 
@@ -413,16 +313,16 @@ public class AudioStreamToStreamTests
             disposeAsyncCallsCount++;
         });
 
-        Stream castStream = new AudioStreamToStream(audioStream);
+        Stream castStream = new AudioStreamToStream(audioStream, AudioStreamToStreamOptions.Default);
 
-        // Arrange
+        // Act
         await castStream.DisposeAsync();
 
         // Assert
         Assert.True(disposeAsyncCalled);
 
-        // the count will be equals 2 because DisposeAsync also calls Dispose
-        Assert.Equal(2, disposeAsyncCallsCount);
+        // the count will be equals 3 because DisposeAsync also calls Dispose and the base DisposeAsync
+        Assert.Equal(3, disposeAsyncCallsCount);
     }
 
     private sealed class AudioStreamMock : AudioStream
@@ -450,6 +350,8 @@ public class AudioStreamToStreamTests
 
         public override long Position { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+        public override RecommendedSynchronicity RecommendedSynchronicity => throw new NotImplementedException();
+
         public override AudioStream Clone()
         {
             throw new NotImplementedException();
@@ -468,6 +370,16 @@ public class AudioStreamToStreamTests
         }
 
         public override long Seek(long offset, SeekOrigin origin)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override ValueTask<long> SeekAsync(long offset, SeekOrigin origin, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void SetLength(long value)
         {
             throw new NotImplementedException();
         }
