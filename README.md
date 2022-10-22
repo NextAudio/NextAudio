@@ -16,7 +16,7 @@
 	<a href="https://www.nuget.org/packages/NextAudio/">
 		<img src="https://img.shields.io/nuget/dt/NextAudio.svg?label=Downloads&logo=nuget&style=for-the-badge&logoWidth=20&labelColor=0d0d0d" />
 	</a>
-  <a href="https://github.com/renanrcp/NextAudio/NextAudio/blob/main/LICENSE">
+  <a href="https://github.com/NextAudio/NextAudio/blob/main/LICENSE">
 		<img src="https://img.shields.io/badge/License-MIT-yellow.svg?label=License&style=for-the-badge&logoWidth=20&labelColor=0d0d0d" />
 	</a>
     <p align="center">
@@ -56,15 +56,15 @@ using var output = new MemoryStream();
 using var file = AudioStream.CreateFromFile("test1.mkv");
 using var demuxer = new MatroskaDemuxer(file);
 
-var bytesReaded = 0;
+var bytesRead = 0;
 Span<byte> buffer = new byte[1024];
 
-while ((bytesReaded = demuxer.Demux(buffer)) > 0)
+while ((bytesRead = demuxer.Demux(buffer)) > 0)
 {
-    // Always slice the buffer to bytesReaded,
+    // Always slice the buffer to bytesRead,
     // the lib always will return an audio frame
     // when using a read operation.
-    var frame = buffer.Slice(0, bytesReaded);
+    var frame = buffer.Slice(0, bytesRead);
     output.Write(frame);
 }
 ```
