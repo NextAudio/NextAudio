@@ -9,12 +9,12 @@ namespace NextAudio.Formats;
 public enum AudioContainerType
 {
     /// <summary>
-    /// The audio container type is unknown,
+    /// The audio container type is unknown.
     /// </summary>
     Unknown = 0,
 
     /// <summary>
-    /// The audio container type is Matroska (.webm/.mkv),
+    /// The audio container type is Matroska (.webm/.mkv).
     /// </summary>
     Matroska = 1,
 }
