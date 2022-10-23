@@ -2,12 +2,14 @@
 // NextAudio licenses this file to you under the MIT license.
 
 using System.Buffers;
+using System.ComponentModel;
 
 namespace NextAudio.Utils;
 
 /// <summary>
 /// Some <see cref="AudioStream" /> function utilities.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Never)]
 public static class AudioStreamUtils
 {
     /// <summary>
@@ -35,7 +37,7 @@ public static class AudioStreamUtils
     /// </summary>
     /// <param name="stream">The <see cref="AudioStream" /> to be read.</param>
     /// <param name="buffer">The buffer to be used to read the <paramref name="stream" />.</param>
-    /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
     /// <returns>A <see cref="ValueTask" /> that represents an asynchronous operation
     /// where the result is the total of bytes read.</returns>
     public static async ValueTask<int> ReadFullyAudioStreamAsync(AudioStream stream, Memory<byte> buffer, CancellationToken cancellationToken = default)
@@ -120,7 +122,7 @@ public static class AudioStreamUtils
     /// <param name="origin">A value of type <see cref="SeekOrigin" /> indicating the reference point used
     /// to obtain the new position.</param>
     /// <param name="position">The current <paramref name="stream" /> position.</param>
-    /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.</param>
     /// <returns>
     /// A <see cref="ValueTask" /> that represents an asynchronous operation
     /// where the result is Tthe new position within the current <paramref name="stream" />.
