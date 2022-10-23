@@ -288,6 +288,11 @@ public class PersistentHttpAudioStream : ReadOnlyAudioStream
             _sourceStream?.Dispose();
             _response?.Dispose();
             _semaphore.Dispose();
+
+            if (_options.DisposeHttpClient)
+            {
+                _options.HttpClient.Dispose();
+            }
         }
     }
 
@@ -305,6 +310,12 @@ public class PersistentHttpAudioStream : ReadOnlyAudioStream
         }
 
         _response?.Dispose();
+
         _semaphore.Dispose();
+
+        if (_options.DisposeHttpClient)
+        {
+            _options.HttpClient.Dispose();
+        }
     }
 }

@@ -11,6 +11,8 @@ namespace NextAudio.Http;
 /// </summary>
 public class PersistentHttpAudioStreamOptions
 {
+    private HttpClient _httpClient;
+
     /// <summary>
     /// Creates a new instance of <see cref="PersistentHttpAudioStreamOptions" />.
     /// </summary>
@@ -24,7 +26,7 @@ public class PersistentHttpAudioStreamOptions
 
         RequestUri = requestUri;
         Length = length ?? 0;
-        HttpClient = httpClient ?? new();
+        _httpClient = httpClient ?? new();
         LoggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
     }
 
@@ -34,7 +36,7 @@ public class PersistentHttpAudioStreamOptions
     public virtual Uri RequestUri { get; set; }
 
     /// <summary>
-    /// The length of the uri.
+    /// The length of the audio stream, if equals to 0 the length will be extracted from the response headers.
     /// </summary>
     public virtual long Length { get; set; }
 
@@ -44,9 +46,26 @@ public class PersistentHttpAudioStreamOptions
     public virtual int MaxRetryCount { get; set; } = 2;
 
     /// <summary>
+    /// If this http client should be disposed.
+    /// </summary>
+    public virtual bool DisposeHttpClient { get; set; } = true;
+
+    /// <summary>
     /// A http client do retrieve the audio stream.
     /// </summary>
-    public virtual HttpClient HttpClient { get; set; }
+    public virtual HttpClient HttpClient
+    {
+        get => _httpClient;
+        set
+        {
+            if (_httpClient != null && DisposeHttpClient)
+            {
+                _httpClient.Dispose();
+            }
+
+            _httpClient = value;
+        }
+    }
 
     /// <summary>
     /// The size of the buffer used by <see cref="BufferedStream" /> for buffering. The default
@@ -70,6 +89,7 @@ public class PersistentHttpAudioStreamOptions
         {
             MaxRetryCount = MaxRetryCount,
             BufferSize = BufferSize,
+            DisposeHttpClient = false,
         };
     }
 }
