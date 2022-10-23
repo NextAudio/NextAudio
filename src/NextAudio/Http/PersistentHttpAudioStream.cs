@@ -12,7 +12,7 @@ using Polly.Retry;
 namespace NextAudio.Http;
 
 /// <summary>
-///
+/// Represents a persistent http audio stream.
 /// </summary>
 public class PersistentHttpAudioStream : ReadOnlyAudioStream
 {
