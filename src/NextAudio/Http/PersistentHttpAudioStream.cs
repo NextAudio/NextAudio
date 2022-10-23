@@ -5,6 +5,7 @@ using System.Buffers;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Sockets;
+using Microsoft.Extensions.Logging;
 using NextAudio.Semaphore;
 using Polly;
 using Polly.Retry;
@@ -25,6 +26,7 @@ public class PersistentHttpAudioStream : ReadOnlyAudioStream
 
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly PersistentHttpAudioStreamOptions _options;
+    private readonly ILogger<PersistentHttpAudioStream> _logger;
     private readonly AsyncRetryPolicy<HttpResponseMessage> _policy;
 
     private Stream? _sourceStream;
@@ -42,6 +44,7 @@ public class PersistentHttpAudioStream : ReadOnlyAudioStream
 
         _options = options;
         _length = options.Length;
+        _logger = _loggerFactory.CreateLogger<PersistentHttpAudioStream>();
 
         _policy = Policy<HttpResponseMessage>
                     .Handle<HttpRequestException>()
@@ -139,6 +142,8 @@ public class PersistentHttpAudioStream : ReadOnlyAudioStream
             }
 
             await ClearAsync().ConfigureAwait(false);
+
+            _logger.LogExceptionWhenRead(socketEx);
 
             semaphoreDisposable.Dispose();
 
