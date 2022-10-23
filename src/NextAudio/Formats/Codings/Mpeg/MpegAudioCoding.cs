@@ -1,8 +1,6 @@
 // Licensed to the NextAudio under one or more agreements.
 // NextAudio licenses this file to you under the MIT license.
 
-using System.Globalization;
-
 namespace NextAudio.Formats.Codings.Mpeg;
 
 /// <summary>
@@ -65,7 +63,13 @@ public record class MpegAudioCoding : AudioCoding
         }
 
         var versionStr = version.HasValue
-            ? version.Value.ToString(CultureInfo.InvariantCulture)
+            ? version.Value switch
+            {
+                1 => "1",
+                2 => "2",
+                25 => "2.5",
+                _ => throw new ArgumentOutOfRangeException(nameof(layer), $"Invalid MPEG version '{version}'."),
+            }
             : layer switch
             {
                 3 => "1, 2, 2.5",
