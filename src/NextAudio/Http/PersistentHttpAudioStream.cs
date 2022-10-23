@@ -62,7 +62,7 @@ public class PersistentHttpAudioStream : ReadOnlyAudioStream
     public override long Position
     {
         get => _position;
-        set => _position = value;
+        set => Seek(value, SeekOrigin.Begin);
     }
 
     /// <inheritdoc />
