@@ -15,7 +15,7 @@ public partial class MatroskaDemuxer
 
         if (!IsInitialized)
         {
-            InitializeCore();
+            Initialize();
         }
 
         int result;

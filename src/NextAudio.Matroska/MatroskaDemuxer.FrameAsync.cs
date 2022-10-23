@@ -15,7 +15,7 @@ public partial class MatroskaDemuxer
 
         if (!IsInitialized)
         {
-            await InitializeCoreAsync(cancellationToken).ConfigureAwait(false);
+            await InitializeAsync(cancellationToken).ConfigureAwait(false);
         }
 
         int result;
