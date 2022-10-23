@@ -31,7 +31,7 @@ OBS: Goals will change as new lib versions come out.
 
 #### Audio stream providers support:
 - File (current supported by `AudioStream.CreateFromFile`)
-- Http (current supported by `AudioStream.CreateFromStream` but is not persistent)
+- Http (current supported by `AudioStream.CreateFromUrl`)
 - Youtube
 
 #### Containers demuxing support:
