@@ -27,7 +27,6 @@ public class PersistentHttpAudioStreamTests
 
         var requestUri = "http://test.com/test1.mkv";
 
-        _ = mockHttp.When(HttpMethod.Head, requestUri).Respond(req => stream.GetResponseMessage(req));
         _ = mockHttp.When(HttpMethod.Get, requestUri).Respond(req => stream.GetResponseMessage(req));
 
         using var client = mockHttp.ToHttpClient();
@@ -59,7 +58,6 @@ public class PersistentHttpAudioStreamTests
 
         var requestUri = "http://test.com/test1.mkv";
 
-        _ = mockHttp.When(HttpMethod.Head, requestUri).Respond(req => stream.GetResponseMessage(req));
         _ = mockHttp.When(HttpMethod.Get, requestUri).Respond(req => stream.GetResponseMessage(req));
 
         using var client = mockHttp.ToHttpClient();
@@ -91,7 +89,6 @@ public class PersistentHttpAudioStreamTests
 
         var requestUri = "http://test.com/test1.mkv";
 
-        _ = mockHttp.When(HttpMethod.Head, requestUri).Respond(req => stream.GetResponseMessage(req));
         _ = mockHttp.When(HttpMethod.Get, requestUri).Respond(req => stream.GetResponseMessage(req));
 
         using var client = mockHttp.ToHttpClient();
@@ -127,7 +124,6 @@ public class PersistentHttpAudioStreamTests
 
         var requestUri = "http://test.com/test1.mkv";
 
-        _ = mockHttp.When(HttpMethod.Head, requestUri).Respond(req => stream.GetResponseMessage(req));
         _ = mockHttp.When(HttpMethod.Get, requestUri).Respond(req => stream.GetResponseMessage(req));
 
         using var client = mockHttp.ToHttpClient();
@@ -162,7 +158,6 @@ public class PersistentHttpAudioStreamTests
 
         var requestUri = "http://test.com/test1.mkv";
 
-        _ = mockHttp.When(HttpMethod.Head, requestUri).Respond(req => stream.GetResponseMessage(req));
         _ = mockHttp.When(HttpMethod.Get, requestUri).Respond(req => stream.GetResponseMessage(req));
 
         using var client = mockHttp.ToHttpClient();
@@ -195,7 +190,6 @@ public class PersistentHttpAudioStreamTests
 
         var requestUri = "http://test.com/test1.mkv";
 
-        _ = mockHttp.When(HttpMethod.Head, requestUri).Respond(req => stream.GetResponseMessage(req));
         _ = mockHttp.When(HttpMethod.Get, requestUri).Respond(req => stream.GetResponseMessage(req));
 
         using var client = mockHttp.ToHttpClient();
@@ -228,7 +222,6 @@ public class PersistentHttpAudioStreamTests
 
         var requestUri = "http://test.com/test1.mkv";
 
-        _ = mockHttp.When(HttpMethod.Head, requestUri).Respond(req => stream.GetResponseMessage(req));
         _ = mockHttp.When(HttpMethod.Get, requestUri).Respond(req => stream.GetResponseMessage(req));
 
         using var client = mockHttp.ToHttpClient();
