@@ -13,7 +13,7 @@
 
   <PropertyGroup>
     <Description>All available components for the NextAudio library.</Description>
-    <PackageTags>transcoder, encoder, decoder, player, muxer, demuxer, demultiplexer, multiplexer, audio, music, next, nextaudio, stream, streaming, csharp, dotnet, vb-net, fsharp</PackageTags>
+    <PackageTags>transcoder, encoder, decoder, player, muxer, demuxer, demultiplexer, multiplexer, audio, music, next, nextaudio, stream, streaming, csharp, dotnet, vb-net, fsharp, all</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
