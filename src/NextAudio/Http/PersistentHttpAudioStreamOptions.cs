@@ -51,7 +51,7 @@ public class PersistentHttpAudioStreamOptions
     public virtual bool DisposeHttpClient { get; set; } = true;
 
     /// <summary>
-    /// A http client do retrieve the audio stream.
+    /// A http client to retrieve the audio stream.
     /// </summary>
     public virtual HttpClient HttpClient
     {
