@@ -117,5 +117,15 @@ public class ReadOnlyAudioStreamTests
         {
             return ValueTask.CompletedTask;
         }
+
+        protected override void InitializeCore()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override ValueTask InitializeCoreAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
