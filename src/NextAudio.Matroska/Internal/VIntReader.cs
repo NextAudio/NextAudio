@@ -27,15 +27,15 @@ internal static class VIntReader
         return vInt;
     }
 
-    public static async ValueTask<VInt> ReadVIntAsync(AudioStream stream, Memory<byte> buffer, long position, ILogger logger)
+    public static async ValueTask<VInt> ReadVIntAsync(AudioStream stream, Memory<byte> buffer, long position, ILogger logger, CancellationToken cancellationToken = default)
     {
-        _ = await AudioStreamUtils.ReadFullyAudioStreamAsync(stream, buffer[..1]).ConfigureAwait(false);
+        _ = await AudioStreamUtils.ReadFullyAudioStreamAsync(stream, buffer[..1], cancellationToken).ConfigureAwait(false);
 
         var length = EbmlReader.ReadVariableSizeIntegerLength(buffer.Span[0]);
 
         if (length > 1)
         {
-            _ = await AudioStreamUtils.ReadFullyAudioStreamAsync(stream, buffer[1..length]).ConfigureAwait(false);
+            _ = await AudioStreamUtils.ReadFullyAudioStreamAsync(stream, buffer[1..length], cancellationToken).ConfigureAwait(false);
         }
 
         var vInt = EbmlReader.ReadVariableSizeInteger(buffer.Span[..length], length);

@@ -35,16 +35,17 @@ public static class AudioStreamUtils
     /// </summary>
     /// <param name="stream">The <see cref="AudioStream" /> to be read.</param>
     /// <param name="buffer">The buffer to be used to read the <paramref name="stream" />.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
     /// <returns>A <see cref="ValueTask" /> that represents an asynchronous operation
     /// where the result is the total of bytes read.</returns>
-    public static async ValueTask<int> ReadFullyAudioStreamAsync(AudioStream stream, Memory<byte> buffer)
+    public static async ValueTask<int> ReadFullyAudioStreamAsync(AudioStream stream, Memory<byte> buffer, CancellationToken cancellationToken = default)
     {
         var totalBytesRead = 0;
         var bytesRead = 0;
 
         do
         {
-            bytesRead = await stream.ReadAsync(buffer[bytesRead..]).ConfigureAwait(false);
+            bytesRead = await stream.ReadAsync(buffer[bytesRead..], cancellationToken).ConfigureAwait(false);
             totalBytesRead += bytesRead;
         } while (bytesRead > 0 && totalBytesRead < buffer.Length);
 
@@ -119,6 +120,7 @@ public static class AudioStreamUtils
     /// <param name="origin">A value of type <see cref="SeekOrigin" /> indicating the reference point used
     /// to obtain the new position.</param>
     /// <param name="position">The current <paramref name="stream" /> position.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
     /// <returns>
     /// A <see cref="ValueTask" /> that represents an asynchronous operation
     /// where the result is Tthe new position within the current <paramref name="stream" />.
@@ -128,11 +130,11 @@ public static class AudioStreamUtils
     /// <see cref="int.MaxValue" />.
     /// </exception>
     /// <exception cref="NotSupportedException">Cannot seek the stream even forcefully.</exception>
-    public static async ValueTask<long> SeekAsync(AudioStream stream, long offset, SeekOrigin origin, long position)
+    public static async ValueTask<long> SeekAsync(AudioStream stream, long offset, SeekOrigin origin, long position, CancellationToken cancellationToken = default)
     {
         if (stream.CanSeek)
         {
-            return await stream.SeekAsync(offset, origin).ConfigureAwait(false);
+            return await stream.SeekAsync(offset, origin, cancellationToken).ConfigureAwait(false);
         }
 
         var pos = origin switch
@@ -164,7 +166,7 @@ public static class AudioStreamUtils
 
         try
         {
-            position += await ReadFullyAudioStreamAsync(stream, skipBuffer.AsMemory(0, numberOfBytesToSkip)).ConfigureAwait(false);
+            position += await ReadFullyAudioStreamAsync(stream, skipBuffer.AsMemory(0, numberOfBytesToSkip), cancellationToken).ConfigureAwait(false);
         }
         finally
         {
