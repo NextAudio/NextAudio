@@ -38,7 +38,14 @@ dotnet cli example:
 ```bash
 dotnet add package NextAudio
 ```
+
 OBS: This install only the core lib. The individual components may also be installed from [NuGet](https://www.nuget.org/profiles/NextAudio).
+
+You can add the `NextAudio.All` lib via nuget package manager if you wanna install all available components.
+
+```bash
+dotnet add package NextAudio.All
+```
 
 ## Stable
 The stable builds are available from [NuGet](https://www.nuget.org/profiles/NextAudio).

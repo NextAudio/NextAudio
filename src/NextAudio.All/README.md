@@ -1,26 +1,18 @@
-## Installation
+# Introduction
+This lib installs all available NextAudio components.
 
+# Installation
 You can add this lib via nuget package manager.
 
 dotnet cli example:
 
 ```bash
-dotnet add package NextAudio
-```
-
-OBS: This install only the core lib. The individual components may also be installed from [NuGet](https://www.nuget.org/profiles/NextAudio).
-
-You can add the `NextAudio.All` lib via nuget package manager if you wanna install all available components.
-
-```bash
 dotnet add package NextAudio.All
 ```
 
-### Stable
-
+## Stable
 The stable builds are available from [NuGet](https://www.nuget.org/profiles/NextAudio).
 
-### Unstable
-
+## Unstable
 The development builds are availabe from Myget feed `https://www.myget.org/F/next-audio/api/v3/index.json`.
 These builds target the `main` branch.
