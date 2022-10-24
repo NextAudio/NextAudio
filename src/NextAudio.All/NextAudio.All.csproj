@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../../NextAudio.targets" />
+
+  <PropertyGroup>
+    <AssemblyName>NextAudio.All</AssemblyName>
+    <RootNamespace>NextAudio.All</RootNamespace>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Description>All available components for the NextAudio library.</Description>
+    <PackageTags>transcoder, encoder, decoder, player, muxer, demuxer, demultiplexer, multiplexer, audio, music, next, nextaudio, stream, streaming, csharp, dotnet, vb-net, fsharp, all</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NextAudio\NextAudio.csproj" />
+    <ProjectReference Include="..\NextAudio.Matroska\NextAudio.Matroska.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+</Project>
