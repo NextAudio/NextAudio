@@ -13,9 +13,9 @@ public partial class MatroskaDemuxer
     {
         _logger.LogReadBufferSize(buffer);
 
-        if (SelectedTrack == null)
+        if (!IsInitialized)
         {
-            StartMatroskaReading(buffer);
+            Initialize();
         }
 
         int result;

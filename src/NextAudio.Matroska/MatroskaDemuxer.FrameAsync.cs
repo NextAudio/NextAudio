@@ -13,9 +13,9 @@ public partial class MatroskaDemuxer
     {
         _logger.LogReadBufferSize(buffer.Span);
 
-        if (SelectedTrack == null)
+        if (!IsInitialized)
         {
-            await StartMatroskaReadingAsync(buffer).ConfigureAwait(false);
+            await InitializeAsync(cancellationToken).ConfigureAwait(false);
         }
 
         int result;

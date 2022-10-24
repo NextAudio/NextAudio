@@ -94,11 +94,15 @@ internal sealed class StreamToAudioStream : AudioStream
 
     protected override ValueTask DisposeAsyncCore()
     {
-        if (IsDisposed)
-        {
-            return ValueTask.CompletedTask;
-        }
+        return IsDisposed ? ValueTask.CompletedTask : _options.DisposeSourceStream ? _sourceStream.DisposeAsync() : ValueTask.CompletedTask;
+    }
 
-        return _options.DisposeSourceStream ? _sourceStream.DisposeAsync() : ValueTask.CompletedTask;
+    protected override void InitializeCore()
+    {
+    }
+
+    protected override ValueTask InitializeCoreAsync(CancellationToken cancellationToken)
+    {
+        return ValueTask.CompletedTask;
     }
 }

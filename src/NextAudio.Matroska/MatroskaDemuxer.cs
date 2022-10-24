@@ -1,6 +1,7 @@
 // Licensed to the NextAudio under one or more agreements.
 // NextAudio licenses this file to you under the MIT license.
 
+using System.Buffers;
 using System.ComponentModel;
 using Microsoft.Extensions.Logging;
 using NextAudio.Matroska.Models;
@@ -71,6 +72,36 @@ public sealed partial class MatroskaDemuxer : AudioDemuxer
     public override long Seek(long offset, SeekOrigin origin)
     {
         throw new NotSupportedException();
+    }
+
+    /// <inheritdoc/>
+    protected override void InitializeCore()
+    {
+        var buffer = ArrayPool<byte>.Shared.Rent(1024);
+
+        try
+        {
+            StartMatroskaReading(buffer.AsSpan());
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override async ValueTask InitializeCoreAsync(CancellationToken cancellationToken)
+    {
+        var buffer = ArrayPool<byte>.Shared.Rent(1024);
+
+        try
+        {
+            await StartMatroskaReadingAsync(buffer.AsMemory()).ConfigureAwait(false);
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
+        }
     }
 
     private bool BlockHasFrames(MatroskaBlock block)

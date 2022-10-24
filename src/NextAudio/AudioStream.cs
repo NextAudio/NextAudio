@@ -37,6 +37,11 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     /// </summary>
     protected bool IsDisposed { get; private set; }
 
+    /// <summary>
+    /// Indicates if this stream was initialized.
+    /// </summary>
+    protected bool IsInitialized { get; private set; }
+
     /// <inheritdoc cref="Stream.CanRead" />
     public abstract bool CanRead { get; }
 
@@ -65,6 +70,48 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     /// </summary>
     /// <returns>A new cloned stream.</returns>
     public abstract AudioStream Clone();
+
+    /// <summary>
+    /// Initializes this stream.
+    /// </summary>
+    public void Initialize()
+    {
+        if (IsInitialized)
+        {
+            return;
+        }
+
+        IsInitialized = true;
+
+        InitializeCore();
+    }
+
+    /// <summary>
+    /// Asynchronously initializes this stream.
+    /// </summary>
+    /// <returns>A <see cref="ValueTask" /> that represents an asynchronous operation.</returns>
+    public ValueTask InitializeAsync(CancellationToken cancellationToken = default)
+    {
+        if (IsInitialized)
+        {
+            return ValueTask.CompletedTask;
+        }
+
+        IsInitialized = true;
+
+        return InitializeCoreAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Initializes this stream.
+    /// </summary>
+    protected abstract void InitializeCore();
+
+    /// <summary>
+    /// Asynchronously initializes this stream.
+    /// </summary>
+    /// <returns>A <see cref="ValueTask" /> that represents an asynchronous operation.</returns>
+    protected abstract ValueTask InitializeCoreAsync(CancellationToken cancellationToken);
 
     /// <inheritdoc cref="Stream.Seek(long, SeekOrigin)" />
     public abstract long Seek(long offset, SeekOrigin origin);

@@ -437,6 +437,16 @@ public class BlockReaderTests
         {
             return ValueTask.CompletedTask;
         }
+
+        protected override void InitializeCore()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override ValueTask InitializeCoreAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class BlockEqualityComparer : IEqualityComparer<MatroskaBlock>
