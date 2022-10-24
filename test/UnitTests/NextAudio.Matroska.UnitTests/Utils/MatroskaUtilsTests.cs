@@ -1,6 +1,10 @@
 // Licensed to the NextAudio under one or more agreements.
 // NextAudio licenses this file to you under the MIT license.
 
+using NextAudio.Formats;
+using NextAudio.Formats.Codings.Mpeg;
+using NextAudio.Formats.Codings.Opus;
+using NextAudio.Formats.Codings.PCM;
 using NextAudio.Matroska.Models;
 using NextAudio.Matroska.Utils;
 using Xunit;
@@ -112,5 +116,163 @@ public class MatroskaUtilsTests
         // Assert
         Assert.False(result);
         Assert.Equal(MatroskaElementType.Unknown, resultValue);
+    }
+
+    public static IEnumerable<object[]> GetAudioCodingReturnsNonUnknownAudioCodingIfIsMappedData()
+    {
+        yield return new object[]
+        {
+            "A_OPUS",
+            new MatroskaAudioSettings
+            {
+                SamplingFrequency = 48000,
+                Channels = 2,
+                BitDepth = 16
+            },
+            new OpusAudioCoding(48000, 2, 16),
+        };
+        yield return new object[]
+        {
+            "A_PCM/INT/BIG",
+            new MatroskaAudioSettings
+            {
+                SamplingFrequency = 48000,
+                Channels = 2,
+                BitDepth = 16
+            },
+            new PCMAudioCoding(PCMEndianness.BigEndian, PCMFormat.SignedInteger, 48000, 2, 16),
+        };
+        yield return new object[]
+        {
+            "A_PCM/INT/LIT",
+            new MatroskaAudioSettings
+            {
+                SamplingFrequency = 48000,
+                Channels = 2,
+                BitDepth = 16
+            },
+            new PCMAudioCoding(PCMEndianness.LittleEndian, PCMFormat.SignedInteger, 48000, 2, 16),
+        };
+        yield return new object[]
+        {
+            "A_PCM/FLOAT/IEEE",
+            new MatroskaAudioSettings
+            {
+                SamplingFrequency = 48000,
+                Channels = 2,
+                BitDepth = 16
+            },
+            new PCMAudioCoding(PCMEndianness.Indeterminate, PCMFormat.FloatingPoint, 48000, 2, 16),
+        };
+        yield return new object[]
+        {
+            "A_MPEG/L3",
+            new MatroskaAudioSettings
+            {
+                SamplingFrequency = 48000,
+                Channels = 2,
+            },
+            new MpegAudioCoding(3, 48000, 2),
+        };
+        yield return new object[]
+        {
+            "A_MPEG/L2",
+            new MatroskaAudioSettings
+            {
+                SamplingFrequency = 48000,
+                Channels = 2,
+            },
+            new MpegAudioCoding(2, 48000, 2),
+        };
+        yield return new object[]
+        {
+            "A_MPEG/L1",
+            new MatroskaAudioSettings
+            {
+                SamplingFrequency = 48000,
+                Channels = 2,
+                BitDepth = 16
+            },
+            new MpegAudioCoding(1, 48000, 2),
+        };
+        yield return new object[]
+        {
+            "A_FLAC",
+            new MatroskaAudioSettings
+            {
+                SamplingFrequency = 48000,
+                Channels = 2,
+            },
+            new AudioCoding("Flac", AudioCodingType.Flac, 48000, 2),
+        };
+    }
+
+    [Theory]
+    [MemberData(nameof(GetAudioCodingReturnsNonUnknownAudioCodingIfIsMappedData))]
+    public void GetAudioCodingReturnsNonUnknownAudioCodingIfIsMapped(string codecID, MatroskaAudioSettings audioSettings, AudioCoding expectedCoding)
+    {
+        // Act
+        var result = MatroskaUtils.GetAudioCoding(codecID, audioSettings);
+
+        // Assert
+        Assert.NotEqual(AudioCodingType.Unknown, result.Type);
+        Assert.StrictEqual(expectedCoding, result);
+    }
+
+    [Fact]
+    public void GetAudioCodingReturnsUnknownAudioCodingIfIsNotMapped()
+    {
+        // Arrange
+        var codecID = "A_RANDOM/CODEC";
+        var audioSettings = new MatroskaAudioSettings
+        {
+            SamplingFrequency = 48000,
+            Channels = 2,
+            BitDepth = 16,
+        };
+
+        // Act
+        var result = MatroskaUtils.GetAudioCoding(codecID, audioSettings);
+
+        // Assert
+        Assert.Equal(AudioCodingType.Unknown, result.Type);
+    }
+
+    [Fact]
+    public void GetAudioCodingThrowsInvalidOperationExceptionIfPCMHaveNullBitDepth()
+    {
+        // Arrange
+        var codecID = "PCM/INT/LIT";
+        var audioSettings = new MatroskaAudioSettings
+        {
+            SamplingFrequency = 48000,
+            Channels = 2,
+            BitDepth = null,
+        };
+
+        // Act + Assert
+        _ = Assert.Throws<InvalidOperationException>(() =>
+        {
+            _ = MatroskaUtils.GetAudioCoding(codecID, audioSettings);
+        });
+    }
+
+    [Fact]
+    public void GetAudioCodingThrowsInvalidOperationExceptionIfPCMHaveInvalidEndianess()
+    {
+        // Arrange
+        var codecID = "PCM/INT/RANDOM";
+        var audioSettings = new MatroskaAudioSettings
+        {
+            SamplingFrequency = 48000,
+            Channels = 2,
+            BitDepth = 16,
+        };
+
+        // Act + Assert
+        _ = Assert.Throws<InvalidOperationException>(() =>
+        {
+            _ = MatroskaUtils.GetAudioCoding(codecID, audioSettings);
+        });
     }
 }

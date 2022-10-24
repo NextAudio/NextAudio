@@ -8,6 +8,8 @@
     href: getting_started/installation.md
   - name: Usage
     href: getting_started/usage.md
+  - name: Audio Formats
+    href: getting_started/audio-formats.md
 - name: Matroska
   items:
   - name: Introduction

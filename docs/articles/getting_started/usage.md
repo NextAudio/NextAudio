@@ -77,6 +77,9 @@ The property `RecommendedSynchronicity` is present in any `AudioStream` it says 
 
 Obs: The lib supports both synchronicitys but some streams don't recommend some synchronicitys, (e.g an async-only stream will have your sync operations using `.GetAwaiter().GetResult()`).
 
+#### Audio formats
+See the [Audio Formats](/articles/audio-formats.html) section.
+
 #### Manually reading/writing
 
 NextAudio will always use audio frame buffers for read/write operations.
