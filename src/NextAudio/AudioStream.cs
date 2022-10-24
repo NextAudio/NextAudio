@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using NextAudio.Http;
 using NextAudio.Internal;
 
 namespace NextAudio;
@@ -246,6 +247,38 @@ public abstract class AudioStream : IAsyncDisposable, IDisposable
     {
         var fileStream = File.Open(path, options.GetFileStreamOptions());
         return CreateFromStream(fileStream, options.GetStreamToAudioStreamOptions());
+    }
+
+    /// <summary>
+    /// Creates an <see cref="AudioStream" /> from the specified url.
+    /// </summary>
+    /// <param name="url">The specified url to create the <see cref="AudioStream" />.</param>
+    /// <returns>A new <see cref="AudioStream" /> from the specified <paramref name="url" />.</returns>
+    public static AudioStream CreateFromUrl(string url)
+    {
+        return CreateFromUrl(new Uri(url));
+    }
+
+    /// <summary>
+    /// Creates an <see cref="AudioStream" /> from the specified url.
+    /// </summary>
+    /// <param name="url">The specified url to create the <see cref="AudioStream" />.</param>
+    /// <returns>A new <see cref="AudioStream" /> from the specified <paramref name="url" />.</returns>
+    public static AudioStream CreateFromUrl(Uri url)
+    {
+        return CreateFromUrl(new PersistentHttpAudioStreamOptions(url));
+    }
+
+    /// <summary>
+    /// Creates an <see cref="AudioStream" /> with the chosen options.
+    /// </summary>
+    /// <param name="options">The chosen http audio stream options.</param>
+    /// <returns>A new <see cref="AudioStream" /> with the chosen options.</returns>
+    public static AudioStream CreateFromUrl(PersistentHttpAudioStreamOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+
+        return new PersistentHttpAudioStream(options);
     }
 
     /// <summary>

@@ -8,6 +8,7 @@ The `AudioStream` also have an additional `SeekAsync` method for streams which s
 #### Stream
 
 The `AudioStream` class has all implict casts if you need an `AudioStream` from a `Stream`, or you can do this manually with:
+
 ```csharp
 AudioStream.CreateFromStream(stream);
 ```
@@ -44,14 +45,15 @@ The default options will be used if you use any implicit cast.
 
 #### File
 You can also create an `AudioStream` from a file path with:
+
 ```csharp
-AudioStream.CreateFromFile("filePath");
+AudioStream.CreateFromFile("filePath.mkv");
 ```
 
 File audio streams supports the `FileAudioStreamOptions` options or the native class `FileStreamOptions`, we recommend the `FileAudioStreamOptions` because this class already cover all options present in `FileStreamOptions`.
 
 ```csharp
-AudioStream.CreateFromFile("filePath", new FileAudioStreamOptions
+AudioStream.CreateFromFile("filePath.mkv", new FileAudioStreamOptions
 {
   Mode = FileMode.Open,
   Access = FileAccess.Read,
@@ -62,6 +64,39 @@ AudioStream.CreateFromFile("filePath", new FileAudioStreamOptions
   DisposeSourceStream = true,
   RecommendedSynchronicity = RecommendedSynchronicity.Sync,
   LoggerFactory = NullLoggerFactory.Instance,
+});
+```
+
+The default options will be used if you use the create method without any options set.
+
+#### Http
+You can also create an `AudioStream` from a url with:
+
+```csharp
+AudioStream.CreateFromUrl("https://url.com");
+```
+
+Http audio streams is persistent (handles eventual disconnects), you can change some of these behaviors with the `PersistentHttpAudioStreamOptions` class:
+
+```csharp
+AudioStream.CreateFromUrl(new PersistentHttpAudioStreamOptions("https://url.com")
+{
+  MaxRetryCount = 2,
+  Length = 0, // Will be extracted from response headers.
+  DisposeHttpClient = true,
+  HttpClient = new HttpClient(),
+  BufferSize = 4096,
+  LoggerFactory = NullLoggerFactory.Instance,
+});
+```
+
+We recommend pass the following params in the constructor to avoid extra allocations: `Length`, `HttpClient` and `LoggerFactory`:
+```csharp
+AudioStream.CreateFromUrl(new PersistentHttpAudioStreamOptions("https://url.com", null, new HttpClient(), NullLoggerFactory.Instance)
+{
+  MaxRetryCount = 2,
+  DisposeHttpClient = true,
+  BufferSize = 4096,
 });
 ```
 

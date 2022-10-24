@@ -33,7 +33,7 @@ internal static class ElementReader
         return new ElementReadResult(element, position);
     }
 
-    public static async ValueTask<ElementReadResult> ReadNextElementAsync(AudioStream stream, long position, Memory<byte> buffer, ILogger logger, MatroskaElement? parent = null)
+    public static async ValueTask<ElementReadResult> ReadNextElementAsync(AudioStream stream, long position, Memory<byte> buffer, ILogger logger, MatroskaElement? parent = null, CancellationToken cancellationToken = default)
     {
         if (parent.HasValue && parent.Value.GetRemaining(position) <= 0)
         {
@@ -42,10 +42,10 @@ internal static class ElementReader
 
         var initialPosition = position;
 
-        var elementId = await VIntReader.ReadVIntAsync(stream, buffer, position, logger).ConfigureAwait(false);
+        var elementId = await VIntReader.ReadVIntAsync(stream, buffer, position, logger, cancellationToken).ConfigureAwait(false);
         position += elementId.Length;
 
-        var elementSize = await VIntReader.ReadVIntAsync(stream, buffer[elementId.Length..], position, logger).ConfigureAwait(false);
+        var elementSize = await VIntReader.ReadVIntAsync(stream, buffer[elementId.Length..], position, logger, cancellationToken).ConfigureAwait(false);
         position += elementSize.Length;
 
         var headerSize = position - initialPosition;
