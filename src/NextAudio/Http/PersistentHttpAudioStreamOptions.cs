@@ -33,7 +33,7 @@ public class PersistentHttpAudioStreamOptions
     /// <summary>
     /// The request uri to retrive the audio stream.
     /// </summary>
-    public virtual Uri RequestUri { get; set; }
+    public virtual Uri RequestUri { get; }
 
     /// <summary>
     /// The length of the audio stream, if equals to 0 the length will be extracted from the response headers.
