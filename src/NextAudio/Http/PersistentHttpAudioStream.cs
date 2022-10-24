@@ -252,9 +252,26 @@ public class PersistentHttpAudioStream : ReadOnlyAudioStream
             pos = 0;
         }
 
+        var oldPos = _position;
+
         await ClearAsync().ConfigureAwait(false);
 
         _position = pos;
+
+        try
+        {
+            await CheckConnectedAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch
+        {
+            await ClearAsync().ConfigureAwait(false);
+
+            _position = oldPos;
+
+            await CheckConnectedAsync(cancellationToken).ConfigureAwait(false);
+
+            throw;
+        }
 
         return pos;
     }
